@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Communication Networks – Visualizers</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #fff; --text: #1f2328; --muted: #59636e;
+    --accent: #800000; --border: #d1d9e0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0d1117; --card: #161b22; --text: #e6edf3; --muted: #9198a1;
+            --accent: #ff7b72; --border: #30363d; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+         background: var(--bg); color: var(--text); line-height: 1.5; }
+  header { padding: 2.5rem 1.5rem 1rem; max-width: 1000px; margin: auto; }
+  h1 { margin: 0 0 .25rem; font-size: 1.9rem; }
+  header p { margin: 0; color: var(--muted); }
+  main { max-width: 1000px; margin: auto; padding: 1rem 1.5rem 3rem;
+         display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+          padding: 1.25rem; display: flex; flex-direction: column; gap: .5rem; }
+  .card h2 { margin: 0; font-size: 1.15rem; }
+  .card p { margin: 0; color: var(--muted); font-size: .92rem; flex: 1; }
+  .links { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .5rem; }
+  .btn { display: inline-block; padding: .45rem .9rem; border-radius: 6px; text-decoration: none;
+         font-size: .9rem; font-weight: 600; border: 1px solid var(--accent); }
+  .btn.primary { background: var(--accent); color: #fff; }
+  .btn.secondary { color: var(--accent); }
+  .status { grid-column: 1 / -1; color: var(--muted); }
+  footer { text-align: center; color: var(--muted); font-size: .85rem; padding-bottom: 2rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Communication Networks – Visualizers</h1>
+  <p>Interactive tools for exploring networking concepts. Pick one to launch it in your browser.</p>
+</header>
+
+<main id="list"><div class="status">Loading visualizers…</div></main>
+
+<footer>Rose-Hulman Institute of Technology · ECE</footer>
+
+<script>
+/* ---- Settings ----------------------------------------------------------
+   On GitHub Pages (https://OWNER.github.io/REPO/) the owner and repo are
+   detected automatically. Fill these in only if detection fails.        */
+const OWNER  = "";            // e.g. "asammoud-RH"
+const REPO   = "";            // e.g. "Communication_Networks"
+const FOLDER = "Visualizers"; // top-level folder that holds the apps
+/* ----------------------------------------------------------------------- */
+
+const list = document.getElementById("list");
+
+function detectRepo() {
+  if (OWNER && REPO) return { owner: OWNER, repo: REPO };
+  const host = location.hostname;
+  if (host.endsWith(".github.io")) {
+    const owner = host.split(".")[0];
+    const seg = location.pathname.split("/").filter(Boolean)[0];
+    return { owner, repo: seg || host };
+  }
+  return null;
+}
+
+function prettyName(folder) {
+  return folder.replace(/[_-]+/g, " ").replace(/\bSubNet\b/i, "Subnet").trim();
+}
+
+// Pull the first real paragraph out of a README for the card description.
+function summarize(md) {
+  const paras = md.split(/\n\s*\n/).map(p => p.trim())
+    .filter(p => p && !p.startsWith("#") && !p.startsWith("```") && !p.startsWith("|"));
+  if (!paras.length) return "";
+  let t = paras[0]
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/[*_`>]/g, "")
+    .replace(/\s+/g, " ").trim();
+  return t.length > 220 ? t.slice(0, 217).replace(/\s+\S*$/, "") + "…" : t;
+}
+
+function card({ name, htmlPath, folderUrl, desc }) {
+  const el = document.createElement("article");
+  el.className = "card";
+  el.innerHTML = `
+    <h2></h2><p></p>
+    <div class="links">
+      <a class="btn primary" target="_blank" rel="noopener">Open</a>
+      <a class="btn secondary" target="_blank" rel="noopener">Source</a>
+    </div>`;
+  el.querySelector("h2").textContent = name;
+  el.querySelector("p").textContent = desc || "";
+  el.querySelector(".primary").href = htmlPath;
+  el.querySelector(".secondary").href = folderUrl;
+  return el;
+}
+
+async function load() {
+  const r = detectRepo();
+  if (!r) {
+    list.innerHTML = `<div class="status">Couldn't detect the repository. Set OWNER and REPO at the
+      top of index.html, or open this page through GitHub Pages.</div>`;
+    return;
+  }
+
+  // One API call lists every file in the repo.
+  const res = await fetch(`https://api.github.com/repos/${r.owner}/${r.repo}/git/trees/HEAD?recursive=1`);
+  if (!res.ok) throw new Error(`GitHub API returned ${res.status}`);
+  const files = (await res.json()).tree.filter(f => f.type === "blob").map(f => f.path);
+
+  // Group: Visualizers/<App>/<file>.html  (only direct children of each app folder)
+  const apps = {};
+  for (const p of files) {
+    const parts = p.split("/");
+    if (parts.length !== 3 || parts[0] !== FOLDER) continue;
+    const [, app, file] = parts;
+    apps[app] ??= { html: [], readme: null };
+    if (/\.html?$/i.test(file)) apps[app].html.push(p);
+    if (/^readme\.md$/i.test(file)) apps[app].readme = p;
+  }
+
+  const names = Object.keys(apps).filter(a => apps[a].html.length).sort();
+  if (!names.length) {
+    list.innerHTML = `<div class="status">No visualizers found in /${FOLDER}.</div>`;
+    return;
+  }
+
+  list.innerHTML = "";
+  for (const app of names) {
+    const info = apps[app];
+    const htmlPath = info.html.find(h => !/index\.html?$/i.test(h)) || info.html[0];
+    const c = card({
+      name: prettyName(app),
+      htmlPath: htmlPath.split("/").map(encodeURIComponent).join("/"),
+      folderUrl: `https://github.com/${r.owner}/${r.repo}/tree/HEAD/${FOLDER}/${encodeURIComponent(app)}`,
+      desc: ""
+    });
+    list.appendChild(c);
+
+    // README text comes from raw.githubusercontent.com, which doesn't count against the API limit.
+    if (info.readme) {
+      fetch(`https://raw.githubusercontent.com/${r.owner}/${r.repo}/HEAD/${info.readme.split("/").map(encodeURIComponent).join("/")}`)
+        .then(x => x.ok ? x.text() : "")
+        .then(md => { c.querySelector("p").textContent = summarize(md); })
+        .catch(() => {});
+    }
+  }
+}
+
+load().catch(err => {
+  list.innerHTML = `<div class="status">Couldn't load the list of visualizers (${err.message}).
+    Browse them directly in the <code>${FOLDER}</code> folder.</div>`;
+});
+</script>
+</body>
+</html>

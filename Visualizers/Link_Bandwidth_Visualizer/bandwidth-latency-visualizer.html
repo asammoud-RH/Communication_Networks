@@ -1,0 +1,2156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bandwidth and Latency Visualizer</title>
+<meta name="description" content="See how bandwidth, distance, and queues add up to latency; how many bits fill a link (the delay × bandwidth product); and what throughput a transfer really gets.">
+<style>
+/* ===================================================== theme (shared by all apps) */
+:root {
+  --brand: #00A2D7; --brand-dark: #0081AD; --navy: #0B3D5C; --ink: #1B2A35; --muted: #5B6B78;
+  --panel: #CFE6F0; --panel-soft: #EAF5FA; --bg: #F4F8FB; --line: #D3E3EC; --white: #FFFFFF;
+  --amber: #F5A524; --amber-soft: #FDF0D5; --ok: #13A88A; --ok-soft: #E1F5EF; --bad: #E5484D; --bad-soft: #FDE8E9;
+  --gray: #E4E4E4; --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Roboto, Arial, sans-serif;
+  --mono: Consolas, "SF Mono", Menlo, "DejaVu Sans Mono", "Courier New", monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: var(--font); font-size: 16px; line-height: 1.5; color: var(--ink); background: var(--bg); }
+h1, h2, h3 { color: var(--navy); line-height: 1.25; }
+h2 { font-size: 22px; margin: 0 0 8px; }
+h3 { font-size: 17px; margin: 18px 0 6px; }
+p { margin: 6px 0; }
+a { color: var(--brand-dark); }
+code, .mono { font-family: var(--mono); font-size: 0.92em; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* header bar */
+.topbar { background: var(--navy); color: #fff; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 0 var(--brand); }
+.topbar .in { max-width: 1180px; margin: 0 auto; padding: 8px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 19px; background: none; border: 0; color: #fff; cursor: pointer; padding: 4px 2px; text-align: left; }
+.brand svg { width: 30px; height: 30px; flex: none; }
+.modes { display: flex; gap: 4px; background: rgba(255,255,255,.12); border-radius: 999px; padding: 4px; }
+.modes button { border: 0; background: transparent; color: #fff; padding: 6px 14px; border-radius: 999px; cursor: pointer; font-weight: 600; }
+.modes button[aria-pressed=true] { background: #fff; color: var(--navy); }
+.spacer { flex: 1; }
+.pill { background: var(--amber); color: #3a2600; font-weight: 700; border-radius: 999px; padding: 4px 12px; white-space: nowrap; }
+@media (max-width: 600px) { .topbar .in { flex-wrap: nowrap; gap: 6px; padding: 6px 8px; } .brand .bname, .pill .pl, .spacer { display: none; } .modes { flex: 1; justify-content: space-between; } .modes button { padding: 6px 7px; font-size: 15px; } .modes { padding: 3px; gap: 2px; } .pill { padding: 4px 8px; font-size: 15px; } .brand { padding: 2px 0; } }
+
+main { max-width: 1180px; margin: 0 auto; padding: 18px 16px 40px; }
+
+/* cards: heavy top and right edge, softened */
+.card { background: var(--white); border: 1px solid var(--line); border-top: 4px solid var(--brand); border-right: 4px solid var(--brand); border-radius: var(--radius); padding: 16px 18px; }
+.card + .card { margin-top: 14px; }
+.soft { background: var(--panel-soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; }
+
+/* buttons */
+.btn { border: 2px solid var(--brand); background: var(--brand); color: #fff; border-radius: 8px; padding: 7px 16px; cursor: pointer; font-weight: 600; }
+.btn:hover:not(:disabled) { background: var(--brand-dark); border-color: var(--brand-dark); }
+.btn.alt { background: #fff; color: var(--brand-dark); }
+.btn.alt:hover:not(:disabled) { background: var(--panel-soft); }
+.btn.amber { background: var(--amber); border-color: var(--amber); color: #3a2600; }
+.btn.amber:hover:not(:disabled) { background: #e3931a; border-color: #e3931a; }
+.btn.small { padding: 4px 10px; font-size: 14px; }
+.btn:disabled { opacity: .45; cursor: default; }
+.row { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 10px 0; }
+.row label { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; max-width: 100%; }
+input[type=text], select { max-width: 100%; }
+.row label > select { min-width: 0; }
+input[type=text], input[type=number], select { border: 1px solid #9DB3C1; border-radius: 6px; padding: 5px 8px; background: #fff; }
+input[type=number] { width: 6.4em; }
+input[type=range] { accent-color: var(--brand); width: 220px; max-width: 100%; }
+input[aria-invalid=true] { border-color: var(--bad); background: var(--bad-soft); }
+.addr { font-family: var(--mono); white-space: nowrap; }
+
+/* start screen */
+.hero { background: linear-gradient(135deg, var(--navy), #0E6A92 60%, var(--brand)); color: #fff; border-radius: 14px; padding: 28px 26px; display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; align-items: center; }
+.hero h1 { color: #fff; font-size: 32px; margin: 0 0 8px; }
+.hero p { font-size: 17px; max-width: 560px; }
+.hero svg { width: 100%; height: auto; max-height: 220px; }
+.modecards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 18px; }
+.modecard { display: flex; flex-direction: column; gap: 6px; }
+.modecard .icon { font-size: 30px; line-height: 1; }
+.modecard h2 { margin: 4px 0; }
+.modecard p { flex: 1; color: var(--muted); }
+.skills { columns: 2; margin: 8px 0 0; padding-left: 20px; }
+@media (max-width: 880px) { .hero { grid-template-columns: 1fr; } .modecards { grid-template-columns: 1fr; } .skills { columns: 1; } }
+
+/* learn: stepper */
+.stepper { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+.stepper button { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 5px 12px 5px 5px; cursor: pointer; font-size: 14px; }
+.stepper .num { display: inline-flex; width: 26px; height: 26px; border-radius: 50%; align-items: center; justify-content: center; background: var(--panel); color: var(--navy); font-weight: 700; }
+.stepper button[aria-current=step] { border-color: var(--brand); box-shadow: 0 0 0 2px var(--brand) inset; }
+.stepper button.done .num { background: var(--ok); color: #fff; }
+.stepper button { padding: 5px; }
+.stepper button .t { display: none; }
+.stepper button[aria-current=step] { padding-right: 14px; }
+.stepper button[aria-current=step] .t { display: inline; }
+.stepper button.mapbtn { padding-right: 14px; }
+.stepper button.mapbtn .num { font-size: 15px; }
+.stepper button.mapbtn .t { display: inline; }
+.progress { height: 8px; background: var(--panel); border-radius: 999px; overflow: hidden; margin: 0 0 12px; }
+.progress > div { height: 100%; background: linear-gradient(90deg, var(--brand), var(--ok)); width: 0; transition: width .4s; }
+.lesson { display: grid; grid-template-columns: minmax(300px, 0.8fr) minmax(0, 1.2fr); grid-template-areas: "text fig" "try fig" "rest fig"; grid-template-rows: auto auto 1fr; gap: 16px; align-items: start; }
+.lesson > * { min-width: 0; }
+#ltext { grid-area: text; } #lfig { grid-area: fig; } #ltry { grid-area: try; margin-top: 0; }
+#lfig > .card + .card, #lfig > details { margin-top: 14px; }
+.lesson.map { grid-template-columns: 1fr; grid-template-areas: "text" "try"; }
+.lesson.map #lfig { display: none; }
+@media (max-width: 980px) { .lesson { grid-template-columns: 1fr; grid-template-areas: "text" "fig" "try"; grid-template-rows: auto; } }
+.intro p { margin: 0 0 10px; }
+.kicker { color: var(--muted); margin: 0; font-size: 14px; }
+@media (max-width: 600px) { .stepper button .t, .stepper button[aria-current=step] .t, .stepper button.mapbtn .t { display: none; } .stepper button[aria-current=step], .stepper button.mapbtn { padding-right: 5px; } }
+details.fold { border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; margin: 8px 0; background: #fff; }
+details.fold > summary { padding: 2px 0; }
+details.fold[open] > summary { margin-bottom: 6px; }
+details.figfold { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 18px; }
+details.figfold > summary { font-size: 16px; }
+.terms { margin: 4px 0; padding-left: 18px; }
+.terms li { margin: 4px 0; }
+.ctls { border-top: 1px solid var(--line); margin-top: 10px; padding-top: 4px; }
+.speed { font-size: 14px; color: var(--muted); }
+.speed select { padding: 3px 6px; }
+/* lesson map */
+.mapintro { max-width: 760px; }
+.mapparts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 12px; }
+.mappart { background: var(--panel-soft); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.mappart h3 { margin: 0 0 8px; font-size: 16px; color: var(--navy); }
+.mapitem { display: block; width: 100%; text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin: 0 0 8px; cursor: pointer; font: inherit; color: inherit; }
+.mapitem:hover { border-color: var(--brand); }
+.mapitem b { color: var(--navy); display: block; }
+.mapitem span { color: var(--muted); font-size: 14px; }
+.mapitem.done b::after { content: ' ✓'; color: var(--ok); }
+@media (max-width: 880px) { .mapparts { grid-template-columns: 1fr; } }
+/* calculator: one link or a path */
+.segs { display: inline-flex; background: var(--panel); border-radius: 999px; padding: 3px; gap: 2px; margin: 0 0 12px; flex-wrap: wrap; }
+.segs button { border: 0; background: transparent; padding: 6px 16px; border-radius: 999px; cursor: pointer; font-weight: 600; color: var(--navy); font: inherit; font-weight: 600; }
+.segs button[aria-pressed=true] { background: var(--navy); color: #fff; }
+#view-calc > * + *, #c_one > * + *, #c_path > * + * { margin-top: 14px; }
+.tryit { border-left: 5px solid var(--amber); background: var(--amber-soft); border-radius: 8px; padding: 10px 14px; margin-top: 14px; }
+.tryit h3 { margin-top: 0; }
+.feedback { border-radius: 8px; padding: 8px 12px; margin-top: 8px; }
+.feedback.ok { background: var(--ok-soft); border: 1px solid var(--ok); }
+.feedback.bad { background: var(--bad-soft); border: 1px solid var(--bad); }
+.feedback.note { background: var(--panel-soft); border: 1px solid var(--line); }
+.feedback:empty { display: none; }
+.navrow { display: flex; justify-content: space-between; gap: 10px; margin-top: 16px; }
+.formula { text-align: center; font-family: var(--mono); }
+
+/* figures */
+.fig { overflow-x: auto; }
+.fig svg { display: block; width: 100%; height: auto; min-width: 520px; }
+@media (max-width: 600px) { .fig::after { content: '↔ Swipe sideways to see the whole figure'; display: block; position: sticky; left: 0; font-size: 12px; color: var(--muted); padding: 2px 0 4px; } }
+#view-calc .fig svg { max-width: 860px; margin: 0 auto; }
+.figtitle { font-weight: 600; color: var(--navy); margin: 4px 0; }
+.legend { list-style: none; padding: 0; margin: 6px 0; display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 14px; color: var(--muted); }
+.legend i { display: inline-block; width: 22px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; }
+.scrub { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 8px 0; }
+.scrub input[type=range] { flex: 1; min-width: 160px; width: auto; }
+.tnow { font-family: var(--mono); font-weight: 700; color: var(--navy); min-width: 9em; }
+
+.list { padding-left: 20px; margin: 6px 0; }
+.list li { margin: 3px 0; }
+.yes { color: var(--ok); font-weight: 700; }
+.no { color: var(--bad); font-weight: 700; }
+.oneway { color: #B86E00; font-weight: 700; }
+
+/* working and terminal output */
+.log { padding-left: 22px; margin: 6px 0; }
+.log li { margin: 4px 0; }
+.term { background: #0F2533; color: #E8F4FA; border-radius: 8px; padding: 8px 10px; font-family: var(--mono); font-size: 13.5px; white-space: pre-wrap; word-break: break-word; margin: 6px 0; min-height: 2.6em; }
+.term .d { color: #8FB3C6; } .term .g { color: #9FE3CF; }
+details { margin-top: 8px; }
+summary { cursor: pointer; color: var(--brand-dark); font-weight: 600; }
+
+/* commands */
+.cmdtabs { display: flex; gap: 4px; margin: 8px 0; flex-wrap: wrap; }
+.cmdtabs button { border: 1px solid var(--line); background: #fff; padding: 5px 14px; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: 600; }
+.cmdtabs button[aria-pressed=true] { background: var(--navy); color: #fff; border-color: var(--navy); }
+.cmd { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; align-items: center; background: #0F2533; color: #E8F4FA; border-radius: 8px; padding: 8px 10px; margin: 6px 0 2px; }
+.cmd code { white-space: pre-wrap; word-break: break-all; font-size: 14px; }
+.cmd button { background: transparent; border: 1px solid #5E8BA3; color: #E8F4FA; border-radius: 6px; padding: 2px 8px; cursor: pointer; font-size: 13px; }
+.cmdnote { font-size: 14px; color: var(--muted); margin: 0 0 8px; }
+.cmdgroup { font-weight: 700; color: var(--navy); margin: 12px 0 0; }
+
+/* calculator */
+.calcgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin: 10px 0; }
+.stat { background: var(--panel-soft); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.stat .k { font-size: 13px; color: var(--muted); }
+.stat .v { font-family: var(--mono); font-size: 17px; font-weight: 700; color: var(--navy); word-break: break-word; }
+.stat .s { font-size: 13px; color: var(--muted); font-family: var(--mono); }
+.stat.hl { background: var(--amber-soft); border-color: var(--amber); }
+.links { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
+.linkbox { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
+.linkbox b { color: var(--navy); display: block; font-size: 14px; }
+.linkbox label { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 4px 0; font-size: 14px; }
+
+/* challenge */
+.levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 12px 0; }
+@media (max-width: 760px) { .levels { grid-template-columns: 1fr; } }
+.level { text-align: left; cursor: pointer; border: 2px solid var(--line); background: #fff; border-radius: 12px; padding: 12px 14px; }
+.level[aria-pressed=true] { border-color: var(--amber); box-shadow: 0 0 0 3px var(--amber-soft); }
+.level b { display: block; font-size: 18px; color: var(--navy); }
+.qhead { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { background: var(--panel-soft); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-weight: 600; font-size: 14px; }
+.chip.fire { background: var(--amber-soft); border-color: var(--amber); }
+.qtext { font-size: 19px; margin: 12px 0; }
+.qtext code, .qtext .addr, .choice code, .feedback code { white-space: normal; overflow-wrap: anywhere; }
+.choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
+.choice { text-align: left; border: 2px solid var(--line); background: #fff; border-radius: 10px; padding: 10px 12px; cursor: pointer; }
+.choice:hover:not(:disabled) { border-color: var(--brand); }
+.choice.right { border-color: var(--ok); background: var(--ok-soft); }
+.choice.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.timer { height: 8px; background: var(--panel); border-radius: 999px; overflow: hidden; }
+.timer > div { height: 100%; background: var(--amber); width: 100%; }
+.stars { font-size: 44px; letter-spacing: 6px; color: var(--amber); }
+.badges { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0; }
+.badge { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 4px 12px 4px 6px; }
+.badge .b { font-size: 22px; }
+.badge.locked { opacity: .45; filter: grayscale(1); }
+.code { font-family: var(--mono); font-size: 22px; font-weight: 700; letter-spacing: 2px; background: var(--panel-soft); border: 2px dashed var(--brand); border-radius: 8px; padding: 6px 14px; display: inline-block; }
+.pop { animation: pop .45s ease-out; }
+@keyframes pop { 0% { transform: scale(.9); } 60% { transform: scale(1.04); } 100% { transform: scale(1); } }
+.burst { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 20; }
+.burst span { position: absolute; top: -20px; font-size: 22px; animation: fall 1.8s ease-in forwards; }
+@keyframes fall { to { transform: translateY(105vh) rotate(360deg); opacity: .2; } }
+@media (prefers-reduced-motion: reduce) { .pop, .burst span { animation: none !important; } .progress > div { transition: none; } }
+
+footer { max-width: 1180px; margin: 0 auto; padding: 0 16px 30px; font-size: 14px; color: var(--muted); }
+footer .card { border-top-width: 1px; border-right-width: 1px; }
+@media print { .topbar, .navrow, .btn, footer, .stepper, .tryit button { display: none !important; } body { background: #fff; } .card { border: 1px solid #999; } }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="in">
+    <button class="brand" id="home" aria-label="Bandwidth and Latency Visualizer home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="7" fill="#00A2D7"/><rect x="5" y="11" width="22" height="10" rx="5" fill="#CFE6F0"/><rect x="7" y="13" width="4" height="6" rx="1" fill="#0B3D5C"/><rect x="13" y="13" width="4" height="6" rx="1" fill="#0B3D5C"/><rect x="19" y="13" width="4" height="6" rx="1" fill="#F5A524"/></svg>
+      <span class="bname">Bandwidth and Latency Visualizer</span>
+    </button>
+    <nav class="modes" aria-label="Mode">
+      <button data-mode="learn" aria-pressed="false">Learn</button>
+      <button data-mode="calc" aria-pressed="false">Calculator</button>
+      <button data-mode="challenge" aria-pressed="false">Challenge</button>
+    </nav>
+    <span class="spacer"></span>
+    <span class="pill" id="xp" title="Points from lessons and challenges">★ 0 points</span>
+  </div>
+</header>
+
+<main id="main">
+<!-- ===================================================== start screen -->
+<section id="view-home">
+  <div class="hero">
+    <div>
+      <h1>Bandwidth and Latency Visualizer</h1>
+      <p>Why does a fast link still feel slow? Watch a packet's bits leave one host and arrive at another. See how bandwidth, distance, and waiting in queues add up to latency, how many bits fill a link, and what throughput a transfer really gets. Then measure it yourself with real commands.</p>
+    </div>
+    <svg id="heroFig" viewBox="0 0 360 200" role="img" aria-label="A link drawn as a pipe filled with bits, with its length labeled delay and its width labeled bandwidth"></svg>
+  </div>
+  <div class="modecards">
+    <div class="card modecard">
+      <div class="icon" aria-hidden="true">📘</div>
+      <h2>Learn</h2>
+      <p>Six short lessons with live figures and animations. Each one ends with a quick task. Best for a first visit.</p>
+      <button class="btn" data-go="learn">Start learning</button>
+    </div>
+    <div class="card modecard">
+      <div class="icon" aria-hidden="true">🧮</div>
+      <h2>Calculator</h2>
+      <p>Type a size, a bandwidth, and a distance, or a whole path of links. Get every delay, the delay × bandwidth product, the transfer time, the throughput, and the commands.</p>
+      <button class="btn alt" data-go="calc">Open the calculator</button>
+    </div>
+    <div class="card modecard">
+      <div class="icon" aria-hidden="true">🏆</div>
+      <h2>Challenge</h2>
+      <p>Ten fresh questions, three levels, streaks, badges, and a completion code.</p>
+      <button class="btn amber" data-go="challenge">Take the challenge</button>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3 style="margin-top:0">What you will be able to do</h3>
+    <ul class="skills">
+      <li>Convert between bits and bytes, and between decimal (KB, MB) and binary (KiB, MiB) units</li>
+      <li>Find how long one bit lasts in time and how long it is on the wire</li>
+      <li>Split latency into propagation, transmit, and queuing delay, and say which one dominates</li>
+      <li>Compute the delay × bandwidth product and the window that keeps a link full</li>
+      <li>Compute transfer time and effective throughput, and spot a latency-bound transfer</li>
+      <li>Follow a packet across a switch and a router, and measure RTT (round-trip time), link speed, and throughput with real commands</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===================================================== learn -->
+<section id="view-learn" hidden>
+  <div class="progress" aria-hidden="true"><div id="lprog"></div></div>
+  <nav class="stepper" id="stepper" aria-label="Lessons"></nav>
+  <div class="lesson" id="lgrid">
+    <div class="card" id="ltext"></div>
+    <div id="lfig"></div>
+    <div id="ltry"></div>
+  </div>
+</section>
+
+<!-- ===================================================== calculator -->
+<section id="view-calc" hidden>
+  <div class="segs" role="group" aria-label="What to calculate"><button id="c_seg1" aria-pressed="true">One link</button><button id="c_seg2" aria-pressed="false">A path of links</button></div>
+  <div id="c_one">
+  <div class="card">
+    <h2>One link</h2>
+    <p>Describe one message on one link. Leave the RTT (round-trip time) blank to use twice the propagation delay.</p>
+    <div class="row">
+      <label>Preset <select id="c_preset"><option value="">choose…</option></select></label>
+    </div>
+    <div class="row">
+      <label>Message size <input type="number" id="c_size" min="0" step="any" value="1500" aria-label="Message size"></label>
+      <select id="c_unit" aria-label="Size unit"></select>
+      <label>Bandwidth <input type="number" id="c_bw" min="0" step="any" value="100" aria-label="Bandwidth"></label>
+      <select id="c_bwu" aria-label="Bandwidth unit"></select>
+    </div>
+    <div class="row">
+      <label>Distance <input type="number" id="c_dist" min="0" step="any" value="1000" aria-label="Distance"></label>
+      <select id="c_distu" aria-label="Distance unit"><option value="1">m</option><option value="1000" selected>km</option></select>
+      <label>Medium <select id="c_med"></select></label>
+    </div>
+    <div class="row">
+      <label>Queuing delay <input type="number" id="c_q" min="0" step="any" value="0" aria-label="Queuing delay in milliseconds"> ms</label>
+      <label>RTT <input type="number" id="c_rtt" min="0" step="any" placeholder="auto" aria-label="Round-trip time in milliseconds"> ms</label>
+    </div>
+    <p id="c_err" class="no" aria-live="polite"></p>
+    <div class="calcgrid" id="c_key"></div>
+    <details class="fold"><summary>All the numbers</summary><div class="calcgrid" id="c_stats"></div></details>
+    <details class="fold"><summary>The working</summary><ol class="log" id="c_work"></ol></details>
+  </div>
+  <div class="card">
+    <p class="figtitle">The message on the link, over time</p>
+    <div id="c_strip"></div>
+    <div class="fig"><svg id="c_wire" role="img" aria-label="Host A, the link, and Host B, with the message's bits on the link at the chosen time"></svg></div>
+    <ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>the message's bits</li><li><i style="background:#9DB3C1;height:9px"></i>a thicker link has more bandwidth</li></ul>
+  </div>
+  <details class="figfold"><summary>The same message on a time diagram (time runs down)</summary>
+    <div id="c_stripb"></div>
+    <div class="fig"><svg id="c_st" role="img" aria-label="Space-time diagram: the message leaves Host A and arrives at Host B"></svg></div>
+    <ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>the message's bits</li><li><i style="background:#FDF0D5;border:1px solid #F5A524"></i>waiting in a queue</li><li><i style="background:#F5A524;height:3px"></i>the chosen moment</li></ul>
+  </details>
+  <details class="figfold"><summary>Where the latency comes from</summary>
+    <div class="fig"><svg id="c_bar" role="img" aria-label="Bar split into queuing, transmit, and propagation delay"></svg></div>
+  </details>
+  <details class="figfold"><summary>The link as a pipe</summary>
+    <div class="fig"><svg id="c_pipe" role="img" aria-label="The link drawn as a pipe holding the delay times bandwidth bits"></svg></div>
+    <p class="cmdnote">The pipe's width shows the bandwidth and its length the one-way delay, both on logarithmic scales: each step of 10 times more adds the same amount.</p>
+  </details>
+  <details class="figfold"><summary>Bandwidth versus throughput for this transfer</summary>
+    <div class="fig"><svg id="c_use" role="img" aria-label="Rate over time: nothing during the first RTT, then the full bandwidth; the dashed line is the throughput"></svg></div>
+    <ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>data at the full bandwidth</li><li><i style="background:#fff;border:1px dashed #9DB3C1"></i>waiting one RTT</li><li><i style="background:#D98A00;height:3px"></i>throughput: the average rate</li></ul>
+  </details>
+  </div>
+  <div id="c_path" hidden>
+  <div class="card">
+    <h2>A path of several links</h2>
+    <p>Switches and routers store and forward: each one receives the whole packet before it sends it on. Give each link its bandwidth, its length, and the queuing delay at the device that sends onto it.</p>
+    <div class="row">
+      <label>Packet size <input type="number" id="p_size" min="1" max="65535" step="1" value="1500" aria-label="Packet size in bytes"> bytes</label>
+      <label>Packets in the message <input type="number" id="p_n" min="1" max="100000" step="1" value="1" aria-label="Number of packets"></label>
+    </div>
+    <div class="links" id="p_links"></div>
+    <div class="row"><button class="btn alt small" id="p_add">+ Add a link</button><button class="btn alt small" id="p_del">− Remove the last link</button></div>
+    <p id="p_err" class="no" aria-live="polite"></p>
+    <div class="calcgrid" id="p_key"></div>
+    <details class="fold"><summary>The delay on each link</summary><div class="calcgrid" id="p_stats"></div></details>
+    <details class="fold"><summary>The working</summary><ol class="log" id="p_work"></ol></details>
+  </div>
+  <div class="card">
+    <p class="figtitle">One packet across the path</p>
+    <div id="p_strip"></div>
+    <div class="fig"><svg id="p_wire" role="img" aria-label="The hosts, switch, and router on the path, with the packet's bits at the chosen time"></svg></div>
+    <p class="cmdnote">Thicker links have more bandwidth. The thinnest one is the bottleneck: it limits the throughput of the whole path.</p>
+  </div>
+  <details class="figfold"><summary>The same packet on a time diagram (time runs down)</summary>
+    <div id="p_stripb"></div>
+    <div class="fig"><svg id="p_st" role="img" aria-label="Space-time diagram of one packet crossing every link"></svg></div>
+  </details>
+  </div>
+  <details class="figfold"><summary>Measure it yourself: Linux and Windows commands</summary>
+    <div id="c_cmds"></div>
+  </details>
+</section>
+
+<!-- ===================================================== challenge -->
+<section id="view-challenge" hidden>
+  <div class="card" id="ch-setup">
+    <h2>Challenge</h2>
+    <p>Answer ten questions. Each right answer earns 10 points, and a streak adds a bonus.</p>
+    <details class="fold"><summary>How scoring works</summary><p>A hint costs 3 points. Every answer comes with an explanation. Number answers within 1% count as right. Unless a question says otherwise, 1 KB (kilobyte) = 1,000 bytes, 1 MB (megabyte) = 1,000,000 bytes, and 1 Mbps (megabit per second) = 1,000,000 bits per second.</p></details>
+    <div class="levels" id="levels">
+      <button class="level" data-level="E" aria-pressed="true"><b>Easy</b>Bits and bytes, bit width, propagation delay, transmit delay, and the terms.</button>
+      <button class="level" data-level="M" aria-pressed="false"><b>Medium</b>Total latency, RTT, bit length, delay × bandwidth, which delay dominates.</button>
+      <button class="level" data-level="H" aria-pressed="false"><b>Hard</b>Throughput, filling the pipe, paths of several links, faster or closer?</button>
+    </div>
+    <div class="row">
+      <label><input type="checkbox" id="sprint"> Sprint: as many as you can in 2 minutes</label>
+      <button class="btn amber" id="ch-start">Start</button>
+    </div>
+    <h3>Your badges</h3>
+    <div class="badges" id="badgeShelf"></div>
+    <p id="bestLine" class="mono"></p>
+  </div>
+  <div class="card" id="ch-play" hidden>
+    <div class="qhead">
+      <div class="chips"><span class="chip" id="q_n"></span><span class="chip" id="q_score"></span><span class="chip fire" id="q_streak"></span></div>
+      <button class="btn alt small" id="q_quit">End round</button>
+    </div>
+    <div class="timer" id="q_timerbar" hidden><div id="q_timer"></div></div>
+    <div id="q_body"></div>
+  </div>
+  <div class="card" id="ch-end" hidden></div>
+</section>
+</main>
+
+<footer>
+  <div class="card">
+    <p><strong>About this app.</strong> Bandwidth and Latency Visualizer works offline in any current browser. It models latency as propagation (distance ÷ signal speed) plus transmit (size ÷ bandwidth) plus queuing delay. Signal speeds are 2.0 × 10⁸ m/s in fiber, 2.3 × 10⁸ m/s in copper cable, and 3.0 × 10⁸ m/s for radio and in a vacuum. Bandwidth uses decimal units (1 Mbps, megabits per second, is 10⁶ bits per second). Sizes are decimal (KB, MB) unless you choose binary units (KiB, MiB). Transfer time is one RTT (round-trip time) plus the transmit time; real TCP (Transmission Control Protocol) transfers also spend time on the connection handshake and slow start. Switches and routers store and forward whole packets. Real ping times also include the time the hosts take to answer, which this model leaves out. Progress and badges are kept in this browser only.</p>
+    <details>
+      <summary>Settings</summary>
+      <div class="row"><button class="btn alt small" id="resetProgress">Reset my progress</button></div>
+    </details>
+    <details>
+      <summary>For instructors: check a completion code</summary>
+      <div class="row"><label>Code <input type="text" id="verifyIn" size="22" spellcheck="false"></label><button class="btn small" id="verifyBtn">Check</button><span id="verifyOut" aria-live="polite"></span></div>
+    </details>
+  </div>
+</footer>
+
+<script>
+(function () {
+'use strict';
+var APP_ID = 'bandwidth-latency-visualizer';
+
+/* ===================================================== small helpers */
+var $ = function (s, r) { return (r || document).querySelector(s); };
+var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+var reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+/* storage that never throws (some embeds block it) */
+var store = {
+  get: function (k, d) { try { var v = window.localStorage.getItem(APP_ID + '.' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set: function (k, v) { try { window.localStorage.setItem(APP_ID + '.' + k, JSON.stringify(v)); } catch (e) { /* ignore */ } }
+};
+
+/* ===================================================== the model
+   Latency = Queue + Transmit + Propagation. Transmit = bits / bandwidth. Propagation = distance / signal speed.
+   Times are in seconds, sizes in bits, bandwidth in bits per second, distances in meters. */
+var SPEED = { fiber: 2.0e8, copper: 2.3e8, radio: 3.0e8 };
+var MEDIA = [['fiber', 'Fiber (2.0 × 10⁸ m/s)'], ['copper', 'Copper cable (2.3 × 10⁸ m/s)'], ['radio', 'Radio or vacuum (3.0 × 10⁸ m/s)']];
+var MEDIUM_NAME = { fiber: 'fiber', copper: 'copper cable', radio: 'radio' };
+var SIZE_UNITS = [['b', 1, 'bits'], ['B', 8, 'bytes'], ['KB', 8e3, 'KB (1,000 bytes)'], ['MB', 8e6, 'MB (10⁶ bytes)'], ['GB', 8e9, 'GB (10⁹ bytes)'],
+  ['KiB', 8 * 1024, 'KiB (1,024 bytes)'], ['MiB', 8 * 1048576, 'MiB (2²⁰ bytes)'], ['GiB', 8 * 1073741824, 'GiB (2³⁰ bytes)']];
+var RATE_UNITS = [['bps', 1], ['kbps', 1e3], ['Mbps', 1e6], ['Gbps', 1e9]];
+function unitBits(u) { for (var i = 0; i < SIZE_UNITS.length; i++) if (SIZE_UNITS[i][0] === u) return SIZE_UNITS[i][1]; return null; }
+function rateMult(u) { for (var i = 0; i < RATE_UNITS.length; i++) if (RATE_UNITS[i][0] === u) return RATE_UNITS[i][1]; return null; }
+
+function propDelay(dist, medium) { return dist / SPEED[medium]; }
+function transDelay(bits, bw) { return bits / bw; }
+function bitWidth(bw) { return 1 / bw; }
+function bitLength(bw, medium) { return SPEED[medium] / bw; }
+function dxb(delay, bw) { return delay * bw; }
+/* one packet across a path; each link: { bw, dist, medium, q } where q is the queuing delay at the device that sends onto that link */
+function pathTimes(bits, links) {
+  var t = 0, hops = [];
+  links.forEach(function (L) {
+    var P = L.P !== undefined ? L.P : propDelay(L.dist, L.medium), T = transDelay(bits, L.bw), q = L.q || 0;
+    hops.push({ ready: t, q: q, start: t + q, T: T, P: P, bw: L.bw, firstIn: t + q + P, end: t + q + T + P });
+    t = t + q + T + P;
+  });
+  return { hops: hops, total: t };
+}
+/* n equal packets sent back to back: the last one arrives one bottleneck transmit time after the one before it */
+function messageTime(bits, n, links) {
+  var first = pathTimes(bits, links).total, bott = 0;
+  links.forEach(function (L) { bott = Math.max(bott, bits / L.bw); });
+  return first + (n - 1) * bott;
+}
+function transfer(bits, bw, rtt) { var t = rtt + bits / bw; return { trans: bits / bw, time: t, thr: bits / t }; }
+function windowThroughput(winBits, bw, rtt) { return Math.min(bw, winBits / rtt); }
+/* 0 at 1 kbps, 1 at 100 Gbps: used to draw bandwidth as width on a logarithmic scale */
+function bwFrac(bw) { return clamp((Math.log10(bw) - 3) / 8, 0, 1); }
+function near(v, a, rel) { return isFinite(v) && Math.abs(v - a) <= Math.max(1e-12, (rel || 0.01) * Math.abs(a)); }
+
+/* ===================================================== formatting */
+function group(s) { var p = String(s).split('.'); p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ','); return p.join('.'); }
+function fmtN(v, sig) {
+  if (!isFinite(v)) return '—'; if (v === 0) return '0';
+  var n = Number(v.toPrecision(sig || 4)), a = Math.abs(n);
+  if (a >= 1e21 || a < 1e-6) return n.toExponential(2);
+  return group(String(n));
+}
+function fmt(v) { return group(String(v)); }
+function fmtT(s, sig) {
+  if (!isFinite(s)) return '—'; if (s === 0) return '0 s'; var a = Math.abs(s);
+  if (a < 1e-6) return fmtN(s * 1e9, sig) + ' ns'; if (a < 1e-3) return fmtN(s * 1e6, sig) + ' µs';
+  if (a < 1) return fmtN(s * 1e3, sig) + ' ms'; return fmtN(s, sig) + ' s';
+}
+function fmtMs(s, sig) { return fmtN(s * 1e3, sig) + ' ms'; }
+function fmtBits(b, sig) {
+  var a = Math.abs(b);
+  if (a < 1e3) return fmtN(b, sig) + ' bits'; if (a < 1e6) return fmtN(b / 1e3, sig) + ' kb'; if (a < 1e9) return fmtN(b / 1e6, sig) + ' Mb';
+  if (a < 1e12) return fmtN(b / 1e9, sig) + ' Gb'; return fmtN(b / 1e12, sig) + ' Tb';
+}
+function fmtBytes(bits, binary, sig) {
+  var B = bits / 8, a = Math.abs(B), k = binary ? 1024 : 1000, u = binary ? ['KiB', 'MiB', 'GiB', 'TiB'] : ['KB', 'MB', 'GB', 'TB'];
+  if (a < k) return fmtN(B, sig) + ' bytes';
+  for (var i = 0; i < 4; i++) { var d = Math.pow(k, i + 1); if (a < d * k || i === 3) return fmtN(B / d, sig) + ' ' + u[i]; }
+}
+function fmtRate(bps, sig) {
+  var a = Math.abs(bps);
+  if (a < 1e3) return fmtN(bps, sig) + ' bps'; if (a < 1e6) return fmtN(bps / 1e3, sig) + ' kbps'; if (a < 1e9) return fmtN(bps / 1e6, sig) + ' Mbps';
+  return fmtN(bps / 1e9, sig) + ' Gbps';
+}
+function fmtBitsW(b, sig) { return b > 0 && b < 1 ? 'less than 1 bit' : fmtBits(b, sig); }
+/* a length with a sensible unit, for bits on the wire */
+function fmtLen(m) { var a = Math.abs(m); return a === 0 ? '0 m' : a < 0.01 ? fmtN(m * 1000, 3) + ' mm' : a < 1 ? fmtN(m * 100, 3) + ' cm' : a < 1000 ? fmtN(m, 3) + ' m' : fmtN(m / 1000, 3) + ' km'; }
+function fmtDist(m) { return m < 1000 ? fmtN(m, 6) + ' m' : fmtN(m / 1000, 6) + ' km'; }
+
+/* ===================================================== theme colors for figures */
+var C = { brand: '#00A2D7', navy: '#0B3D5C', ink: '#1B2A35', panel: '#CFE6F0', soft: '#EAF5FA', gray: '#E4E4E4', amber: '#F5A524', amberSoft: '#FDF0D5', ok: '#13A88A', bad: '#E5484D', oneway: '#D98A00', white: '#FFFFFF', muted: '#5B6B78', wire: '#9DB3C1' };
+var BAND = [0, 1, 3, 4];
+var CAT = [
+  { line: '#00A2D7', fill: '#CFE6F0' }, { line: '#7B61FF', fill: '#E7E1FF' },
+  { line: '#E08B00', fill: '#FCE9C6' }, { line: '#13A88A', fill: '#D3F1E8' }, { line: '#D6457A', fill: '#F9DCE7' }
+];
+
+/* ===================================================== figure library (inches, y up, sizes in points) */
+var NS = 'http://www.w3.org/2000/svg', figN = 0;
+function el(tag, at, parent) { var e = document.createElementNS(NS, tag); if (at) for (var k in at) if (at[k] !== null && at[k] !== undefined) e.setAttribute(k, at[k]); if (parent) parent.appendChild(e); return e; }
+function r4(v) { return Math.round(v * 10000) / 10000; }
+function Fig(svg, x0, x1, y0, y1, k) {
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  svg.setAttribute('viewBox', '0 0 ' + r4(x1 - x0) + ' ' + r4(y1 - y0));
+  this.svg = svg; this.x0 = x0; this.y1 = y1; this.k = k || 1.2; this.id = 'f' + (++figN);
+  var defs = el('defs', null, svg);
+  this.defs = defs; this.markers = {};
+  this.root = el('g', { 'font-family': 'Segoe UI, system-ui, -apple-system, Helvetica Neue, Roboto, Arial, sans-serif' }, svg);
+}
+Fig.prototype.X = function (x) { return r4(x - this.x0); };
+Fig.prototype.Y = function (y) { return r4(this.y1 - y); };
+Fig.prototype.pt = function (v) { return r4(v / 72); };
+Fig.prototype.g = function (p) { return el('g', null, p || this.root); };
+Fig.prototype.rect = function (x, y, w, h, o) {
+  o = o || {};
+  return el('rect', { x: this.X(x), y: this.Y(y + h), width: r4(Math.max(0, w)), height: r4(Math.max(0, h)), rx: o.rx ? r4(o.rx) : null, fill: o.fill || C.white,
+    stroke: o.stroke || C.brand, 'stroke-width': this.pt(o.lw || 1.1), 'stroke-dasharray': o.dash ? o.dash.map(this.pt, this).join(' ') : null, 'fill-opacity': o.opacity }, o.parent || this.root);
+};
+Fig.prototype.slab = function (x, y, w, h, o) {   // the slab box: thin outline, heavy top and right edges
+  o = o || {};
+  var g = this.g(o.parent);
+  g.box = this.rect(x, y, w, h, { fill: o.fill || C.white, stroke: o.stroke || C.brand, lw: 1.1, parent: g });
+  el('path', { d: 'M' + this.X(x) + ' ' + this.Y(y + h) + 'H' + this.X(x + w) + 'V' + this.Y(y), fill: 'none', stroke: o.stroke || C.brand,
+    'stroke-width': this.pt(o.thick || 3.4), 'stroke-linecap': 'square' }, g);
+  if (o.text) this.text(x + w / 2, y + h / 2, o.text, { fs: o.fs || 10, bold: o.bold, parent: g });
+  return g;
+};
+Fig.prototype.line = function (x1, y1, x2, y2, o) {
+  o = o || {};
+  return el('line', { x1: this.X(x1), y1: this.Y(y1), x2: this.X(x2), y2: this.Y(y2), stroke: o.color || C.ink, 'stroke-width': this.pt(o.lw || 1.3),
+    'stroke-dasharray': o.dash ? o.dash.map(this.pt, this).join(' ') : null, 'stroke-linecap': o.cap || null }, o.parent || this.root);
+};
+Fig.prototype.poly = function (pts, o) {
+  o = o || {}; var self = this;
+  return el(o.closed ? 'polygon' : 'polyline', { points: pts.map(function (p) { return self.X(p[0]) + ',' + self.Y(p[1]); }).join(' '), fill: o.fill || 'none', stroke: o.color || C.ink,
+    'stroke-width': this.pt(o.lw || 1.5), 'stroke-dasharray': o.dash ? o.dash.map(this.pt, this).join(' ') : null, 'stroke-linejoin': 'round', 'fill-opacity': o.opacity }, o.parent || this.root);
+};
+Fig.prototype.arrow = function (x1, y1, x2, y2, o) {
+  if (o && o.both) { var mx = (x1 + x2) / 2, my = (y1 + y2) / 2, oo = { color: o.color, lw: o.lw }; this.arrow(mx, my, x1, y1, oo); return this.arrow(mx, my, x2, y2, oo); }
+  var col = (o && o.color) || C.ink, mid = this.markers[col];
+  if (!mid) {   // one arrowhead per color, so the head always matches its line
+    mid = this.markers[col] = this.id + 'a' + Object.keys(this.markers).length;
+    var m = el('marker', { id: mid, viewBox: '0 0 10 10', refX: 10, refY: 5, markerWidth: 0.13, markerHeight: 0.13, markerUnits: 'userSpaceOnUse', orient: 'auto' }, this.defs);
+    el('path', { d: 'M0 0L10 5L0 10z', fill: col }, m);
+  }
+  var l = this.line(x1, y1, x2, y2, o); l.setAttribute('marker-end', 'url(#' + mid + ')'); return l;
+};
+Fig.prototype.text = function (x, y, s, o) {   // centered on y; no dominant-baseline, so every browser places it the same
+  o = o || {};
+  var size = (o.fs || 9.5) * this.k / 72, lh = size * 1.3, lines = String(s).split('\n'), n = lines.length;
+  var t = el('text', { 'font-size': r4(size), fill: o.color || C.ink, 'fill-opacity': o.opacity, 'text-anchor': o.ha === 'left' ? 'start' : o.ha === 'right' ? 'end' : 'middle',
+    'font-style': o.italic ? 'italic' : null, 'font-weight': o.bold ? 'bold' : null, transform: o.rot ? 'rotate(' + o.rot + ' ' + this.X(x) + ' ' + this.Y(y) + ')' : null }, o.parent || this.root);
+  var yc = this.Y(y), self = this;
+  lines.forEach(function (ln, i) { var ts = el('tspan', { x: self.X(x), y: r4(yc + (i - (n - 1) / 2) * lh + size * 0.35) }, t); ts.textContent = ln; });
+  return t;
+};
+Fig.prototype.tw = function (s, fs) { return String(s).length * (fs * this.k / 72) * 0.55; };
+Fig.prototype.label = function (x, y, s, o) {   // text on a white patch, for labels that sit on lines
+  o = o || {}; var w = this.tw(s, o.fs || 8.5) + 0.12, hh = (o.fs || 8.5) * this.k / 72 * 1.5, x0 = o.ha === 'left' ? x - 0.06 : o.ha === 'right' ? x - w + 0.06 : x - w / 2;
+  this.rect(x0, y - hh / 2, w, hh, { fill: o.bg || '#fff', stroke: o.bg || '#fff', lw: 0.1, rx: 0.05, parent: o.parent });
+  return this.text(x, y, s, o);
+};
+
+function copyText(t, btn) {
+  function done(ok) { var o = btn.textContent; btn.textContent = ok ? 'Copied' : 'Select it'; setTimeout(function () { btn.textContent = o; }, 1200); }
+  try { if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(t).then(function () { done(true); }, function () { fallback(); }); return; } } catch (e) { /* fall through */ }
+  fallback();
+  function fallback() { var ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); var ok = false; try { ok = document.execCommand('copy'); } catch (e) { ok = false; } document.body.removeChild(ta); done(ok); }
+}
+
+/* runs step(frac) from 0 to 1 over ms milliseconds; stops when alive() turns false */
+function animate(ms, step, alive) {
+  return new Promise(function (resolve) {
+    if (reduceMotion || ms <= 0) { step(1); resolve(); return; }
+    var t0 = null;
+    function frame(ts) {
+      if (!alive()) { resolve(); return; }
+      if (t0 === null) t0 = ts;
+      var f = Math.min(1, (ts - t0) / ms); step(f);
+      if (f < 1) window.requestAnimationFrame(frame); else resolve();
+    }
+    window.requestAnimationFrame(frame);
+  });
+}
+
+/* ===================================================== points */
+var progress = store.get('progress', null);
+if (!progress || typeof progress !== 'object') progress = {};
+progress.xp = progress.xp || 0; progress.lessons = progress.lessons || {}; progress.badges = progress.badges || {}; progress.best = progress.best || {};
+function showXP(pop) { var x = $('#xp'); x.innerHTML = '★ ' + progress.xp + '<span class="pl"> points</span>'; if (pop && !reduceMotion) { x.classList.remove('pop'); void x.offsetWidth; x.classList.add('pop'); } }
+function addXP(n) { progress.xp += n; store.set('progress', progress); showXP(true); }
+
+/* ===================================================== figures */
+/* node column centers shared by the wire figure and the space-time figure */
+function columns(n) { var a = 1.9, b = n === 2 ? 7.2 : 8.1, xs = []; for (var i = 0; i < n; i++) xs.push(n === 1 ? (a + b) / 2 : a + (b - a) * i / (n - 1)); return xs; }
+
+/* The hosts and links, with the packet's bits on each link at time tc */
+function drawWire(svg, o) {
+  var names = o.names, hops = o.hops, tc = o.tc, n = names.length, xs = columns(n), f = new Fig(svg, 0, 10, 0, 2.3, 1.55), W = n > 3 ? 0.95 : 1.1, H = 0.56, yc = 1.42, onLinks = [];
+  for (var i = 0; i < n - 1; i++) {
+    var xa = xs[i] + W / 2, xb = xs[i + 1] - W / 2, L = xb - xa, h = hops[i], lk = o.links[i];
+    var th = 1.5 + 11 * bwFrac(lk.bw), ph = th / 72 + 0.08;   // a link with more bandwidth is drawn thicker
+    f.line(xa, yc, xb, yc, { color: C.wire, lw: th, cap: 'butt' });
+    f.text((xa + xb) / 2, yc + 0.6, fmtRate(lk.bw) + '\n' + (lk.dist !== undefined ? fmtDist(lk.dist) : fmtT(h.P)), { fs: 7.4, color: C.muted });
+    var sent = clamp(tc - h.start, 0, h.T), got = clamp(tc - h.start - h.P, 0, h.T), onWire = (sent - got) * h.bw;
+    if (h.P > 0 && onWire > 1e-9) {
+      var f1 = clamp((tc - h.start) / h.P, 0, 1), f2 = clamp((tc - h.start - h.T) / h.P, 0, 1);
+      var x1 = xa + f2 * L, x2 = xa + f1 * L; if (x2 - x1 < 0.04) { x1 = Math.max(xa, x2 - 0.04); }
+      f.rect(x1, yc - ph / 2, x2 - x1, ph, { fill: C.panel, stroke: C.brand, lw: 1.3 });
+      if (x2 - x1 < 0.2) {   // a packet too short to see at this scale: point at it
+        f.poly([[(x1 + x2) / 2, yc + ph / 2 + 0.04], [(x1 + x2) / 2 - 0.07, yc + ph / 2 + 0.18], [(x1 + x2) / 2 + 0.07, yc + ph / 2 + 0.18]], { closed: true, fill: C.amber, color: '#B86E00', lw: 0.8 });
+      }
+      onLinks.push((n > 2 ? 'link ' + (i + 1) + ': ' : '') + (onWire < 1 ? 'less than 1 bit (one bit is longer than the link)' : fmtBits(onWire, 3)));
+    }
+  }
+  xs.forEach(function (x, i) {
+    f.slab(x - W / 2, yc - H / 2, W, H, { text: names[i], fs: 8.6, bold: true });
+    var st = '', col = C.muted, hin = hops[i - 1], hout = hops[i];
+    if (i === 0) {
+      if (tc < hout.start) { st = 'waiting in\nthe queue'; col = C.oneway; }
+      else if (tc < hout.start + hout.T) st = 'sending:\n' + Math.floor(100 * (tc - hout.start) / hout.T) + '% sent';
+      else st = 'all bits\nsent';
+    } else {
+      if (tc < hin.firstIn) st = '';
+      else if (tc < hin.end) st = 'receiving:\n' + Math.floor(100 * (tc - hin.firstIn) / hin.T) + '%';
+      else if (i === n - 1) { st = '✓ whole\npacket arrived'; col = C.ok; }
+      else if (tc < hout.start) { st = 'stored, waiting\nto send'; col = C.oneway; }
+      else if (tc < hout.start + hout.T) st = 'forwarding:\n' + Math.floor(100 * (tc - hout.start) / hout.T) + '% sent';
+      else st = 'all bits\nsent';
+    }
+    if (st) f.text(x, yc - H / 2 - 0.3, st, { fs: 7.2, color: col, bold: col !== C.muted });
+  });
+  f.text(5, 0.12, onLinks.length ? 'Bits on the wire now: ' + onLinks.join(', ') : 'No bits on the wire right now.', { fs: 7.8, bold: !!onLinks.length, color: C.navy });
+}
+
+function wrapText(t, n) { var out = [], line = ''; t.split(' ').forEach(function (w) { if (line && (line + ' ' + w).length > n) { out.push(line); line = w; } else line = line ? line + ' ' + w : w; }); out.push(line); return out.join('\n'); }
+/* Numbered moments on a time axis from xa (t = 0) to xb (t = tot). Done moments are green; the amber marker is now. */
+function eventAxis(f, xa, xb, Y0, ev, tc, tot) {
+  var L = xb - xa, last = -9, lvl = 0;
+  f.line(xa, Y0, xb, Y0, { lw: 1 });
+  f.text(xa - 0.12, Y0, 'time', { fs: 7.4, color: C.muted, ha: 'right' });
+  f.text(xa, Y0 - 0.2, '0', { fs: 7.2, color: C.muted }); f.text(xb, Y0 - 0.2, fmtT(tot, 3), { fs: 7.2, color: C.muted });
+  ev.forEach(function (e, i) {
+    var x = xa + L * (tot ? e.t / tot : 0); lvl = x - last < 0.22 ? lvl + 1 : 0; last = x;
+    var y = Y0 + 0.02 + (lvl > 2 ? 1 : lvl) * 0.25, done = tc >= e.t - tot * 1e-9;
+    if (lvl > 2) x += 0.24 * (lvl - 2);   // many moments at the same time: put the extra ones beside the stack
+    if (lvl) f.line(x, Y0, x, y - 0.1, { color: C.wire, lw: 0.8 });
+    el('circle', { cx: f.X(x), cy: f.Y(y), r: 0.1, fill: done ? C.ok : '#fff', stroke: done ? C.ok : C.navy, 'stroke-width': f.pt(1) }, f.root);
+    f.text(x, y, String(i + 1), { fs: 6.8, bold: true, color: done ? '#fff' : C.navy });
+  });
+  var xc = xa + L * clamp(tot ? tc / tot : 1, 0, 1);
+  f.poly([[xc, Y0 - 0.02], [xc - 0.07, Y0 - 0.14], [xc + 0.07, Y0 - 0.14]], { closed: true, fill: C.amber, color: '#B86E00', lw: 0.6 });
+}
+/* The four moments of one packet on one link, in time order. */
+function linkEvents(h) {
+  return [
+    { t: h.start, what: 'The first bit leaves Host A', how: h.q > 0 ? 'queue' : 'right away, with no queue' },
+    { t: h.start + h.T, what: 'The last bit leaves Host A', how: (h.q > 0 ? 'queue + ' : '') + 'transmit' },
+    { t: h.firstIn, what: 'The first bit reaches Host B', how: (h.q > 0 ? 'queue + ' : '') + 'propagation' },
+    { t: h.end, what: 'The last bit reaches Host B: the packet has arrived', how: (h.q > 0 ? 'queue + ' : '') + 'transmit + propagation = latency' }
+  ].map(function (e, i) { e.k = i; return e; }).sort(function (a, b) { return a.t - b.t || a.k - b.k; });
+}
+
+/* The message's journey on one link: bits drain out of Host A, travel as a train, and fill Host B.
+   The train's length on the link is to scale (transmit time ÷ propagation delay), with a minimum so it stays visible. */
+function drawJourney(svg, o) {
+  var h = o.h, tc = o.tc, tot = h.end || 1, f = new Fig(svg, 0, 10, 0, 3.35, 1.55);
+  var A0 = 0.1, AW = 1.5, B0 = 8.4, xa = A0 + AW, xb = B0, L = xb - xa, yc = 2.3, th = 0.18 + 0.4 * bwFrac(h.bw);
+  var sent = h.T > 0 ? clamp((tc - h.start) / h.T, 0, 1) : (tc >= h.start ? 1 : 0), got = h.T > 0 ? clamp((tc - h.firstIn) / h.T, 0, 1) : (tc >= h.firstIn ? 1 : 0);
+  [[A0, 'Host A', 1 - sent, 'to send'], [B0, 'Host B', got, 'received']].forEach(function (b, j) {
+    f.slab(b[0], yc - 0.62, AW, 1.24, {});
+    f.text(b[0] + AW / 2, yc + 0.38, b[1], { fs: 8.8, bold: true, color: C.navy });
+    f.rect(b[0] + 0.15, yc - 0.12, AW - 0.3, 0.22, { fill: '#fff', stroke: C.wire, lw: 0.8 });
+    if (b[2] > 0) f.rect(b[0] + 0.15, yc - 0.12, (AW - 0.3) * b[2], 0.22, { fill: j ? '#D3F1E8' : C.panel, stroke: j ? C.ok : C.brand, lw: 0.8 });
+    f.text(b[0] + AW / 2, yc - 0.38, Math.round(100 * b[2]) + '% ' + b[3], { fs: 7.6, bold: true, color: j ? '#0B7A64' : C.navy });
+  });
+  f.rect(xa, yc - th / 2, L, th, { fill: C.bg || '#F4F8FB', stroke: C.wire, lw: 1 });
+  f.text((xa + xb) / 2, 3.18, 'Link: ' + fmtRate(h.bw) + (o.dist !== undefined ? ' · ' + fmtDist(o.dist) : '') + ' · transmit ' + fmtT(h.T, 3) + ' · propagation ' + fmtT(h.P, 3), { fs: 7.4, color: C.muted });
+  var scaled = false, status;
+  if (h.P > 0) {
+    var f1 = (tc - h.start) / h.P, f2 = (tc - h.start - h.T) / h.P, c1 = clamp(f2, 0, 1), c2 = clamp(f1, 0, 1);
+    var eps = Math.max(1e-15, tot * 1e-9);   // rounding allowance that grows with the total time
+    if (tc > h.start + eps && tc < h.end - eps) {   // some bits have left Host A and not all have reached Host B
+      var x1 = xa + c1 * L, x2 = xa + c2 * L;
+      if (x2 - x1 < 0.3) { scaled = true; if (c2 >= 1) x1 = Math.max(xa, x2 - 0.3); else if (c1 <= 0) x2 = Math.min(xb, x1 + 0.3); else x1 = Math.max(xa, x2 - 0.3); }
+      f.rect(x1, yc - th / 2 + 0.03, x2 - x1, th - 0.06, { fill: C.panel, stroke: C.brand, lw: 1 });
+      var nst = Math.min(60, Math.max(3, Math.round((x2 - x1) / 0.07)));
+      for (var i = 1; i < nst; i++) { var xx = x1 + (x2 - x1) * i / nst; f.line(xx, yc - th / 2 + 0.05, xx, yc + th / 2 - 0.05, { color: C.brand, lw: 0.4 }); }
+      if (tc > h.start + eps && tc < h.firstIn - eps) {   // the first bit is on the link
+        f.rect(x2 - 0.06, yc - th / 2 + 0.03, 0.06, th - 0.06, { fill: C.amber, stroke: '#B86E00', lw: 0.8 });
+        f.arrow(x2 - 0.03, yc + th / 2 + 0.2, x2 - 0.03, yc + th / 2 + 0.03, { lw: 1, color: '#B86E00' });
+        f.label(clamp(x2 - 0.03, xa + 0.32, xb - 0.32), yc + th / 2 + 0.32, 'first bit', { fs: 7.6, bold: true, color: '#B86E00' });
+      }
+      if (tc >= h.start + h.T - eps && tc < h.end - eps) {   // the last bit has left Host A and is on the link
+        f.rect(x1, yc - th / 2 + 0.03, 0.06, th - 0.06, { fill: C.navy, stroke: C.navy, lw: 0.8 });
+        f.arrow(x1 + 0.03, yc - th / 2 - 0.2, x1 + 0.03, yc - th / 2 - 0.03, { lw: 1, color: C.navy });
+        f.label(clamp(x1 + 0.03, xa + 0.32, xb - 0.32), yc - th / 2 - 0.32, 'last bit', { fs: 7.6, bold: true, color: C.navy });
+      }
+    }
+  }
+  if (tc <= 0 && h.start <= 0) status = 'Nothing has been sent yet. Press Send to start Host A sending.';
+  else if (tc < h.start) status = 'The packet waits in Host A\'s queue. No bit has left yet.';
+  else if (h.P === 0) status = tc >= h.end ? 'With no distance, every bit arrived the moment it left. The packet has arrived.' : 'With no distance, each bit arrives the moment it leaves.';
+  else if (tc < h.start + h.T && tc < h.firstIn) status = 'Bits leave Host A one after another. The first bit is still on its way.';
+  else if (tc < h.start + h.T) status = 'The first bit has arrived, but Host A is still sending: this packet is longer than the link.';
+  else if (tc < h.firstIn) status = 'Every bit has left Host A. The whole packet is on the link, and the first bit has not arrived yet.';
+  else if (tc < h.end) status = 'Host B is receiving. It has the packet only when the last bit arrives.';
+  else status = '✓ The last bit has arrived. Latency = ' + fmtT(h.end, 4) + '.';
+  f.text(5, 1.25, wrapText(status, 80) + (scaled ? '\n(The bits are drawn longer than to scale, so you can see them.)' : ''), { fs: 7.6, bold: true, color: tc >= h.end ? '#0B7A64' : C.navy });
+  eventAxis(f, xa, xb, 0.42, linkEvents(h), tc, tot);
+}
+
+/* clip a polygon (points [x, t]) to t <= tc */
+function clipT(pts, tc) {
+  var out = [];
+  for (var i = 0; i < pts.length; i++) {
+    var a = pts[i], b = pts[(i + 1) % pts.length], ina = a[1] <= tc, inb = b[1] <= tc;
+    if (ina) out.push(a);
+    if (ina !== inb) { var r = (tc - a[1]) / (b[1] - a[1]); out.push([a[0] + r * (b[0] - a[0]), tc]); }
+  }
+  return out;
+}
+
+/* Time runs down the page. Each band is the packet: its height at the sender is the transmit time, its slope is the propagation delay. */
+function drawSpaceTime(svg, o) {
+  var names = o.names, hops = o.hops, n = names.length, xs = o.detail ? [2.8, 7.2] : columns(n), tMax = o.tMax || hops[hops.length - 1].end || 1, tc = o.tc;
+  var f = new Fig(svg, 0, 10, 0, 4.4, 1.55), top = 3.7, bot = names.length > 2 ? 0.68 : 0.45;
+  function Y(t) { return top - (top - bot) * t / tMax; }
+  xs.forEach(function (x, i) { f.text(x, 4.13, names[i], { fs: 8.6, bold: true, color: C.navy }); f.line(x, top, x, bot - 0.08, { color: C.ink, lw: 1.2 }); });
+  f.arrow(0.4, top, 0.4, bot - 0.05, { lw: 1 }); f.text(0.22, (top + bot) / 2, 'time', { fs: 8, rot: -90, color: C.muted });
+  hops.forEach(function (h, i) {
+    var xa = xs[i], xb = xs[i + 1];
+    if (h.q > 0 && h.ready <= tc) f.rect(xa - 0.09, Y(Math.min(h.start, tc)), 0.18, Y(h.ready) - Y(Math.min(h.start, tc)), { fill: C.amberSoft, stroke: C.amber, lw: 1 });
+    var quad = [[xa, h.start], [xb, h.start + h.P], [xb, h.end], [xa, h.start + h.T]], cl = clipT(quad, tc);
+    if (cl.length > 2) f.poly(cl.map(function (p) { return [p[0], Y(p[1])]; }), { closed: true, fill: CAT[BAND[i % 4]].fill, color: CAT[BAND[i % 4]].line, lw: 1.3 });
+    f.poly(quad.map(function (p) { return [p[0], Y(p[1])]; }), { closed: true, color: CAT[BAND[i % 4]].line, lw: 0.6, dash: [2, 2] });
+  });
+  if (tc < tMax * 0.999) f.line(0.55, Y(tc), 9.9, Y(tc), { color: C.amber, lw: 1.6, dash: [5, 3] });
+  var last = hops[hops.length - 1], thin = hops.some(function (h) { return h.T < tMax * 0.012; });
+  if (o.detail) {   // one link: label each part
+    var h = hops[0], xa = xs[0], xb = xs[1];
+    var yq = (Y(0) + Y(h.start)) / 2, ytr = (Y(h.start) + Y(h.start + h.T)) / 2;
+    if (h.q > 0) { yq = Math.min(yq, top - 0.12); ytr = Math.min(ytr, yq - 0.26); f.label(xa - 0.2, yq, 'Queue ' + fmtT(h.q, 3), { fs: 7.6, ha: 'right', color: C.oneway, bold: true }); }
+    else ytr = Math.min(ytr, top - 0.12);
+    ytr = Math.max(ytr, bot + 0.15);
+    f.line(xa - 0.14, Y(h.start), xa - 0.14, Y(h.start + h.T), { color: C.navy, lw: 1.4 });
+    f.label(xa - 0.2, ytr, 'Transmit ' + fmtT(h.T, 3), { fs: 7.6, ha: 'right', color: C.navy, bold: true });
+    var ex = (xa + xb) / 2, ey = (Y(h.start) + Y(h.start + h.P)) / 2, steep = (Y(h.start) - Y(h.start + h.P)) / (xb - xa) > 0.25;
+    if (steep) f.label(ex + 0.18, ey + 0.12, 'Propagation ' + fmtT(h.P, 3), { fs: 7.6, bold: true, color: C.navy, ha: 'left' });
+    else f.text(ex, ey + 0.24, 'Propagation ' + fmtT(h.P, 3), { fs: 7.6, bold: true, color: C.navy });
+    var yl = Y(h.end) - 0.02, yf = Math.max(Y(h.firstIn), yl + 0.2);
+    f.text(xb + 0.15, yf, 'first bit arrives ' + fmtT(h.firstIn, 3), { fs: 7.4, ha: 'left' });
+    f.text(xb + 0.15, yl, 'last bit arrives ' + fmtT(h.end, 3), { fs: 7.4, ha: 'left', bold: true });
+  } else {
+    f.text(xs[n - 1] + 0.12, Y(last.end), fmtT(last.end, 3), { fs: 7.4, ha: 'left', bold: true });
+    f.text(5, 0.17 + 0.25, 'Whole packet held at: ' + hops.map(function (h, i) { return names[i + 1] + ' ' + fmtT(h.end, 3); }).join(' · '), { fs: 7.4, color: C.muted });
+  }
+  f.text(0.4, top + 0.17, 't = 0', { fs: 7.2, color: C.muted });
+  f.text(5, 0.17 - (n > 2 ? 0 : 0), 'Latency: ' + fmtT(last.end, 4) + (n > 2 ? ' from Host A to Host B' : '') + (thin ? '   (a band that looks like a line has a transmit time too short to see at this scale)' : ''), { fs: 8, bold: true, color: C.navy });
+}
+
+/* stacked bar of the delay parts */
+function drawBar(svg, parts) {
+  var f = new Fig(svg, 0, 10, 0, 1.15, 1.5), tot = 0, x = 0.3, W = 9.4;
+  parts.forEach(function (p) { tot += p.v; });
+  if (tot <= 0) return;
+  parts.forEach(function (p) {
+    var w = W * p.v / tot; if (w <= 0) return;
+    f.rect(x, 0.62, w, 0.38, { fill: p.fill, stroke: p.line, lw: 1 });
+    if (w > f.tw(p.name, 7.8) + 0.15) f.text(x + w / 2, 0.81, p.name, { fs: 7.8, bold: true });
+    x += w;
+  });
+  f.text(5, 0.26, parts.map(function (p) { return p.name + ' ' + fmtT(p.v, 3) + ' (' + fmtN(100 * p.v / tot, 3) + '%)'; }).join('    '), { fs: 7.8 });
+}
+
+/* the link as a pipe: length = delay, width = bandwidth, volume = delay × bandwidth */
+/* When Host A sends a message of S bits on a link with one-way delay D, bandwidth bw, and window W (round-trip mode):
+   it sends one window per round trip, at the full bandwidth; with no window limit it sends without a pause.
+   Returns the sending intervals, when the last bit leaves (te) and when it reaches Host B (done). */
+function pipeSchedule(D, bw, W, S) {
+  var iv = [], left = S, k = 0;
+  if (!(W < Infinity) || W >= bw * 2 * D) iv.push([0, S / bw]);
+  else while (left > 0 && k < 100000) { var b = Math.min(W, left); iv.push([k * 2 * D, k * 2 * D + b / bw]); left -= b; k++; }
+  var te = iv.length ? iv[iv.length - 1][1] : 0;
+  return { iv: iv, te: te, done: te + D };
+}
+function sentBy(iv, t, bw) { var s = 0; iv.forEach(function (x) { if (t > x[0]) s += (Math.min(t, x[1]) - x[0]) * bw; }); return s; }
+function sendingDuring(iv, a, b) { for (var i = 0; i < iv.length; i++) if (iv[i][0] < b && iv[i][1] > a) return true; return false; }
+function sendingAt(iv, t) { for (var i = 0; i < iv.length; i++) if (t >= iv[i][0] && t < iv[i][1]) return true; return false; }
+/* the pipe: a cylinder whose columns of blocks light up where bits are; has(c) says whether column c holds bits */
+function drawCylinder(f, x0, L, yc, H, rows, N, has, hi) {
+  var yb = yc - H / 2;
+  f.rect(x0, yb, L, H, { fill: C.soft, stroke: C.navy, lw: 1.2 });
+  el('ellipse', { cx: f.X(x0 + L), cy: f.Y(yc), rx: r4(Math.min(0.14, H / 3)), ry: r4(H / 2), fill: '#DDEFF6', stroke: C.navy, 'stroke-width': f.pt(1.2) }, f.root);
+  el('ellipse', { cx: f.X(x0), cy: f.Y(yc), rx: r4(Math.min(0.14, H / 3)), ry: r4(H / 2), fill: C.navy, stroke: C.navy, 'stroke-width': f.pt(1.2) }, f.root);
+  var cw = L / N, rh = (H - 0.08) / rows;
+  for (var c = 0; c < N; c++) {
+    var on = has(c), hl = on && hi === c;
+    for (var r = 0; r < rows; r++) f.rect(x0 + c * cw + 0.02, yb + 0.04 + r * rh + 0.015, cw - 0.04, rh - 0.03, { fill: hl ? C.amber : on ? C.brand : '#fff', stroke: hl ? '#B86E00' : on ? C.navy : C.wire, lw: 0.5, rx: 0.02 });
+  }
+}
+function doneBanner(f, xm, y, text) {
+  var w = f.tw(text, 8.4) + 0.4;
+  f.rect(xm - w / 2, y - 0.2, w, 0.4, { fill: C.okSoft || '#E1F5EF', stroke: C.ok, lw: 1.6, rx: 0.08 });
+  f.text(xm, y, text, { fs: 8.4, bold: true, color: '#0B7A64' });
+}
+function hostBar(f, x, w, y, frac, label, done) {
+  f.rect(x, y - 0.07, w, 0.14, { fill: '#fff', stroke: C.wire, lw: 0.7 });
+  if (frac > 0) f.rect(x, y - 0.07, w * frac, 0.14, { fill: done ? '#D3F1E8' : C.panel, stroke: done ? C.ok : C.brand, lw: 0.7 });
+  f.text(x + w / 2, y - 0.22, (done ? '✓ ' : '') + label, { fs: 7, bold: true, color: done ? '#0B7A64' : C.navy });
+}
+function drawPipe(svg, o) {
+  /* The link as a pipe: length = one-way delay, width = bandwidth (both logarithmic), volume = delay × bandwidth.
+     Host A sends a message of o.size bits (or keeps sending if o.size is Infinity). The pipe fills; at t = delay the first
+     bit reaches Host B and the pipe is full; it stays full while the message streams, then empties after the last bit leaves.
+     The transfer is complete when the last bit reaches Host B. In round-trip mode acknowledgments come back, and a window W
+     makes Host A send one window per round trip. */
+  var D = o.delay, bw = o.bw, rtt = o.mode === 'rtt', R = 2 * D, S = o.size > 0 ? o.size : Infinity;
+  var V = bw * D, W = rtt && o.win !== null && o.win !== undefined && o.win !== '' ? o.win : Infinity;
+  var sch = pipeSchedule(D, bw, W, S), finite = S < Infinity, tEnd = finite ? sch.done : (rtt ? R : D);
+  if (!finite && W < Infinity) { sch = pipeSchedule(D, bw, W, W); tEnd = R; }   // no message size: one window, up to the first acknowledgment
+  var tc = o.tc === undefined ? tEnd : clamp(o.tc, 0, tEnd), eps = Math.max(1e-15, tEnd * 1e-9);
+  var iv = finite || W < Infinity ? sch.iv : [[0, Infinity]];
+  var f = new Fig(svg, 0, 10, 0, 3.95, 1.5), L = 1.4 + 5.0 * clamp((Math.log10(D) + 6) / 6, 0, 1), H = 0.2 + 0.9 * bwFrac(bw);
+  var yc = 2.2, yb = yc - H / 2, yt = yc + H / 2, x0 = 1.65, x1 = x0 + L, rows = 1 + Math.round(4 * bwFrac(bw)), N = Math.max(5, Math.round(L / 0.24));
+  var sent = Math.min(sentBy(iv, tc, bw), S), got = Math.min(sentBy(iv, tc - D, bw), S), on = sent - got, done = finite && tc >= sch.done - eps;
+  f.slab(0.1, yc - 0.34, 0.98, 0.68, { text: 'Host A', fs: 8.2, bold: true });
+  f.slab(x1 + 0.38, yc - 0.34, 0.98, 0.68, { text: 'Host B', fs: 8.2, bold: true, fill: done ? '#E1F5EF' : '#fff' });
+  if (finite) {
+    hostBar(f, 0.14, 0.9, yc - 0.6, 1 - sent / S, Math.round(100 * (1 - sent / S)) + '% to send', false);
+    hostBar(f, x1 + 0.42, 0.9, yc - 0.6, got / S, Math.round(100 * got / S) + '% received', done);
+  }
+  // The first bit leaves at t = 0 and is at fraction tc / D of the pipe: amber marks the column it is in, the leading lit column.
+  var front = tc > 0 && tc < D ? clamp(Math.ceil(tc / D * N - 1e-9) - 1, 0, N - 1) : -1;
+  drawCylinder(f, x0, L, yc, H, rows, N, function (c) { var a = tc - (c + 1) / N * D, b = tc - c / N * D; return b > 0 && sendingDuring(iv, Math.max(0, a), b); }, tc < D ? front : -1);
+  if (done) { var bt = '✓ Transfer complete: all ' + fmtBytes(S, o.binary, 3) + ' arrived'; if (f.tw(bt, 8.4) + 0.4 < L - 0.1) doneBanner(f, (x0 + x1) / 2, yc, bt); else { var bw2 = f.tw(bt, 8.4) + 0.4; doneBanner(f, Math.min(9.9 - bw2 / 2, x1 + 1.55 + bw2 / 2), yc, bt); } }
+  // length: a time ruler on top
+  var yr = yt + 0.3;
+  f.line(x0, yr, x1, yr, { lw: 1 });
+  [0, 0.5, 1].forEach(function (q) { var xq = x0 + q * L; f.line(xq, yr - 0.06, xq, yr + 0.06, { lw: 1 }); f.text(xq, yr + 0.18, fmtT(q * D, 3), { fs: 7.2, color: C.muted }); });
+  var lt = 'length = one-way delay = ' + fmtT(D, 3) + ' (the time one bit takes to cross)', lw2 = f.tw(lt, 8) / 2 + 0.1;
+  f.text(clamp((x0 + x1) / 2, lw2, 10 - lw2), yr + 0.42, lt, { fs: 8, bold: true, color: C.navy });
+  f.arrow(x0 - 0.3, yc, x0 - 0.3, yt + 0.02, { lw: 1, color: '#B86E00' }); f.arrow(x0 - 0.3, yc, x0 - 0.3, yb - 0.02, { lw: 1, color: '#B86E00' });
+  f.text(0.1, 3.78, 'width = bandwidth = ' + fmtRate(bw, 3) + ' (bits put in per second)', { fs: 8, bold: true, ha: 'left', color: '#B86E00' });
+  // acknowledgments come back on a return path
+  var ya = yb - 0.36;
+  if (rtt) {
+    f.line(x1, ya, x0, ya, { color: C.wire, lw: 1.2, dash: [4, 3] });
+    f.text((x0 + x1) / 2, ya - 0.17, 'acknowledgments come back this way: another ' + fmtT(D, 3), { fs: 7.2, color: C.muted });
+    if (tc >= D && !(done && tc >= sch.done + D)) { var ph = ((tc - D) % R + R) % R; if (ph < D && sendingAt(iv, tc - D - ph)) { var xk = x1 - L * ph / D; f.rect(xk - 0.17, ya - 0.08, 0.34, 0.16, { fill: C.ok, stroke: '#0B7A64', lw: 0.8, rx: 0.04 }); f.text(xk, ya, 'ACK', { fs: 6.6, bold: true, color: '#fff' }); } }
+  }
+  f.text(5, 0.82, 't = ' + fmtT(tc, 3) + '  ·  sent: ' + fmtBitsW(sent, 3) + '  ·  on the link: ' + fmtBitsW(on, 3) + '  ·  arrived at Host B: ' + fmtBitsW(got, 3), { fs: 7.6, color: C.navy });
+  var st, col = C.navy, waiting = !sendingAt(iv, tc) && sent < S && tc > 0;
+  if (done) { st = 'The transfer is complete at t = ' + fmtT(sch.done, 3) + ': one delay for the first bit (' + fmtT(D, 3) + ') plus ' + fmtT(sch.te, 3) + ' to send it all' + (W < Infinity && sch.iv.length > 1 ? ', in ' + sch.iv.length + ' windows, one per round trip' : '') + '. Throughput = ' + fmtRate(S / sch.done, 3) + '.'; col = '#0B7A64'; }
+  else if (finite && tc >= sch.te) st = 'Host A has sent the last bit. The pipe empties as the last bits travel to Host B.';
+  else if (waiting) { st = 'Host A has used up its window (' + fmtBytes(W, o.binary, 3) + ') and waits for an acknowledgment. Part of the pipe goes empty.'; col = '#B86E00'; }
+  else if (tc <= 0) st = 'Nothing has been sent yet. Press Send to start Host A sending' + (finite ? ' the ' + fmtBytes(S, o.binary, 3) + ' message.' : '.');
+  else if (tc < D) st = 'The first bit (amber) is on its way. Host A keeps putting bits in behind it.';
+  else if (V < 1) st = 'The first bit has reached Host B before Host A finished sending it: one bit is longer than this whole link.';
+  else if (!rtt && !finite) { st = 'The first bit has reached Host B. The pipe is full: ' + fmtBits(V, 3) + ' (' + fmtBytes(V, o.binary, 3) + ') on the link = delay × bandwidth.'; col = '#0B7A64'; }
+  else if (!rtt) st = 'The pipe is full: ' + fmtBytes(V, o.binary, 3) + ' on the link (delay × bandwidth). It stays full while the rest of the message streams through.';
+  else if (tc < R) st = 'Host B acknowledges the first bit. The acknowledgment needs another ' + fmtT(D, 3) + ' to come back, and Host A keeps sending.';
+  else if (!finite) { st = 'The acknowledgment arrives after one RTT. Host A has sent ' + fmtBytes(sent, o.binary, 3) + (sent >= bw * R * 0.999 ? ' = RTT × bandwidth: the window that keeps the pipe full.' : ', less than RTT × bandwidth (' + fmtBytes(bw * R, o.binary, 3) + '), so throughput is only ' + fmtRate(W / R, 3) + '.'); col = sent >= bw * R * 0.999 ? '#0B7A64' : '#B86E00'; }
+  else st = 'Acknowledgments keep coming back, and Host A keeps the pipe full.';
+  f.text(5, 0.42, wrapText(st, 100), { fs: 7.8, bold: true, color: col });
+  f.text(5, 0.12, 'pipe volume = delay × bandwidth = ' + (V < 1 ? 'less than 1 bit' : fmtBits(V, 3) + ' = ' + fmtBytes(V, o.binary, 3)) + (rtt ? '  ·  RTT × bandwidth = ' + fmtBitsW(2 * V, 3) : '') + (finite ? '  ·  message ' + fmtBytes(S, o.binary, 3) : ''), { fs: 7.2, color: C.muted });
+}
+
+/* how a transfer uses the link over time: height = rate, so area = bits.
+   Bandwidth is the height of the box; throughput is the average height over the whole transfer. */
+function drawUsage(svg, o) {
+  var f = new Fig(svg, 0, 10, 0, 2.75, 1.5), X0 = 1.25, X1 = 9.55, Y0 = 0.62, Y1 = 2.12, tot = o.rtt + o.trans;
+  if (tot <= 0) return;
+  function PX(t) { return X0 + (X1 - X0) * t / tot; }
+  function PY(r) { return Y0 + (Y1 - Y0) * r / o.bw; }
+  var xr = PX(o.rtt), yt = PY(o.thr), ty = yt > (Y0 + Y1) / 2 ? Y0 + 0.36 : Y1 - 0.36, ly = yt + 0.17 > Y1 - 0.05 ? yt - 0.17 : yt + 0.17;
+  if (o.rtt > 0) {
+    f.rect(X0, Y0, xr - X0, Y1 - Y0, { fill: '#fff', stroke: C.wire, lw: 0.8, dash: [3, 2] });
+    if (xr - X0 > 1.5) f.text((X0 + xr) / 2, ty, 'waiting one RTT:\nno data arrives yet', { fs: 7.6, color: C.muted });
+  }
+  f.rect(xr, Y0, X1 - xr, Y1 - Y0, { fill: C.panel, stroke: C.brand, lw: 1.2 });
+  if (X1 - xr > 1.6) f.text((xr + X1) / 2, ty, 'data arrives at\nthe full bandwidth', { fs: 7.6, bold: true, color: C.navy });
+  else f.text(X1, Y1 + 0.17, 'data at the full bandwidth ↓', { fs: 7.4, bold: true, color: C.navy, ha: 'right' });
+  f.line(X0, yt, X1, yt, { color: C.oneway, lw: 2.2, dash: [6, 3] });
+  if (X1 - xr > 3) f.label(X1 - 0.08, ly, 'throughput = average rate = ' + fmtRate(o.thr, 3), { fs: 7.8, bold: true, color: '#B86E00', ha: 'right' });
+  else f.label(X0 + 0.12, ly, 'throughput = average rate = ' + fmtRate(o.thr, 3), { fs: 7.8, bold: true, color: '#B86E00', ha: 'left' });
+  f.line(X0, Y0, X1 + 0.1, Y0, { lw: 1 }); f.line(X0, Y0, X0, Y1 + 0.2, { lw: 1 });
+  f.text(X0 - 0.08, Y1, fmtRate(o.bw, 3), { fs: 7.4, ha: 'right', bold: true }); f.text(X0 - 0.08, Y1 - 0.2, 'bandwidth', { fs: 7, ha: 'right', color: C.muted });
+  f.text(X0 - 0.08, Y0, '0', { fs: 7.4, ha: 'right' });
+  f.text(X0, Y0 - 0.2, '0', { fs: 7.2, color: C.muted });
+  if (o.rtt > 0 && xr - X0 > 0.5 && X1 - xr > 0.5) f.text(xr, Y0 - 0.2, fmtT(o.rtt, 3), { fs: 7.2, color: C.muted });
+  f.text(X1, Y0 - 0.2, fmtT(tot, 3), { fs: 7.2, color: C.muted, bold: true });
+  f.text((X0 + X1) / 2, 0.14, 'time from the request to the last bit (rate goes up the page)', { fs: 7.4, color: C.muted });
+  f.text(5.4, 2.55, 'Both shapes hold the same number of bits: the blue box and the area under the amber line.', { fs: 7.4, color: C.muted });
+  if (o.tc !== undefined && o.tc < tot * 0.999) {   // the moment shown in the transfer animation
+    var xt = PX(clamp(o.tc, 0, tot));
+    f.line(xt, Y0, xt, Y1 + 0.12, { color: C.amber, lw: 1.8, dash: [4, 2] });
+  }
+}
+
+/* Eight bits at two bandwidths laid out along the wire, in meters. Both rows move at the same signal speed;
+   phase (0 to 1 per slow bit time) slides them along. */
+var SCALE_OBJECTS = [[0.001, 'a grain of sand'], [0.007, 'a grain of rice'], [0.02, 'a coin'], [0.3, 'a ruler'], [1.8, 'a person'], [12, 'a bus'], [100, 'a football field'], [828, 'the tallest building'], [5000, 'a 5 km run'], [42195, 'a marathon'], [1e6, 'a long drive'], [4e6, 'a continent']];
+function drawBitSpace(svg, o) {
+  var f = new Fig(svg, 0, 10, 0, 3.05, 1.5), X0 = 1.6, X1 = 9.7, Lb = bitLength(o.rate, o.medium), S = 8 * Lb, w1 = (X1 - X0) / 8, shift = (o.phase || 0) * w1, pat = [1, 0, 1, 1, 0, 0, 1, 0];
+  [[o.rate, 2.15, 1, C.panel, C.brand, C.navy], [o.rate * o.mult, 1.3, o.mult, '#E7E1FF', '#7B61FF', '#7B61FF']].forEach(function (r) {
+    var w = w1 / r[2], k = Math.floor(shift / w), x = X0 - w + (shift - k * w);
+    f.line(X0, r[1] + 0.2, X1, r[1] + 0.2, { color: C.wire, lw: 9, cap: 'butt' });
+    f.text(X0 - 0.12, r[1] + 0.28, fmtRate(r[0]), { fs: 8, bold: true, ha: 'right', color: r[5] });
+    f.text(X0 - 0.12, r[1] + 0.08, 'bit = ' + fmtLen(Lb / r[2]), { fs: 7, ha: 'right', color: C.muted });
+    for (var sidx = 0; x < X1; sidx++, x += w) {
+      var a = Math.max(x, X0), b = Math.min(x + w, X1); if (b <= a) continue;
+      var v = pat[(((sidx - k) % 8) + 8) % 8];
+      f.rect(a, r[1] + 0.04, b - a, 0.32, { fill: v ? r[3] : '#fff', stroke: r[4], lw: 0.7 });
+      if (w > 0.3 && b - a > 0.2) f.text((a + b) / 2, r[1] + 0.2, String(v), { fs: 7.4, bold: true });
+    }
+  });
+  // one bit, measured
+  f.arrow(X1 - w1, 2.72, X1, 2.72, { lw: 1, both: true, color: C.navy });
+  f.label(X1 - w1 / 2, 2.88, 'one bit = ' + fmtLen(Lb), { fs: 7.6, bold: true, color: C.navy });
+  // the ruler in meters
+  var yr = 0.85;
+  f.line(X0, yr, X1, yr, { lw: 1 });
+  for (var i = 0; i <= 8; i++) { var xi = X0 + i * w1; f.line(xi, yr - 0.05, xi, yr + 0.05, { lw: 1 }); if (i % 2 === 0) f.text(xi, yr - 0.19, fmtLen(i * Lb), { fs: 7, color: C.muted }); }
+  f.text(X0 - 0.12, yr, 'distance', { fs: 7.2, color: C.muted, ha: 'right' });
+  var ob = null; SCALE_OBJECTS.forEach(function (x) { if (x[0] <= S && x[0] >= S / 60) ob = x; });
+  if (ob) {
+    var xe = X0 + (X1 - X0) * ob[0] / S, yo = 0.32;
+    f.line(X0, yo, xe, yo, { color: C.ok, lw: 2.2 }); f.line(X0, yo - 0.07, X0, yo + 0.07, { color: C.ok, lw: 1.4 }); f.line(xe, yo - 0.07, xe, yo + 0.07, { color: C.ok, lw: 1.4 });
+    if (xe < 6.5) f.text(xe + 0.1, yo, 'for scale: ' + ob[1] + ' (' + fmtLen(ob[0]) + ')', { fs: 7.4, bold: true, color: '#0B7A64', ha: 'left' });
+    else f.text(X0, yo + 0.18, 'for scale: ' + ob[1] + ' (' + fmtLen(ob[0]) + ')', { fs: 7.4, bold: true, color: '#0B7A64', ha: 'left' });
+  }
+  f.text(5.65, 0.12, 'Both rows move along the wire at the same speed (' + fmtN(SPEED[o.medium]) + ' m/s). The faster link\'s bits are shorter, not faster.', { fs: 7.2, color: C.muted });
+}
+
+/* A file transfer through the pipe: the request goes from Host A to Host B, the data comes back at the full bandwidth,
+   and the transfer completes when the last bit reaches Host A at t = RTT + size ÷ bandwidth. */
+function transferEvents(o) {
+  var T = o.bits / o.bw, h = o.rtt / 2;
+  return [
+    { t: 0, what: 'Host A sends its request' },
+    { t: h, what: 'The request reaches Host B, which starts sending' },
+    { t: o.rtt, what: 'The first data bit reaches Host A' },
+    { t: h + T, what: 'Host B puts the last bit on the link' },
+    { t: o.rtt + T, what: 'The last bit reaches Host A: the transfer is complete' }
+  ].map(function (e, i) { e.k = i; return e; }).sort(function (a, b) { return a.t - b.t || a.k - b.k; });
+}
+function drawTransfer(svg, o) {
+  var T = o.bits / o.bw, hD = o.rtt / 2, tot = o.rtt + T, tc = clamp(o.tc, 0, tot), eps = Math.max(1e-15, tot * 1e-9);
+  var f = new Fig(svg, 0, 10, 0, 3.5, 1.55), A0 = 0.1, AW = 1.5, B0 = 8.4, xa = A0 + AW, xb = B0, L = xb - xa, yc = 2.4, th = 0.18 + 0.4 * bwFrac(o.bw);
+  var doneX = tc >= o.rtt + T - Math.max(1e-15, (o.rtt + T) * 1e-9);
+  var sentF = T > 0 ? clamp((tc - hD) / T, 0, 1) : (tc >= hD ? 1 : 0), gotF = T > 0 ? clamp((tc - o.rtt) / T, 0, 1) : (tc >= o.rtt ? 1 : 0);
+  [[A0, 'Host A\n(downloads)', gotF, 'received', '#D3F1E8', C.ok, '#0B7A64'], [B0, 'Host B\n(server)', 1 - sentF, 'still to send', C.panel, C.brand, C.navy]].forEach(function (b) {
+    f.slab(b[0], yc - 0.62, AW, 1.24, { fill: doneX && b[0] === A0 ? '#E1F5EF' : '#fff' });
+    f.text(b[0] + AW / 2, yc + 0.36, b[1], { fs: 7.8, bold: true, color: C.navy });
+    f.rect(b[0] + 0.15, yc - 0.12, AW - 0.3, 0.22, { fill: '#fff', stroke: C.wire, lw: 0.8 });
+    if (b[2] > 0) f.rect(b[0] + 0.15, yc - 0.12, (AW - 0.3) * b[2], 0.22, { fill: b[4], stroke: b[5], lw: 0.8 });
+    f.text(b[0] + AW / 2, yc - 0.38, (doneX && b[0] === A0 ? '✓ ' : '') + Math.round(100 * b[2]) + '% ' + b[3], { fs: 7.4, bold: true, color: b[6] });
+  });
+  var H = 0.24 + 0.5 * bwFrac(o.bw), rows = 1 + Math.round(3 * bwFrac(o.bw)), x0p = xa + 0.25, Lp = L - 0.5, N = Math.max(6, Math.round(Lp / 0.24)), done = tc >= tot - eps;
+  f.text((xa + xb) / 2, 3.33, 'Link: ' + fmtRate(o.bw) + ' · one-way delay ' + fmtT(hD, 3) + ' · file ' + fmtBytes(o.bits, o.binary, 3) + ' · transmit ' + fmtT(T, 3), { fs: 7.4, color: C.muted });
+  // a column holds data if Host B was sending during the times whose bits are now at that column (data flows from right to left)
+  drawCylinder(f, x0p, Lp, yc, H, rows, N, function (c) {
+    if (hD <= 0) return false;
+    var pA = c / N, pB = (c + 1) / N, a = tc - (1 - pA) * hD, b = tc - (1 - pB) * hD;   // send times for the column's two edges
+    return Math.min(b, hD + T) > Math.max(a, hD) && b > hD;
+  }, -1);
+  if (hD > 0 && tc > hD + eps && tc < tot - eps) f.text((xa + xb) / 2, yc - H / 2 - 0.18, '← the file\'s data at ' + fmtRate(o.bw), { fs: 7.4, bold: true, color: C.navy });
+  if (done) doneBanner(f, (xa + xb) / 2, yc, '✓ Transfer complete: all ' + fmtBytes(o.bits, o.binary, 3) + ' received');
+  // the request, travelling right just above the pipe
+  var yq = yc + H / 2 + 0.2;
+  f.line(x0p, yq, x0p + Lp, yq, { color: C.wire, lw: 0.8, dash: [3, 3] });
+  if (hD > 0 && tc < hD - eps) { var xq = clamp(x0p + Lp * tc / hD, x0p + 0.32, x0p + Lp - 0.32); f.rect(xq - 0.28, yq - 0.08, 0.56, 0.16, { fill: C.amber, stroke: '#B86E00', lw: 0.8, rx: 0.04 }); f.text(xq, yq, 'request', { fs: 6.6, bold: true }); }
+  var got = gotF * o.bits, st;
+  if (tc <= 0) st = 'Host A is about to send its request for the file. Press Send to start.';
+  else if (tc < hD - eps) st = 'The request is on its way to Host B. The pipe carries no data yet.';
+  else if (tc < o.rtt - eps) st = 'Host B is sending. The first data has not reached Host A yet: Host A has received nothing.';
+  else if (tc < tot - eps) st = 'Data is arriving at the full bandwidth. Host A has ' + Math.round(100 * gotF) + '% of the file.';
+  else st = '✓ Transfer complete at t = ' + fmtT(tot, 4) + '. Throughput = ' + fmtBytes(o.bits, o.binary, 3) + ' ÷ ' + fmtT(tot, 3) + ' = ' + fmtRate(o.bits / tot, 3) + ' (bandwidth ' + fmtRate(o.bw, 3) + ').';
+  f.text(5, 1.32, wrapText(st, 90), { fs: 7.8, bold: true, color: tc >= tot - eps ? '#0B7A64' : C.navy });
+  f.text(5, 0.98, 't = ' + fmtT(tc, 3) + '  ·  received: ' + fmtBytes(got, o.binary, 3) + '  ·  average rate so far: ' + (tc > 0 ? fmtRate(got / tc, 3) : '0 bps'), { fs: 7.4, color: C.muted });
+  eventAxis(f, xa, xb, 0.42, transferEvents(o), tc, tot);
+}
+
+/* log-log line plot */
+function drawPlot(svg, o) {
+  var f = new Fig(svg, 0, 10, 0, 4.3, 1.45), X0 = 1.35, X1 = 9.55, Y0 = 0.8, Y1 = 3.95;
+  var lx0 = Math.log10(o.x[0]), lx1 = Math.log10(o.x[1]), ly0 = Math.log10(o.y[0]), ly1 = Math.log10(o.y[1]);
+  function PX(v) { return X0 + (X1 - X0) * (Math.log10(v) - lx0) / (lx1 - lx0); }
+  function PY(v) { return Y0 + (Y1 - Y0) * (clamp(Math.log10(v), ly0 - 0.5, ly1 + 0.5) - ly0) / (ly1 - ly0); }
+  f.rect(X0, Y0, X1 - X0, Y1 - Y0, { fill: '#fff', stroke: C.wire, lw: 0.8 });
+  for (var d = Math.ceil(lx0); d <= Math.floor(lx1); d++) { var xx = PX(Math.pow(10, d)); f.line(xx, Y0, xx, Y1, { color: C.gray, lw: 0.6 }); f.text(xx, Y0 - 0.2, o.xfmt(Math.pow(10, d)), { fs: 7.2, color: C.muted }); }
+  for (var e = Math.ceil(ly0); e <= Math.floor(ly1); e++) { var yy = PY(Math.pow(10, e)); f.line(X0, yy, X1, yy, { color: C.gray, lw: 0.6 }); f.text(X0 - 0.08, yy, o.yfmt(Math.pow(10, e)), { fs: 7.2, color: C.muted, ha: 'right' }); }
+  f.text((X0 + X1) / 2, 0.2, o.xlab, { fs: 8, bold: true }); f.text(0.17, (Y0 + Y1) / 2, o.ylab, { fs: 8, bold: true, rot: -90 });
+  var clipId = f.id + 'c', cp = el('clipPath', { id: clipId }, f.svg.firstChild); el('rect', { x: f.X(X0), y: f.Y(Y1), width: r4(X1 - X0), height: r4(Y1 - Y0) }, cp);
+  var g = el('g', { 'clip-path': 'url(#' + clipId + ')' }, f.root);
+  (o.vlines || []).forEach(function (v) { var xx = PX(v.x); f.line(xx, Y0, xx, Y1, { color: v.color || C.muted, lw: 1, dash: [4, 3], parent: g }); f.label(xx, Y1 - 0.15 - (v.dy || 0), v.label, { fs: 7.2, color: v.color || C.muted, bold: true, parent: g }); });
+  o.series.forEach(function (s) { f.poly(s.pts.map(function (p) { return [PX(p[0]), PY(p[1])]; }), { color: s.color, lw: s.lw || 2, dash: s.dash, parent: g }); });
+  var used = [];
+  (o.marks || []).forEach(function (m) {
+    var mx = PX(m.x), my = PY(m.y);
+    el('circle', { cx: f.X(mx), cy: f.Y(my), r: 0.07, fill: m.color, stroke: '#fff', 'stroke-width': f.pt(1.2) }, g);
+    if (!m.label) return;
+    var ha = mx > X1 - 1.6 ? 'right' : 'left', lx = mx + (ha === 'right' ? -0.14 : 0.14), ly = clamp(my + (m.dy || 0.18), Y0 + 0.16, Y1 - 0.16);
+    used.forEach(function (u) { if (Math.abs(u - ly) < 0.26) ly = u + (ly >= u ? 0.26 : -0.26); });
+    ly = clamp(ly, Y0 + 0.16, Y1 - 0.16); used.push(ly);
+    f.label(lx, ly, m.label, { fs: 7.4, ha: ha, bold: true, color: m.color, parent: g });
+  });
+}
+function logPts(a, b, fn, n) { var out = [], la = Math.log10(a), lb = Math.log10(b); n = n || 80; for (var i = 0; i <= n; i++) { var x = Math.pow(10, la + (lb - la) * i / n); out.push([x, fn(x)]); } return out; }
+
+/* eight bits on a time axis, at two rates */
+function drawBits(svg, rate, mult) {
+  var f = new Fig(svg, 0, 10, 0, 2.55, 1.5), X0 = 1.6, X1 = 9.7, span = 8 / rate, pat = [1, 0, 1, 1, 0, 0, 1, 0];
+  [[rate, 1.75], [rate * mult, 0.95]].forEach(function (r, j) {
+    var n = Math.round(span * r[0]), w = (X1 - X0) / n;
+    f.text(X0 - 0.12, r[1] + 0.2, fmtRate(r[0]), { fs: 8.2, bold: true, ha: 'right', color: j ? '#7B61FF' : C.navy });
+    for (var i = 0; i < n; i++) {
+      var b = pat[i % 8];
+      f.rect(X0 + i * w, r[1], w, 0.4, { fill: b ? (j ? '#E7E1FF' : C.panel) : '#fff', stroke: j ? '#7B61FF' : C.brand, lw: 0.8 });
+      if (w > 0.28) f.text(X0 + (i + 0.5) * w, r[1] + 0.2, String(b), { fs: 7.6, bold: true });
+    }
+  });
+  f.line(X0, 0.62, X1, 0.62, { color: C.ink, lw: 1 });
+  for (var i = 0; i <= 8; i++) { var x = X0 + (X1 - X0) * i / 8; f.line(x, 0.57, x, 0.67, { color: C.ink, lw: 1 }); if (i % 2 === 0) f.text(x, 0.38, fmtT(i / rate, 3), { fs: 7.2, color: C.muted }); }
+  f.text((X0 + X1) / 2, 0.12, 'time', { fs: 7.6, color: C.muted });
+  f.label(X0 + (X1 - X0) / 16, 2.38, '← one bit: ' + fmtT(1 / rate, 3), { fs: 7.6, bold: true, ha: 'left', color: C.navy });
+}
+
+/* start screen: the pipe */
+function drawHero() {
+  var f = new Fig($('#heroFig'), 0, 7.2, 0, 4, 1.55);
+  f.slab(0.15, 1.5, 1.05, 0.9, { text: 'Host A', fill: '#fff', fs: 8.6, bold: true });
+  f.slab(6.0, 1.5, 1.05, 0.9, { text: 'Host B', fill: '#fff', fs: 8.6, bold: true });
+  f.rect(1.25, 1.55, 4.7, 0.8, { fill: 'rgba(255,255,255,0.18)', stroke: '#fff', lw: 1.4, rx: 0.4 });
+  for (var i = 0; i < 14; i++) f.rect(1.45 + i * 0.31, 1.68, 0.24, 0.54, { fill: i < 10 ? (i % 3 === 2 ? C.amber : '#fff') : 'rgba(255,255,255,0.15)', stroke: '#fff', lw: 0.6, rx: 0.04 });
+  f.arrow(1.3, 2.75, 5.9, 2.75, { color: '#fff', lw: 1.2, both: true });
+  f.text(3.6, 3.05, 'length = delay', { fs: 9, bold: true, color: '#fff' });
+  f.arrow(3.6, 1.45, 3.6, 0.95, { color: '#fff', lw: 1 });
+  f.text(3.6, 0.7, 'width = bandwidth', { fs: 9, bold: true, color: '#FCE9C6' });
+  f.text(3.6, 0.3, 'bits in flight = delay × bandwidth', { fs: 8.2, color: '#CFE6F0' });
+}
+
+/* ===================================================== commands (Linux and Windows) */
+var cmdState = { os: 'linux', dest: '192.168.20.20', iface: 'eth0' };
+function commandList(os, dest, iface) {
+  if (os === 'linux') return [
+    ['Measure the round-trip time'],
+    ['ping -c 5 ' + dest, 'Sends 5 echo requests and prints each RTT, then the minimum, average, maximum, and mdev (how much the RTT varies).'],
+    ['ping -c 5 -s 1400 ' + dest, 'The same with 1400-byte payloads. On a slow link the extra transmit time shows up in the RTT; at 1 Gbps it is only about 11 µs per link each way.'],
+    ['Find the link speed'],
+    ['cat /sys/class/net/' + iface + '/speed', 'Prints the adapter\'s link speed in Mbps. In a virtual machine this is the virtual adapter\'s speed, not the real cable\'s: check the host or the switch instead.'],
+    ['ip -s link show dev ' + iface, 'Shows the bytes and packets this adapter has sent and received so far. Run it twice to see how much moved in between.'],
+    ['Measure throughput between two Linux hosts'],
+    ['nc -l 5000 > /dev/null', 'Run this on the receiver first: listen on TCP port 5000 and throw the data away.'],
+    ['dd if=/dev/zero bs=1M count=100 | nc -N ' + dest + ' 5000', 'Run this on the sender: send 100 MiB (here 1M means 2²⁰ bytes). When it ends, dd prints the bytes, the time, and the rate in MB/s; multiply by 8 for Mbps. Expect a little less than the slowest link\'s rate, because headers use part of it.'],
+    ['Add delay or limit the rate, then undo it (needs sudo)'],
+    ['sudo tc qdisc add dev ' + iface + ' root netem delay 50ms', 'Adds 50 ms of delay to every packet this host sends on ' + iface + '. A ping to the other host takes about 50 ms longer.'],
+    ['sudo tc qdisc add dev ' + iface + ' root tbf rate 10mbit burst 32kbit latency 400ms', 'Instead of the delay: limits what this host sends on ' + iface + ' to 10 Mbps. Only one of these two can be in place at a time.'],
+    ['tc qdisc show dev ' + iface, 'Shows what is in place on ' + iface + ' now.'],
+    ['sudo tc qdisc del dev ' + iface + ' root', 'Undo: removes the added delay or rate limit and returns ' + iface + ' to normal.']
+  ];
+  return [
+    ['Measure the round-trip time'],
+    ['ping -n 5 ' + dest, 'Sends 5 echo requests and prints each time, then the minimum, maximum, and average. On a local network Windows often prints time<1ms.'],
+    ['ping -n 5 -l 1400 ' + dest, 'The same with 1400-byte payloads, to see the extra transmit time on a slow link.'],
+    ['Find the link speed (PowerShell)'],
+    ['Get-NetAdapter | Select-Object Name, Status, LinkSpeed', 'Lists each adapter with its link speed, for example 1 Gbps. A cable with a damaged pair often links at 100 Mbps instead.'],
+    ['Get-NetAdapterStatistics', 'Shows the bytes each adapter has sent and received so far. Run it twice to see how much moved in between.'],
+    ['Watch throughput'],
+    ['taskmgr', 'Opens Task Manager. Choose Performance, then the Ethernet or Wi-Fi adapter, to watch the send and receive rate while a transfer runs. Windows has no built-in command that sends a test stream.'],
+    ['Add delay'],
+    ['', 'Windows has no built-in command to add delay or limit the rate. Use a Linux host for that part.']
+  ];
+}
+function renderCommands(box) {
+  var list = commandList(cmdState.os, cmdState.dest || 'HOST_B', cmdState.iface || 'eth0');
+  box.innerHTML = '<div class="row"><label>Other host\'s address <input type="text" class="cmd-dest" size="16" spellcheck="false" value="' + esc(cmdState.dest) + '"></label>' +
+    (cmdState.os === 'linux' ? '<label>Interface <input type="text" class="cmd-if" size="8" spellcheck="false" value="' + esc(cmdState.iface) + '"></label>' : '') + '</div>' +
+    '<p class="cmdnote">Find your interface\'s name with <code>ip link show</code> (Linux). Every command only looks, except the ones marked sudo, which change settings until you undo them.</p>' +
+    '<div class="cmdtabs" role="group" aria-label="Operating system"><button data-os="linux" aria-pressed="' + (cmdState.os === 'linux') + '">Linux</button><button data-os="win" aria-pressed="' + (cmdState.os === 'win') + '">Windows</button></div>' +
+    list.map(function (c) {
+      if (c.length === 1) return '<p class="cmdgroup">' + esc(c[0]) + '</p>';
+      if (!c[0]) return '<p class="cmdnote">' + esc(c[1]) + '</p>';
+      return '<div class="cmd"><code>' + esc(c[0]) + '</code><button type="button" data-copy="' + esc(c[0]) + '">Copy</button></div><p class="cmdnote">' + esc(c[1]) + '</p>';
+    }).join('');
+  $$('[data-os]', box).forEach(function (b) { b.onclick = function () { cmdState.os = b.getAttribute('data-os'); renderCommands(box); }; });
+  $$('[data-copy]', box).forEach(function (b) { b.onclick = function () { copyText(b.getAttribute('data-copy'), b); }; });
+  var d = $('.cmd-dest', box), i = $('.cmd-if', box);
+  d.onchange = function () { cmdState.dest = d.value.trim().replace(/[^\w.:-]/g, '') || '192.168.20.20'; renderCommands(box); };
+  if (i) i.onchange = function () { cmdState.iface = i.value.trim().replace(/[^\w.:-]/g, '') || 'eth0'; renderCommands(box); };
+}
+
+/* shared option lists */
+function sizeUnitOptions(sel) { return SIZE_UNITS.map(function (u) { return '<option value="' + u[0] + '"' + (u[0] === sel ? ' selected' : '') + '>' + u[2] + '</option>'; }).join(''); }
+function rateUnitOptions(sel) { return RATE_UNITS.map(function (u) { return '<option value="' + u[0] + '"' + (u[0] === sel ? ' selected' : '') + '>' + u[0] + '</option>'; }).join(''); }
+function mediumOptions(sel) { return MEDIA.map(function (m) { return '<option value="' + m[0] + '"' + (m[0] === sel ? ' selected' : '') + '>' + m[1] + '</option>'; }).join(''); }
+var RATE_CHOICES = [[1e3, '1 kbps'], [56e3, '56 kbps'], [1e6, '1 Mbps'], [10e6, '10 Mbps'], [45e6, '45 Mbps'], [100e6, '100 Mbps'], [1e9, '1 Gbps'], [10e9, '10 Gbps'], [100e9, '100 Gbps']];
+function rateOptions(sel) { return RATE_CHOICES.map(function (r) { return '<option value="' + r[0] + '"' + (r[0] === sel ? ' selected' : '') + '>' + r[1] + '</option>'; }).join(''); }
+function stat(k, v, s, hl) { return '<div class="stat' + (hl ? ' hl' : '') + '"><div class="k">' + k + '</div><div class="v">' + v + '</div>' + (s ? '<div class="s">' + s + '</div>' : '') + '</div>'; }
+/* ===================================================== animation speed: one setting for every Send button, 0.5× by default */
+var SPEEDS = [0.25, 0.5, 1, 2];
+var animSpeed = (function () { var v = +store.get('speed', 0.5); return SPEEDS.indexOf(v) >= 0 ? v : 0.5; })();
+function speedHTML() {
+  return '<label class="speed">Speed <select data-speed aria-label="Animation speed">' + SPEEDS.map(function (v) { return '<option value="' + v + '"' + (v === animSpeed ? ' selected' : '') + '>' + v + '×</option>'; }).join('') + '</select></label>';
+}
+function wireSpeeds() {
+  $$('[data-speed]').forEach(function (s) {
+    s.value = String(animSpeed);
+    s.onchange = function () { animSpeed = +s.value; store.set('speed', animSpeed); $$('[data-speed]').forEach(function (o) { o.value = String(animSpeed); }); };
+  });
+}
+/* Like animate(), but the run time is ms at 1× and the speed can change mid-run. */
+function animateS(ms, step, alive) {
+  return new Promise(function (resolve) {
+    if (reduceMotion || ms <= 0) { step(1); resolve(); return; }
+    var f = 0, last = null;
+    function frame(ts) {
+      if (!alive()) { resolve(); return; }
+      if (last !== null) f = Math.min(1, f + (ts - last) * animSpeed / ms);
+      last = ts; step(f);
+      if (f < 1) window.requestAnimationFrame(frame); else resolve();
+    }
+    window.requestAnimationFrame(frame);
+  });
+}
+
+/* ===================================================== player: Send + time slider + speed, repeated next to every figure it moves, all in sync */
+function stripHTML(p, label) {
+  return '<div class="scrub"><button class="btn small" id="' + p + 'play">▶ ' + (label || 'Send') + '</button><label for="' + p + 'scrub">Time</label>' +
+    '<input type="range" id="' + p + 'scrub" min="0" max="1000" value="0"><span class="tnow" id="' + p + 'tnow"></span>' + speedHTML() + '</div>';
+}
+function Player(o) {   // o.strips: id prefixes of the control strips; o.draw(frac) draws and returns the time label; o.ms: run time at 1×
+  var self = this; this.o = o; this.frac = o.frac === undefined ? 0 : o.frac; this.tok = 0;
+  o.strips.forEach(function (p) {
+    $('#' + p + 'scrub').oninput = function () { self.tok++; self.frac = this.value / 1000; self.show(); };
+    $('#' + p + 'play').onclick = function () { self.play(); };
+  });
+  wireSpeeds();
+}
+Player.prototype.show = function () {
+  var lab = this.o.draw(this.frac), f = this.frac;
+  this.o.strips.forEach(function (p) {
+    var sc = $('#' + p + 'scrub'), tn = $('#' + p + 'tnow');
+    if (sc) sc.value = Math.round(f * 1000);
+    if (tn && lab !== undefined) tn.textContent = lab;
+  });
+};
+Player.prototype.jump = function (f) { this.tok++; this.frac = clamp(f, 0, 1); this.show(); };
+Player.prototype.play = function () {
+  var self = this, tok = ++this.tok, outer = this.o.alive || function () { return true; };
+  var btns = this.o.strips.map(function (p) { return $('#' + p + 'play'); }).filter(Boolean);
+  btns.forEach(function (b) { b.disabled = true; });
+  return animateS(this.o.ms || 4500, function (f) { self.frac = f; self.show(); }, function () { return tok === self.tok && outer(); })
+    .then(function () { btns.forEach(function (b) { b.disabled = false; }); });
+};
+
+/* ===================================================== timeline: wire figure + space-time figure on one player */
+function Timeline(o) {
+  var self = this; this.o = o;
+  this.pl = new Player({ strips: o.strips, ms: o.ms || 4500, alive: o.alive, frac: o.frac, draw: function (f) { return self.draw(f); } });
+}
+Timeline.prototype.set = function (names, links, bits) { this.names = names; this.links = links; this.r = pathTimes(bits, links); this.pl.show(); };
+Timeline.prototype.draw = function (frac) {
+  if (!this.r) return '';
+  var tot = this.r.total, tc = tot * frac;
+  if (this.o.wire) drawWire(this.o.wire, { names: this.names, hops: this.r.hops, links: this.links, tc: tc });
+  if (this.o.extra) this.o.extra(tc, this.r);
+  if (this.o.st) drawSpaceTime(this.o.st, { names: this.names, hops: this.r.hops, tc: tc, tMax: tot, detail: this.o.detail });
+  return 't = ' + fmtT(tc, 4);
+};
+Timeline.prototype.jump = function (frac) { this.pl.jump(frac); };
+Timeline.prototype.play = function () { return this.pl.play(); };
+var ST_LEGEND = '<ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>the packet\'s bits</li><li><i style="background:#FDF0D5;border:1px solid #F5A524"></i>waiting in a queue</li><li><i style="background:#F5A524;height:3px"></i>the chosen moment</li></ul>';
+function figFold(title, body, open) { return '<details class="figfold"' + (open ? ' open' : '') + '><summary>' + title + '</summary>' + body + '</details>'; }
+
+/* ===================================================== LEARN */
+var lessonState = { i: (function () { var v = store.get('lesson', -1); return clamp(isFinite(+v) ? +v : -1, -1, 5); })(), task: null, token: 0,
+  l1: { rate: 1e6, mult: 2, medium: 'copper', cv: 1, cu: 'MB', view: 'time' },
+  l2: { size: 1500, bw: 10e6, distKm: 1000, medium: 'fiber', q: 1 },
+  l3: { bwA: 100e6, dA: 250, bwB: 10e6, dB: 10, lsize: 5 },
+  l4: { dMs: 50, bw: 45e6, mode: 'one', winKB: '', msg: 1, msgu: 'MB' },
+  l5: { size: 1, unit: 'MB', bw: 1e9, rtt: 100 },
+  l6: { size: 1500, links: [{ bw: 100e6, dist: 100, medium: 'copper' }, { bw: 1e9, dist: 20000, medium: 'fiber' }, { bw: 10e6, dist: 500000, medium: 'fiber' }], qs: 0, qr: 2 } };
+var LESSONS = [
+  { t: 'A bit is a slice of time', setup: l1, what: 'See how long one bit lasts, and how long it is on the wire.' },
+  { t: 'Three parts of latency', setup: l2, what: 'Watch a packet travel and add up its queue, transmit, and propagation times.' },
+  { t: 'Which part dominates?', setup: l3, what: 'Compare a far, fast link with a near, slow one for small and large messages.' },
+  { t: 'The pipe: delay × bandwidth', setup: l4, what: 'Watch the link fill with bits and find the window that keeps it full.' },
+  { t: 'Bandwidth is not throughput', setup: l5, what: 'Watch a download from request to completion and find the rate it really gets.' },
+  { t: 'Across a switch and a router', setup: l6, what: 'Add up the delays link by link, find the bottleneck, and predict ping times.' }
+];
+var PARTS = [
+  { t: 'Part 1: One packet on one link', l: [0, 1, 2] },
+  { t: 'Part 2: Keeping the link busy', l: [3, 4] },
+  { t: 'Part 3: A real path', l: [5] }
+];
+function partOf(i) { for (var k = 0; k < PARTS.length; k++) if (PARTS[k].l.indexOf(i) >= 0) return PARTS[k].t; return ''; }
+function alive(tok) { return tok === lessonState.token; }
+function lessonAlive() { var tok = lessonState.token; return function () { return tok === lessonState.token && current === 'learn'; }; }
+function renderStepper() {
+  var st = $('#stepper'), cur = lessonState.i;
+  st.innerHTML = '<button data-l="-1" class="mapbtn" aria-label="Lesson map"' + (cur < 0 ? ' aria-current="step"' : '') + '><span class="num" aria-hidden="true">☰</span><span class="t">Lesson map</span></button>' +
+    LESSONS.map(function (L, i) {
+      return '<button data-l="' + i + '" class="' + (progress.lessons[i] ? 'done' : '') + '"' + (i === cur ? ' aria-current="step"' : '') + ' aria-label="Lesson ' + (i + 1) + ': ' + esc(L.t) + (progress.lessons[i] ? ' (done)' : '') + '" title="' + esc(L.t) + '">' +
+        '<span class="num">' + (progress.lessons[i] ? '✓' : i + 1) + '</span><span class="t">' + L.t + '</span></button>';
+    }).join('');
+  $$('[data-l]', st).forEach(function (b) { b.onclick = function () { openLesson(+b.getAttribute('data-l')); }; });
+  $('#lprog').style.width = (Object.keys(progress.lessons).length / LESSONS.length * 100) + '%';
+}
+function renderMap() {
+  $('#ltext').innerHTML = '<h2>Lesson map</h2><div class="mapintro"><p>Six short lessons in three parts. Each lesson has a short intro, a few controls, one main figure that you can play and step through, and a Try it task worth 20 points.</p>' +
+    '<p>Start with Part 1 if bandwidth and delay are new to you. Extra explanations and figures are folded under <b>Show more</b> and the other closed sections; open them when you want more.</p></div>' +
+    '<div class="mapparts">' + PARTS.map(function (P) {
+      return '<div class="mappart"><h3>' + P.t + '</h3>' + P.l.map(function (i) {
+        return '<button class="mapitem' + (progress.lessons[i] ? ' done' : '') + '" data-ml="' + i + '"><b>' + (i + 1) + '. ' + LESSONS[i].t + '</b><span>' + LESSONS[i].what + '</span></button>';
+      }).join('') + '</div>';
+    }).join('') + '</div>';
+  $$('[data-ml]').forEach(function (b) { b.onclick = function () { openLesson(+b.getAttribute('data-ml')); }; });
+}
+function openLesson(i) {
+  lessonState.token++;   // stops any animation from the previous lesson
+  i = clamp(i, -1, LESSONS.length - 1);
+  if (lessonState.i !== i) lessonState.task = null;
+  lessonState.i = i; store.set('lesson', i);
+  renderStepper(); $('#lfig').innerHTML = ''; $('#ltry').innerHTML = '';
+  $('#lgrid').className = 'lesson' + (i < 0 ? ' map' : '');
+  if (i < 0) renderMap(); else LESSONS[i].setup();
+  var nav = '<div class="navrow">' + (i < 0 ? '<span></span>' : '<button class="btn alt" id="lprev">← ' + (i === 0 ? 'Lesson map' : 'Back') + '</button>') +
+    (i < LESSONS.length - 1 ? '<button class="btn" id="lnext">' + (i < 0 ? 'Start Lesson 1 →' : 'Next lesson →') + '</button>' : '<button class="btn amber" id="lnext">Take the challenge →</button>') + '</div>';
+  $('#ltry').insertAdjacentHTML('beforeend', nav);
+  if ($('#lprev')) $('#lprev').onclick = function () { openLesson(lessonState.i - 1); };
+  $('#lnext').onclick = function () { if (lessonState.i < LESSONS.length - 1) openLesson(lessonState.i + 1); else go('challenge'); };
+  wireSpeeds();
+  writeLink();
+}
+/* One lesson's text column: kicker, title, a short intro, Show more and Terms (both closed), then the controls right above the figure. */
+function lessonText(n, title, o) {
+  $('#ltext').innerHTML = '<p class="kicker">Lesson ' + n + ' of 6 · ' + partOf(n - 1) + '</p><h2>' + title + '</h2><div class="intro">' + o.intro + '</div>' +
+    '<details class="fold"><summary>Show more</summary>' + o.more + '</details>' +
+    '<details class="fold"><summary>Terms in this lesson</summary><ul class="terms">' + o.terms.map(function (t) { return '<li><b>' + t[0] + '</b>: ' + t[1] + '</li>'; }).join('') + '</ul></details>' +
+    '<div class="ctls">' + o.ctl + '</div>';
+}
+function setTry(html) { $('#ltry').innerHTML = tryBox(html); }
+function lessonDone(fb, msg) {
+  fb.className = 'feedback ok'; fb.innerHTML = '✓ ' + msg + (progress.lessons[lessonState.i] ? '' : ' <b>+20 points</b>');
+  if (!progress.lessons[lessonState.i]) { progress.lessons[lessonState.i] = true; addXP(20); renderStepper(); if (Object.keys(progress.lessons).length === LESSONS.length) earn('learned'); }
+}
+function wrong(fb, msg) { fb.className = 'feedback bad'; fb.innerHTML = msg; }
+function note(fb, msg) { fb.className = 'feedback note'; fb.innerHTML = msg; }
+function numIn(id, v, min, max, label, step) { return '<input type="number" id="' + id + '" min="' + min + '" max="' + max + '" step="' + (step || 'any') + '" value="' + v + '"' + (label ? ' aria-label="' + esc(label) + '"' : '') + '>'; }
+function readF(sel, min, max, allowBlank) {
+  var e = $(sel), raw = e.value.trim(), v = +raw;
+  if (raw === '' && allowBlank) { e.removeAttribute('aria-invalid'); return ''; }
+  if (raw === '' || !isFinite(v) || v < min || v > max) { e.setAttribute('aria-invalid', 'true'); return null; }
+  e.removeAttribute('aria-invalid'); return v;
+}
+function tryBox(html) { return '<div class="tryit"><h3>Try it</h3>' + html + '</div>'; }
+function answerRow(p, label) { return '<div class="row">' + numIn(p + 'a', '', 0, 1e15, label) + '<button class="btn small" id="' + p + 'c">Check</button><button class="btn alt small" id="' + p + 'h">Hint</button></div><div class="feedback" id="' + p + 'fb" aria-live="polite"></div>'; }
+function readAnswer(sel) { var raw = $(sel).value.trim().replace(/,/g, ''); return raw === '' ? NaN : +raw; }
+function evList(id, ev, how) {
+  return ev.map(function (e, i) { return '<li data-t="' + e.t + '"><span class="evmark" aria-hidden="true">○</span> <b>' + e.what + '</b> at t = ' + fmtT(e.t, 4) + (how && e.how ? ' <span class="cmdnote">(' + e.how + ')</span>' : '') + ' <button class="btn alt small" data-ev="' + i + '">Show</button></li>'; }).join('');
+}
+function markEvents(box, tc, tot) {
+  $$('li', box).forEach(function (li) { var done = tc >= +li.getAttribute('data-t') - tot * 1e-9; li.querySelector('.evmark').textContent = done ? '✓' : '○'; li.querySelector('.evmark').className = 'evmark' + (done ? ' yes' : ''); });
+}
+
+/* Lesson 1: a bit is a slice of time */
+var L1_TASK_RATES = [2, 4, 5, 8, 20, 25, 40, 50, 125, 200, 250, 400, 500];
+function l1() {
+  var s = lessonState.l1, t = lessonState.task || (lessonState.task = { r: pick(L1_TASK_RATES) });
+  lessonText(1, 'A bit is a slice of time', {
+    intro: '<p><b>Bandwidth</b> is how many bits per second a link puts on the wire. 1 Mbps (megabit per second) is 10⁶ bits per second. Each bit lasts <b>1 ÷ bandwidth</b> seconds: its <b>bit width</b>.</p>' +
+      '<p>A faster link makes each bit shorter. It does not make the signal travel faster. Switch the figure to <b>On the wire</b> to see each bit\'s length in meters.</p>',
+    more: '<p>At 1 Mbps (megabit per second) a bit lasts 1 µs (one microsecond, a millionth of a second). At 2 Mbps it lasts 0.5 µs. At 1 Gbps (gigabit per second, 10⁹ bits per second) it lasts 1 ns (one nanosecond, a billionth of a second).</p>' +
+      '<p><b>Why a bit has a length.</b> While Host A is still sending a bit, the start of that bit is already travelling down the wire. When the bit is finished, its start is speed × bit width away. So one bit is speed ÷ bandwidth long.</p>' +
+      '<p>At 1 Mbps on copper cable a bit is 230 m (meters) long, more than two football fields. At 1 Gbps it is 23 cm (centimeters), shorter than a ruler.</p>' +
+      '<p><b>Bits and bytes.</b> A lowercase b is a bit and an uppercase B is a byte, which is 8 bits. Sizes here are decimal: 1 KB (kilobyte) = 1,000 bytes and 1 MB (megabyte) = 10⁶ bytes. Memory and some programs count in powers of 2: 1 KiB (kibibyte) = 1,024 bytes and 1 MiB (mebibyte) = 1,048,576 bytes. The unit converter under the figure shows both.</p>',
+    terms: [['Bandwidth', 'how many bits per second a link can put on the wire'], ['Mbps and Gbps', 'megabits (10⁶) and gigabits (10⁹) per second'], ['Bit width', 'how long one bit lasts: 1 ÷ bandwidth'],
+      ['µs and ns', 'microsecond (a millionth of a second) and nanosecond (a billionth of a second)'], ['Length on the wire', 'how far one bit stretches along the wire: signal speed ÷ bandwidth'],
+      ['Signal speed', 'about 2.0 × 10⁸ m/s (meters per second) in fiber, 2.3 × 10⁸ m/s in copper cable, and 3.0 × 10⁸ m/s by radio'],
+      ['b and B', 'a bit, and a byte (8 bits)'], ['KB and MB', 'kilobyte (1,000 bytes) and megabyte (10⁶ bytes)'], ['KiB and MiB', 'kibibyte (1,024 bytes) and mebibyte (1,048,576 bytes)']],
+    ctl: '<div class="row"><label>Bandwidth <select id="l1rate">' + rateOptions(s.rate) + '</select></label><label>Compare with <select id="l1mult">' + [2, 4, 10].map(function (m) { return '<option value="' + m + '"' + (m === s.mult ? ' selected' : '') + '>' + m + ' times faster</option>'; }).join('') + '</select></label></div>' +
+      '<div class="row"><label>Medium <select id="l1med">' + mediumOptions(s.medium) + '</select></label></div>'
+  });
+  setTry('<p>A link runs at <b>' + t.r + ' Mbps</b>. How long is one bit, in <b>ns</b> (nanoseconds, billionths of a second)?</p>' + answerRow('l1', 'Bit width in nanoseconds'));
+  $('#lfig').innerHTML = '<div class="card"><div class="segs" role="group" aria-label="Figure view"><button id="l1vtime" aria-pressed="' + (s.view === 'time') + '">⏱ In time</button><button id="l1vwire" aria-pressed="' + (s.view === 'wire') + '">📏 On the wire</button></div>' +
+    '<div id="l1ptime"' + (s.view === 'time' ? '' : ' hidden') + '><p class="figtitle">Eight bits at two bandwidths, on the same time axis</p><div class="fig"><svg id="l1svg" role="img" aria-label="The bits 10110010 at two bandwidths; the faster link packs more bits into the same time"></svg></div>' +
+    '<ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>chosen bandwidth</li><li><i style="background:#E7E1FF;border:1px solid #7B61FF"></i>faster link</li></ul></div>' +
+    '<div id="l1pwire"' + (s.view === 'wire' ? '' : ' hidden') + '><p class="figtitle">The same bits on the wire, in meters</p><div class="scrub"><button class="btn small" id="l1go">▶ Watch the bits move</button>' + speedHTML() + '</div><p class="cmdnote" id="l1slow"></p><div class="fig"><svg id="l1space" role="img" aria-label="The bits laid out along the wire with a ruler in meters and an everyday object for scale; both rows move at the same speed"></svg></div>' +
+    '<ul class="legend"><li><i style="background:#9DB3C1;height:9px"></i>the wire</li><li><i style="background:#13A88A;height:4px"></i>an everyday object, for scale</li></ul></div>' +
+    '<div class="calcgrid" id="l1stats"></div></div>' +
+    figFold('Unit converter: bits, bytes, KB and KiB', '<div class="row"><label>Size ' + numIn('l1cv', s.cv, 0, 1e15, 'Size') + '</label><select id="l1cu" aria-label="Unit">' + sizeUnitOptions(s.cu) + '</select></div><div class="calcgrid" id="l1conv"></div>');
+  function view(v) { s.view = v; $('#l1ptime').hidden = v !== 'time'; $('#l1pwire').hidden = v !== 'wire'; $('#l1vtime').setAttribute('aria-pressed', String(v === 'time')); $('#l1vwire').setAttribute('aria-pressed', String(v === 'wire')); }
+  function upd() {
+    s.rate = +$('#l1rate').value; s.mult = +$('#l1mult').value; s.medium = $('#l1med').value;
+    drawBits($('#l1svg'), s.rate, s.mult);
+    drawBitSpace($('#l1space'), { rate: s.rate, mult: s.mult, medium: s.medium, phase: 0 });
+    $('#l1slow').textContent = 'Both rows move at the signal speed, slowed down about ' + fmtN(6 * s.rate / 4, 2) + ' times at 1×.';
+    $('#l1stats').innerHTML = stat('Bit width at ' + fmtRate(s.rate), fmtT(bitWidth(s.rate)), '1 ÷ ' + fmtRate(s.rate) + '; at ' + fmtRate(s.rate * s.mult) + ': ' + fmtT(bitWidth(s.rate * s.mult))) +
+      stat('Length of one bit on ' + MEDIUM_NAME[s.medium], fmtLen(bitLength(s.rate, s.medium)), fmtN(SPEED[s.medium]) + ' m/s ÷ ' + fmtRate(s.rate));
+  }
+  function conv() {
+    var v = readF('#l1cv', 0, 1e15); if (v === null) return; s.cv = v; s.cu = $('#l1cu').value; var b = v * unitBits(s.cu);
+    $('#l1conv').innerHTML = stat('Bits', fmtN(b, 6)) + stat('Bytes', fmtN(b / 8, 6)) + stat('KB and KiB', fmtN(b / 8e3, 5) + ' KB', fmtN(b / 8192, 5) + ' KiB') + stat('MB and MiB', fmtN(b / 8e6, 5) + ' MB', fmtN(b / 8388608, 5) + ' MiB');
+  }
+  $('#l1vtime').onclick = function () { view('time'); }; $('#l1vwire').onclick = function () { view('wire'); };
+  $('#l1rate').onchange = upd; $('#l1mult').onchange = upd; $('#l1med').onchange = upd;
+  $('#l1go').onclick = function () { var ok = lessonAlive(), b = this; b.disabled = true; animateS(6000, function (f) { drawBitSpace($('#l1space'), { rate: s.rate, mult: s.mult, medium: s.medium, phase: 4 * f }); }, ok).then(function () { b.disabled = false; }); };
+  $('#l1cv').oninput = conv; $('#l1cu').onchange = conv;
+  var ans = 1000 / t.r;
+  $('#l1c').onclick = function () {
+    var v = readAnswer('#l1a'), fb = $('#l1fb');
+    if (near(v, ans)) lessonDone(fb, 'Right: 1 ÷ (' + t.r + ' × 10⁶ bits per second) = ' + fmtN(ans) + ' ns. Every bit on this link lasts ' + fmtN(ans) + ' ns.');
+    else if (near(v, ans / 1000)) wrong(fb, 'That is the right size in µs (microseconds). The task asks for ns: 1 µs = 1,000 ns.');
+    else if (near(v, t.r)) wrong(fb, 'That is the bandwidth itself. The bit width is 1 ÷ bandwidth.');
+    else wrong(fb, 'Not yet. Choose a bandwidth above and read the bit width under the figure, then work out the same thing for ' + t.r + ' Mbps.');
+  };
+  $('#l1h').onclick = function () { note($('#l1fb'), '💡 At 1 Mbps a bit lasts 1 µs = 1,000 ns. At ' + t.r + ' Mbps it lasts ' + t.r + ' times less.'); };
+  upd(); conv();
+}
+
+/* Lesson 2: three parts of latency. Every part of the task's answer is at least 5% of it, so an answer that leaves one out is never accepted. */
+function l2Task() {
+  var t, T, P, a;
+  do { t = { size: pick([500, 1000, 1500, 9000]), bw: pick([10e6, 100e6]), distKm: rnd(2, 50) * 100, q: pick([0, 1, 2, 5]) }; T = t.size * 8 / t.bw * 1e3; P = t.distKm / 200; a = t.q + T + P; }
+  while (T < 0.05 * a || P < 0.05 * a || (t.q > 0 && t.q < 0.05 * a));
+  return t;
+}
+var L2_PRESETS = {
+  lan: { name: 'A 1500-byte packet on 100 m of Ethernet at 1 Gbps', size: 1500, bw: 1e9, distKm: 0.1, medium: 'copper', q: 0 },
+  wan: { name: 'A 1500-byte packet across 4,000 km of fiber at 100 Mbps', size: 1500, bw: 100e6, distKm: 4000, medium: 'fiber', q: 0 },
+  sat: { name: 'A 1500-byte packet up to a satellite and down (71,572 km) at 45 Mbps', size: 1500, bw: 45e6, distKm: 71572, medium: 'radio', q: 0 },
+  big: { name: 'A 1 MB file across 1,000 km of fiber at 10 Mbps', size: 1e6, bw: 10e6, distKm: 1000, medium: 'fiber', q: 0 }
+};
+function l2() {
+  var s = lessonState.l2, t = lessonState.task || (lessonState.task = l2Task());
+  var tT = t.size * 8 / t.bw * 1e3, tP = t.distKm / 200, ans = t.q + tT + tP;
+  lessonText(2, 'Three parts of latency', {
+    intro: '<p>The <b>latency</b> of a packet is the time from when it is ready to send until its last bit arrives. It has three parts:</p>' +
+      '<p class="soft formula">Latency = Queue + Transmit + Propagation</p>' +
+      '<ul class="list"><li><b>Queue:</b> waiting in a buffer behind other packets.</li><li><b>Transmit</b> = size ÷ bandwidth: putting every bit on the wire.</li><li><b>Propagation</b> = distance ÷ signal speed: one bit crossing the link.</li></ul>' +
+      '<p>Press <b>Send</b> and follow the first bit and the last bit. The packet has arrived only when its <b>last bit</b> arrives.</p>',
+    more: '<p><b>Reading the figure.</b> Host A\'s box empties as its bits leave, and Host B\'s box fills. The amber block is the first bit and the dark block is the last bit. The link is drawn thicker when its bandwidth is higher.</p>' +
+      '<p>The line under the link marks the four moments in time order. Press <b>Show</b> next to a moment to jump to it.</p>' +
+      '<p><b>Which comes first?</b> The last bit leaves Host A one transmit time after the first. The first bit reaches Host B one propagation delay after it leaves. If the transmit time is longer than the propagation delay, the first bit arrives before the last bit leaves.</p>' +
+      '<p>Signals travel at about 2.0 × 10⁸ m/s (meters per second) in fiber, 2.3 × 10⁸ m/s in copper cable, and 3.0 × 10⁸ m/s by radio. The folded time diagram under the figure shows the same journey with time running down the page.</p>',
+    terms: [['Latency', 'the time from when a packet is ready to send until its last bit arrives'], ['Queue (queuing delay)', 'time spent waiting in a buffer behind other packets'],
+      ['Transmit time', 'the time to put every bit on the wire: size ÷ bandwidth'], ['Propagation delay', 'the time one bit takes to cross the link: distance ÷ signal speed'],
+      ['ms', 'millisecond, a thousandth of a second'], ['km', 'kilometer, 1,000 m (meters)'], ['Mbps and Gbps', 'megabits (10⁶) and gigabits (10⁹) per second'],
+      ['First bit and last bit', 'the first and the last bit of the packet to leave Host A'], ['Time diagram', 'a figure with the hosts across the top and time running down the page']],
+    ctl: '<div class="row"><label>Example <select id="l2p"><option value="">choose…</option>' + Object.keys(L2_PRESETS).map(function (k) { return '<option value="' + k + '">' + esc(L2_PRESETS[k].name) + '</option>'; }).join('') + '</select></label></div>' +
+      '<div class="row"><label>Size ' + numIn('l2s', s.size, 1, 1e12, 'Size in bytes') + ' bytes</label><label>Bandwidth <select id="l2bw">' + rateOptions(s.bw) + '</select></label></div>' +
+      '<div class="row"><label>Distance ' + numIn('l2d', s.distKm, 0, 1e7, 'Distance in kilometers') + ' km</label><label>Medium <select id="l2m">' + mediumOptions(s.medium) + '</select></label><label>Queue ' + numIn('l2q', s.q, 0, 1e6, 'Queuing delay in milliseconds') + ' ms</label></div>'
+  });
+  setTry('<p>A <b>' + fmt(t.size) + '-byte</b> packet waits <b>' + t.q + ' ms</b> in a queue, then crosses <b>' + fmt(t.distKm) + ' km</b> of fiber at <b>' + fmtRate(t.bw) + '</b>. What is its latency, in <b>ms</b>?</p>' + answerRow('l2', 'Latency in milliseconds'));
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">The packet travels from Host A to Host B</p>' + stripHTML('l2') +
+    '<div class="fig"><svg id="l2jour" role="img" aria-label="Host A sends the packet bit by bit; the bits travel along the link with the first and last bit marked; Host B receives them"></svg></div>' +
+    '<ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>the packet\'s bits</li><li><i style="background:#F5A524"></i>first bit</li><li><i style="background:#0B3D5C"></i>last bit</li><li><i style="background:#13A88A;border-radius:50%;width:12px"></i>a moment that has happened</li></ul>' +
+    '<p class="figtitle">The four moments</p><ol class="log" id="l2ev" aria-live="polite"></ol></div>' +
+    figFold('The same journey on a time diagram (time runs down)', stripHTML('l2b') + '<div class="fig"><svg id="l2st" role="img" aria-label="Space-time diagram: Host A sends one packet to Host B"></svg></div>' + ST_LEGEND +
+      '<p class="cmdnote">The height of the band at Host A is the transmit time. Its slope is the propagation delay.</p>') +
+    figFold('The numbers: queue, transmit, and propagation', '<div class="calcgrid" id="l2stats"></div><p class="figtitle">Where the latency comes from</p><div class="fig"><svg id="l2bar" role="img" aria-label="Bar split into queue, transmit, and propagation"></svg></div>');
+  var curL = null, evKey = '';
+  var tl = new Timeline({ strips: ['l2', 'l2b'], st: $('#l2st'), detail: true, alive: lessonAlive(), ms: 6000,
+    extra: function (tc, r) {
+      var h = r.hops[0], ev = linkEvents(h), key = ev.map(function (e) { return e.k + ':' + e.t; }).join();
+      drawJourney($('#l2jour'), { h: h, tc: tc, dist: curL ? curL.dist : undefined });
+      if (key !== evKey) {   // rebuild the list only when the link changes
+        evKey = key;
+        $('#l2ev').innerHTML = evList('l2ev', ev, true);
+        $$('[data-ev]', $('#l2ev')).forEach(function (b) { b.onclick = function () { var e = ev[+b.getAttribute('data-ev')]; tl.jump(h.end ? e.t / h.end : 1); }; });
+      }
+      markEvents($('#l2ev'), tc, h.end);
+    } });
+  function upd() {
+    var size = readF('#l2s', 1, 1e12), d = readF('#l2d', 0, 1e7), q = readF('#l2q', 0, 1e6); if (size === null || d === null || q === null) return;
+    s.size = size; s.distKm = d; s.q = q; s.bw = +$('#l2bw').value; s.medium = $('#l2m').value;
+    var L = { bw: s.bw, dist: d * 1000, medium: s.medium, q: q / 1000 }, bits = size * 8, r = pathTimes(bits, [L]).hops[0];
+    curL = L; tl.set(['Host A', 'Host B'], [L], bits);
+    $('#l2stats').innerHTML = stat('Queue', fmtT(r.q)) + stat('Transmit', fmtT(r.T), fmtN(bits) + ' bits ÷ ' + fmtRate(s.bw)) + stat('Propagation', fmtT(r.P), fmtDist(d * 1000) + ' ÷ ' + fmtN(SPEED[s.medium]) + ' m/s') + stat('Latency', fmtT(r.end), r.T > r.P ? 'transmit is the biggest part' : 'propagation is the biggest part', true);
+    drawBar($('#l2bar'), [{ name: 'Queue', v: r.q, fill: C.amberSoft, line: C.amber }, { name: 'Transmit', v: r.T, fill: C.panel, line: C.brand }, { name: 'Propagation', v: r.P, fill: '#E7E1FF', line: '#7B61FF' }]);
+  }
+  $('#l2p').onchange = function () { var P = L2_PRESETS[this.value]; if (!P) return; $('#l2s').value = P.size; $('#l2bw').value = P.bw; $('#l2d').value = P.distKm; $('#l2m').value = P.medium; $('#l2q').value = P.q; upd(); tl.play(); };
+  ['#l2s', '#l2d', '#l2q'].forEach(function (id) { $(id).oninput = upd; }); $('#l2bw').onchange = upd; $('#l2m').onchange = upd;
+  $('#l2c').onclick = function () {
+    var v = readAnswer('#l2a'), fb = $('#l2fb');
+    if (near(v, ans)) lessonDone(fb, 'Right: ' + t.q + ' ms (queue) + ' + fmtN(tT) + ' ms (transmit: ' + fmt(t.size * 8) + ' bits ÷ ' + fmtRate(t.bw) + ') + ' + fmtN(tP) + ' ms (propagation: ' + fmt(t.distKm) + ' km ÷ 2 × 10⁸ m/s) = ' + fmtN(ans) + ' ms.');
+    else if (t.q > 0 && near(v, ans - t.q)) wrong(fb, 'Close. Did you leave out the time in the queue?');
+    else if (near(v, tP + t.q) || near(v, tP)) wrong(fb, 'You have the propagation part. The packet also needs time to be put on the wire.');
+    else if (near(v, 2 * ans) || near(v, 2 * (tT + tP) + t.q)) wrong(fb, 'That looks like a round trip. Latency here is one way, from Host A to Host B.');
+    else if (near(v, t.q + t.size / t.bw * 1e3 + tP)) wrong(fb, 'Check the transmit part: the size is in bytes, and the bandwidth is in bits per second.');
+    else wrong(fb, 'Not yet. Type the task\'s numbers into the boxes above, then read the last moment\'s time or open <b>The numbers</b> under the figure.');
+  };
+  $('#l2h').onclick = function () { note($('#l2fb'), '💡 Transmit = ' + fmt(t.size) + ' × 8 bits ÷ ' + fmtRate(t.bw) + '. Propagation = ' + fmt(t.distKm) + ',000 m ÷ 2 × 10⁸ m/s. Then add the queue.'); };
+  upd();
+}
+
+/* Lesson 3: which part dominates? */
+var L3_SIZES = [[1e4, '10 KB'], [1e5, '100 KB'], [1e6, '1 MB'], [1e7, '10 MB'], [1e8, '100 MB'], [1e9, '1 GB']];
+function l3Task() {
+  var a, b, sz, la, lb;
+  do {
+    a = { bw: pick([100e6, 1e9]), d: 0.25 }; b = { bw: pick([10e6, 45e6]), d: pick([0.01, 0.02, 0.03]) }; sz = pick(L3_SIZES);
+    la = a.d + sz[0] * 8 / a.bw; lb = b.d + sz[0] * 8 / b.bw;
+  } while (Math.max(la, lb) / Math.min(la, lb) < 1.3);
+  return { a: a, b: b, sz: sz, win: la < lb ? 1 : 2, la: la, lb: lb };
+}
+function l3() {
+  var s = lessonState.l3, t = lessonState.task || (lessonState.task = l3Task());
+  lessonText(3, 'Which part dominates?', {
+    intro: '<p>The propagation delay is fixed by the distance, but the transmit time grows with the message size. So which link is faster depends on what you send.</p>' +
+      '<p>Compare a satellite link (fast but far) with a ground link (slower but close). Move the <b>message size</b> and watch the two curves cross.</p>',
+    more: '<p><b>Small messages:</b> the transmit time is tiny, so the latency is about the propagation delay. More bandwidth hardly helps. The transfer is <b>latency-bound</b>.</p>' +
+      '<p><b>Large messages:</b> the transmit time dominates, so bandwidth matters most. The transfer is <b>bandwidth-bound</b>.</p>' +
+      '<p>Transmit and propagation are equal when size ÷ bandwidth = delay, that is, when the size equals <b>delay × bandwidth</b>. That product is the subject of the next lesson.</p>' +
+      '<p><b>Reading the plot.</b> Both axes are logarithmic: each grid step is 10 times more. A flat part of a curve means the delay dominates; a rising part means the transmit time dominates.</p>',
+    terms: [['Latency', 'one-way delay (propagation) plus transmit time, here with no queue'], ['One-way delay', 'the time one bit takes to cross the link'], ['Transmit time', 'size ÷ bandwidth'],
+      ['Latency-bound', 'the delay is the bigger part, so more bandwidth hardly helps'], ['Bandwidth-bound', 'the transmit time is the bigger part, so bandwidth matters most'],
+      ['Logarithmic scale', 'each equal step on the axis is 10 times more'], ['ms', 'millisecond, a thousandth of a second'], ['Mbps and Gbps', 'megabits (10⁶) and gigabits (10⁹) per second'],
+      ['KB, MB, GB', 'kilobyte (1,000 bytes), megabyte (10⁶ bytes), gigabyte (10⁹ bytes)']],
+    ctl: '<div class="row"><b style="color:#00A2D7">Link 1</b><label>Bandwidth <select id="l3ba">' + rateOptions(s.bwA) + '</select></label><label>One-way delay ' + numIn('l3da', s.dA, 0, 1e6, 'Link 1 one-way delay in milliseconds') + ' ms</label></div>' +
+      '<div class="row"><b style="color:#7B61FF">Link 2</b><label>Bandwidth <select id="l3bb">' + rateOptions(s.bwB) + '</select></label><label>One-way delay ' + numIn('l3db', s.dB, 0, 1e6, 'Link 2 one-way delay in milliseconds') + ' ms</label></div>' +
+      '<div class="row"><label>Message size <input type="range" id="l3sz" min="2" max="9" step="0.1" value="' + s.lsize + '"></label><b class="mono" id="l3szv"></b></div>'
+  });
+  setTry('<p>Link 1: <b>' + fmtRate(t.a.bw) + '</b>, one-way delay <b>250 ms</b>. Link 2: <b>' + fmtRate(t.b.bw) + '</b>, one-way delay <b>' + t.b.d * 1000 + ' ms</b>. Which one delivers a <b>' + t.sz[1] + '</b> message first?</p>' +
+    '<div class="row"><button class="btn small alt" id="l3c1">Link 1</button><button class="btn small alt" id="l3c2">Link 2</button><button class="btn alt small" id="l3h">Hint</button></div><div class="feedback" id="l3fb" aria-live="polite"></div>');
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">Latency for each message size</p><p class="cmdnote">Both axes are logarithmic: each grid step is 10 times more.</p><div class="fig"><svg id="l3svg" role="img" aria-label="Latency against message size for two links, on logarithmic scales"></svg></div>' +
+    '<ul class="legend"><li><i style="background:#00A2D7"></i>Link 1</li><li><i style="background:#7B61FF"></i>Link 2</li><li><i style="background:#fff;border:1px dashed #5B6B78"></i>same latency</li></ul><div class="calcgrid" id="l3stats"></div></div>';
+  function lat(bw, d, B) { return d + B * 8 / bw; }
+  function upd() {
+    var da = readF('#l3da', 0, 1e6), db = readF('#l3db', 0, 1e6); if (da === null || db === null) return;
+    s.dA = da; s.dB = db; s.bwA = +$('#l3ba').value; s.bwB = +$('#l3bb').value; s.lsize = +$('#l3sz').value;
+    var B = Math.pow(10, s.lsize), A = { bw: s.bwA, d: da / 1000 }, Bk = { bw: s.bwB, d: db / 1000 };
+    $('#l3szv').textContent = fmtBytes(B * 8, false, 3);
+    var fa = function (x) { return lat(A.bw, A.d, x); }, fb = function (x) { return lat(Bk.bw, Bk.d, x); };
+    var ys = [fa(100), fb(100), fa(1e9), fb(1e9)].filter(function (v) { return v > 0; }), ylo = Math.pow(10, Math.floor(Math.log10(Math.min.apply(null, ys)))), yhi = Math.pow(10, Math.ceil(Math.log10(Math.max.apply(null, ys))));
+    if (yhi / ylo < 100) ylo = yhi / 100;
+    var vl = [], cross = (A.d - Bk.d) / (8 / Bk.bw - 8 / A.bw);
+    if (isFinite(cross) && cross > 100 && cross < 1e9) vl.push({ x: cross, label: 'same at ' + fmtBytes(cross * 8, false, 3) });
+    var la = fa(B), lb = fb(B);
+    drawPlot($('#l3svg'), { x: [100, 1e9], y: [ylo, yhi], xlab: 'message size', ylab: 'latency', xfmt: function (v) { return fmtBytes(v * 8, false, 1).replace(' bytes', ' B'); }, yfmt: function (v) { return fmtT(v, 1); },
+      series: [{ pts: logPts(100, 1e9, fa), color: C.brand }, { pts: logPts(100, 1e9, fb), color: '#7B61FF' }], vlines: vl,
+      marks: [{ x: B, y: la, color: C.brand, label: fmtT(la, 3), ha: 'right' }, { x: B, y: lb, color: '#7B61FF', label: fmtT(lb, 3), dy: -0.17 }] });
+    var w = la < lb ? 'Link 1' : lb < la ? 'Link 2' : 'a tie';
+    $('#l3stats').innerHTML = stat('Link 1', fmtT(la), fmtT(A.d) + ' + ' + fmtT(B * 8 / A.bw) + ' transmit') + stat('Link 2', fmtT(lb), fmtT(Bk.d) + ' + ' + fmtT(B * 8 / Bk.bw) + ' transmit') + stat('First to deliver', w, 'for ' + fmtBytes(B * 8, false, 3), true);
+  }
+  $('#l3da').oninput = upd; $('#l3db').oninput = upd; $('#l3ba').onchange = upd; $('#l3bb').onchange = upd; $('#l3sz').oninput = upd;
+  function check(k) {
+    var fb = $('#l3fb');
+    var why = 'Link 1 takes ' + fmtT(t.a.d) + ' + ' + fmtT(t.sz[0] * 8 / t.a.bw) + ' = ' + fmtT(t.la) + '. Link 2 takes ' + fmtT(t.b.d) + ' + ' + fmtT(t.sz[0] * 8 / t.b.bw) + ' = ' + fmtT(t.lb) + '.';
+    if (k === t.win) lessonDone(fb, 'Right. ' + why + (t.win === 2 ? ' The message is small enough that the satellite\'s long delay dominates.' : ' The message is big enough that bandwidth dominates.'));
+    else wrong(fb, 'Not this time. Set the two links and the size above to the task\'s values, then compare the two latencies under the figure.');
+  }
+  $('#l3c1').onclick = function () { check(1); }; $('#l3c2').onclick = function () { check(2); };
+  $('#l3h').onclick = function () { note($('#l3fb'), '💡 For each link, add the one-way delay and the transmit time (size × 8 ÷ bandwidth).'); };
+  upd();
+}
+
+/* Lesson 4: the pipe */
+var L4_RTTS = [10, 20, 40, 50, 80, 100, 200], L4_BWS = [10, 45, 100, 1000];
+function l4() {
+  var s = lessonState.l4, t = lessonState.task || (lessonState.task = { rtt: pick(L4_RTTS), bw: pick(L4_BWS) }), ans = t.rtt * t.bw / 8;
+  lessonText(4, 'The pipe: delay × bandwidth', {
+    intro: '<p>Picture the link as a pipe. Its <b>length</b> is the one-way delay and its <b>width</b> is the bandwidth. Its volume, <b>delay × bandwidth</b>, is how many bits are on the link at once.</p>' +
+      '<p>Press <b>Send</b>. The pipe fills, stays full while the message streams through, then empties. The transfer is complete when the last bit reaches Host B.</p>' +
+      '<p>The <b>Show</b> and <b>Window</b> controls are for the round trip, when acknowledgments come back; <b>Show more</b> explains them.</p>',
+    more: '<p>For example, 50 ms (milliseconds) × 45 Mbps (megabits per second) = 2.25 × 10⁶ bits, about 281 KB (kilobytes). Host A has put 2.25 million bits on the wire before the first one arrives.</p>' +
+      '<p><b>The round trip.</b> A sender usually waits for an ACK (acknowledgment) from the receiver. The first ACK can come back only one RTT (round-trip time) after the first bit leaves. To keep the pipe full until then, the sender must be allowed <b>RTT × bandwidth</b> bits in flight. That allowance is its <b>window</b>. Choose <b>a round trip</b> to watch the ACK come back.</p>' +
+      '<p><b>A small window.</b> With a window smaller than RTT × bandwidth, Host A sends one window, waits for the ACK, and sends the next. Part of the pipe sits empty, and the throughput drops to <b>window ÷ RTT</b>, however fast the link is.</p>' +
+      '<p><b>Width is not bit width.</b> A wider pipe puts more bits on the wire each second, so each bit lasts a <i>shorter</i> time. Width and length are drawn on logarithmic scales: each step of 10 times more bandwidth (or delay) adds the same width (or length).</p>' +
+      '<p><b>The controls.</b> Leave the window blank for no limit; a window matters only in a round trip. Leave the message blank to keep sending without an end. When you quote a delay × bandwidth product, say which delay you mean: one way or the RTT.</p>',
+    terms: [['Delay × bandwidth', 'how many bits fit on the link at once: the pipe\'s volume'], ['One-way delay', 'the time one bit takes to cross the link: the pipe\'s length'], ['Bandwidth', 'bits per second the link carries: the pipe\'s width'],
+      ['RTT', 'round-trip time: there and back, twice the one-way delay here'], ['ACK', 'acknowledgment: a short message from the receiver saying what has arrived'],
+      ['Window', 'how many bits the sender may have in flight before it must wait for an ACK'], ['In flight', 'sent but not yet acknowledged'], ['Throughput', 'the rate a transfer really gets, in bits per second'],
+      ['ms', 'millisecond, a thousandth of a second'], ['Mb and Mbps', 'megabits (10⁶ bits) and megabits per second'], ['KB and MB', 'kilobyte (1,000 bytes) and megabyte (10⁶ bytes)']],
+    ctl: '<div class="row"><label>One-way delay ' + numIn('l4d', s.dMs, 0.001, 1e6, 'One-way delay in milliseconds') + ' ms</label><label>Bandwidth <select id="l4bw">' + rateOptions(s.bw) + '</select></label></div>' +
+      '<div class="row"><label>Message ' + numIn('l4m', s.msg, 0, 1e12, 'Message size') + '</label><select id="l4mu" aria-label="Message size unit">' + sizeUnitOptions(s.msgu) + '</select></div>' +
+      '<div class="row"><label>Show <select id="l4mode"><option value="one"' + (s.mode === 'one' ? ' selected' : '') + '>one way</option><option value="rtt"' + (s.mode === 'rtt' ? ' selected' : '') + '>a round trip</option></select></label><label>Window ' + numIn('l4w', s.winKB, 0, 1e12, 'Window in kilobytes') + ' KB</label></div>'
+  });
+  setTry('<p>A path has an <b>RTT of ' + t.rtt + ' ms</b> and a bandwidth of <b>' + t.bw + ' Mbps</b>. How many <b>KB</b> must the sender be allowed to have in flight to keep the pipe full?</p>' + answerRow('l4', 'Window in kilobytes'));
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">The link as a pipe</p>' + stripHTML('l4') + '<div class="fig"><svg id="l4svg" role="img" aria-label="A pipe whose length is the delay and whose width is the bandwidth, filled with blocks of bits"></svg></div>' +
+    '<ul class="legend"><li><i style="background:#00A2D7"></i>bits in flight</li><li><i style="background:#F5A524"></i>the first bit</li><li><i style="background:#fff;border:1px solid #9DB3C1"></i>empty part of the pipe</li><li><i style="background:#13A88A"></i>acknowledgment (ACK)</li></ul>' +
+    '<div class="calcgrid" id="l4key"></div></div>' +
+    figFold('More numbers for this pipe', '<div class="calcgrid" id="l4stats"></div>');
+  var D = 0, tEnd = 0, pl;
+  function draw(frac) {
+    var w = s.winKB, winBits = w === '' ? null : w * 8000, Sbits = s.msg === '' || s.msg <= 0 ? Infinity : s.msg * unitBits(s.msgu);
+    drawPipe($('#l4svg'), { delay: D, bw: s.bw, mode: s.mode, win: s.mode === 'rtt' ? winBits : null, size: Sbits, binary: /i/.test(s.msgu), tc: frac * tEnd });
+    return 't = ' + fmtT(frac * tEnd, 4);
+  }
+  function upd() {
+    var d = readF('#l4d', 0.001, 1e6), w = readF('#l4w', 0, 1e12, true), m = readF('#l4m', 0, 1e12, true); if (d === null || w === null || m === null) return;
+    s.dMs = d; s.winKB = w; s.bw = +$('#l4bw').value; s.mode = $('#l4mode').value; s.msg = m; s.msgu = $('#l4mu').value;
+    D = d / 1000; var rtt = 2 * D, one = dxb(D, s.bw), two = dxb(rtt, s.bw), winBits = w === '' ? null : w * 8000;
+    var Sbits = m === '' || m <= 0 ? Infinity : m * unitBits(s.msgu), Wuse = s.mode === 'rtt' && winBits !== null ? winBits : Infinity;
+    var sch = Sbits < Infinity ? pipeSchedule(D, s.bw, Wuse, Sbits) : null;
+    tEnd = sch ? sch.done : s.mode === 'rtt' ? rtt : D;
+    var thr = winBits === null ? s.bw : windowThroughput(winBits, s.bw, rtt);
+    var tWin = stat('RTT × bandwidth', fmtBits(two), fmtBytes(two, false) + ': the window that fills the pipe', true),
+      tThr = stat('Throughput with this window', fmtRate(thr), winBits === null ? 'no limit: the full bandwidth' : 'window ÷ RTT = ' + fmtN(100 * thr / s.bw, 3) + '% of the link'),
+      tDone = sch ? stat('Message complete at', fmtT(sch.done), 'delay + ' + (sch.iv.length > 1 ? sch.iv.length + ' windows, one per RTT' : 'transmit time') + ' · throughput ' + fmtRate(Sbits / sch.done, 3), true) : '';
+    $('#l4key').innerHTML = stat('Pipe volume (delay × bandwidth)', fmtBits(one), fmtBytes(one, false) + ' on the link') + (sch ? tDone : tWin);
+    $('#l4stats').innerHTML = stat('One-way delay × bandwidth', fmtBits(one), fmtBytes(one, false) + ' on the link') + tWin + stat('In 1500-byte packets', fmtN(two / 12000, 4), 'packets per RTT') + tThr + tDone;
+    if (pl) pl.show();
+  }
+  pl = new Player({ strips: ['l4'], ms: 7000, alive: lessonAlive(), draw: draw });
+  $('#l4d').oninput = upd; $('#l4w').oninput = upd; $('#l4m').oninput = upd; $('#l4mu').onchange = upd; $('#l4bw').onchange = upd; $('#l4mode').onchange = upd;
+  $('#l4c').onclick = function () {
+    var v = readAnswer('#l4a'), fb = $('#l4fb');
+    if (near(v, ans)) lessonDone(fb, 'Right: ' + t.rtt + ' ms × ' + t.bw + ' Mbps = ' + fmt(t.rtt * t.bw) + ' kilobits, and ÷ 8 = ' + fmtN(ans) + ' KB. With less than that, the sender stalls before the first acknowledgment returns.');
+    else if (near(v, ans * 8)) wrong(fb, 'That is in kilobits. Divide by 8 for bytes.');
+    else if (near(v, ans / 2)) wrong(fb, 'That fills the pipe one way. The sender must keep sending until an acknowledgment comes back: a full round trip.');
+    else if (near(v, ans * 1000) || near(v, ans / 1000)) wrong(fb, 'Check the units: ms × Mbps gives kilobits.');
+    else wrong(fb, 'Not yet. Set a one-way delay of ' + t.rtt / 2 + ' ms and ' + t.bw + ' Mbps above and read RTT × bandwidth under <b>More numbers</b>.');
+  };
+  $('#l4h').onclick = function () { note($('#l4fb'), '💡 Window = RTT × bandwidth. ms × Mbps gives kilobits (10³ bits); then divide by 8 for kilobytes.'); };
+  upd();
+}
+
+/* Lesson 5: bandwidth is not throughput. The task always has a throughput clearly below the bandwidth (at most 90%), so answering with the bandwidth is never accepted. */
+function l5Task() { var t; do { t = { mb: pick([1, 2, 5, 10, 25, 100]), bw: pick([10, 45, 100, 1000]), rtt: pick([20, 40, 50, 80, 100, 200]) }; } while (t.mb * 8 / (t.rtt / 1000 + t.mb * 8 / t.bw) > 0.9 * t.bw); return t; }
+function l5() {
+  var s = lessonState.l5, t = lessonState.task || (lessonState.task = l5Task());
+  var tt = t.mb * 8 / t.bw, ans = t.mb * 8 / (t.rtt / 1000 + tt);
+  lessonText(5, 'Bandwidth is not throughput', {
+    intro: '<p><b>Bandwidth</b> is what a link can carry. <b>Throughput</b> is what a transfer actually gets: its size ÷ its transfer time.</p>' +
+      '<p class="soft formula">Transfer time = RTT + Size ÷ Bandwidth</p>' +
+      '<p>Press <b>Send</b>. The request goes out, the pipe stays empty for one RTT (round-trip time), then the file streams in at the full bandwidth.</p>',
+    more: '<p><b>Why the RTT (round-trip time)?</b> The request must reach Host B, and the first data must come back, before anything arrives. Then the data takes size ÷ bandwidth to transmit.</p>' +
+      '<p><b>Example.</b> Fetch a 1 MB (megabyte) file over a 1 Gbps (gigabit per second) link with a 100 ms (millisecond) RTT. Transmitting 8 × 10⁶ bits takes 8 ms, so the transfer takes 108 ms and the throughput is about 74 Mbps, not 1 Gbps. Ten times the bandwidth would save only 7.2 ms. This transfer is <b>latency-bound</b>: shorten the RTT, not the transmit time.</p>' +
+      '<p>Real TCP (Transmission Control Protocol) transfers also need a handshake and start slowly, so they take even longer than this.</p>' +
+      '<p>The folded figures under the main one show how the link is used over time and the throughput for every bandwidth.</p>',
+    terms: [['Bandwidth', 'how many bits per second a link can carry: the pipe\'s width'], ['Latency', 'how long one packet takes from host to host: the pipe\'s length, plus any waiting'],
+      ['Throughput', 'how many bits per second a transfer actually delivers, from start to finish. It is never more than the slowest link\'s bandwidth'],
+      ['Delay × bandwidth', 'how many bits fit in the pipe: its volume'], ['RTT', 'round-trip time: there and back'], ['Transfer time', 'RTT + size ÷ bandwidth'],
+      ['Latency-bound', 'the RTT is the bigger part, so more bandwidth hardly helps'], ['TCP', 'Transmission Control Protocol, which most downloads use'],
+      ['MB and Mb', 'megabyte (10⁶ bytes) and megabit (10⁶ bits)'], ['Mbps and Gbps', 'megabits (10⁶) and gigabits (10⁹) per second'], ['ms', 'millisecond, a thousandth of a second']],
+    ctl: '<div class="row"><label>Size ' + numIn('l5s', s.size, 0.000001, 1e9, 'Size') + '</label><select id="l5u" aria-label="Size unit">' + sizeUnitOptions(s.unit) + '</select></div>' +
+      '<div class="row"><label>Bandwidth <select id="l5bw">' + rateOptions(s.bw) + '</select></label><label>RTT ' + numIn('l5r', s.rtt, 0, 1e6, 'Round-trip time in milliseconds') + ' ms</label></div>'
+  });
+  setTry('<p>A <b>' + t.mb + ' MB</b> file is fetched over a <b>' + t.bw + ' Mbps</b> link with an <b>RTT of ' + t.rtt + ' ms</b>. What is the effective throughput, in <b>Mbps</b>?</p>' + answerRow('l5', 'Throughput in megabits per second'));
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">The download, from request to completion</p>' + stripHTML('l5') +
+    '<div class="fig"><svg id="l5xfer" role="img" aria-label="Host A sends a request; Host B sends the file back through the pipe; the transfer completes when the last bit arrives"></svg></div>' +
+    '<ul class="legend"><li><i style="background:#F5A524"></i>the request</li><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>the file\'s data</li><li><i style="background:#13A88A;border-radius:50%;width:12px"></i>a moment that has happened</li></ul>' +
+    '<div class="calcgrid" id="l5key"></div></div>' +
+    figFold('Step through the five moments', '<ol class="log" id="l5ev" aria-live="polite"></ol><p class="cmdnote">The request is tiny, so its transmit time is left out.</p>') +
+    figFold('Bandwidth versus throughput, over time', stripHTML('l5b') + '<div class="fig"><svg id="l5use" role="img" aria-label="Rate over time: nothing during the first RTT, then the full bandwidth; the dashed line is the average rate, the throughput"></svg></div>' +
+      '<ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>data arriving at the full bandwidth</li><li><i style="background:#fff;border:1px dashed #9DB3C1"></i>waiting: no data yet</li><li><i style="background:#D98A00;height:3px"></i>throughput: the average rate</li></ul>' +
+      '<p class="cmdnote">The box\'s height is the bandwidth. Spread the same bits over the whole transfer time and you get the throughput.</p>') +
+    figFold('Throughput for every bandwidth', '<p class="cmdnote">Both axes are logarithmic: each grid step is 10 times more.</p><div class="fig"><svg id="l5svg" role="img" aria-label="Effective throughput against bandwidth on logarithmic scales, with the ceiling set by size divided by RTT"></svg></div>' +
+      '<ul class="legend"><li><i style="background:#00A2D7"></i>effective throughput</li><li><i style="background:#fff;border:1px dashed #5B6B78"></i>throughput = bandwidth</li><li><i style="background:#fff;border:1px dashed #D98A00"></i>ceiling: size ÷ RTT</li></ul><div class="calcgrid" id="l5stats"></div>' +
+      '<p class="figtitle">Where the transfer time goes</p><div class="fig"><svg id="l5bar" role="img" aria-label="Bar split into RTT and transmit time"></svg></div>');
+  var cur = null, evKey = '', pl;
+  function draw(frac) {   // the transfer, the moments, and the bandwidth-versus-throughput figure, at the same moment
+    if (!cur) return '';
+    var tot = cur.rtt + cur.trans, tc = frac * tot, ev = transferEvents(cur), key = ev.map(function (e) { return e.k + ':' + e.t; }).join();
+    drawTransfer($('#l5xfer'), { bits: cur.bits, bw: cur.bw, rtt: cur.rtt, binary: cur.binary, tc: tc });
+    drawUsage($('#l5use'), { rtt: cur.rtt, trans: cur.trans, bw: cur.bw, thr: cur.thr, tc: tc });
+    if (key !== evKey) {
+      evKey = key;
+      $('#l5ev').innerHTML = evList('l5ev', ev, false);
+      $$('[data-ev]', $('#l5ev')).forEach(function (b) { b.onclick = function () { var e = ev[+b.getAttribute('data-ev')], T0 = cur.rtt + cur.trans; pl.jump(T0 ? e.t / T0 : 1); }; });
+    }
+    markEvents($('#l5ev'), tc, tot);
+    return 't = ' + fmtT(tc, 4);
+  }
+  function upd() {
+    var v = readF('#l5s', 0.000001, 1e9), r = readF('#l5r', 0, 1e6); if (v === null || r === null) return;
+    s.size = v; s.unit = $('#l5u').value; s.bw = +$('#l5bw').value; s.rtt = r;
+    var bits = v * unitBits(s.unit), R = r / 1000, x = transfer(bits, s.bw, R), fn = function (b) { return transfer(bits, b, R).thr; };
+    var series = [{ pts: logPts(1e3, 1e11, fn), color: C.brand }, { pts: [[1e3, 1e3], [1e11, 1e11]], color: C.muted, lw: 1.2, dash: [4, 3] }];
+    if (R > 0) series.push({ pts: [[1e3, bits / R], [1e11, bits / R]], color: C.oneway, lw: 1.2, dash: [4, 3] });
+    drawPlot($('#l5svg'), { x: [1e3, 1e11], y: [1e3, 1e11], xlab: 'link bandwidth', ylab: 'effective throughput', xfmt: function (b) { return fmtRate(b, 1); }, yfmt: function (b) { return fmtRate(b, 1); },
+      series: series, marks: [{ x: s.bw, y: x.thr, color: C.navy, label: fmtRate(x.thr, 3), ha: x.thr > 1e10 ? 'right' : 'left', dy: -0.2 }] });
+    var x10 = transfer(bits, s.bw * 10, R);
+    var tTime = stat('Transfer time', fmtT(x.time), 'RTT + transmit (' + fmtT(x.trans) + ')'), tThr = stat('Effective throughput', fmtRate(x.thr), fmtN(100 * x.thr / s.bw, 3) + '% of the bandwidth', true),
+      tKind = stat('This transfer is', R > x.trans ? 'latency-bound' : 'bandwidth-bound', R > x.trans ? 'the RTT is the bigger part' : 'the transmit time is the bigger part');
+    $('#l5key').innerHTML = tTime + tThr + tKind;
+    $('#l5stats').innerHTML = stat('Transmit time', fmtT(x.trans), fmtBits(bits) + ' ÷ ' + fmtRate(s.bw)) + tTime + tThr + tKind + stat('With 10 times the bandwidth', fmtT(x10.time), 'saves ' + fmtT(x.time - x10.time, 3));
+    drawBar($('#l5bar'), [{ name: 'RTT', v: R, fill: '#E7E1FF', line: '#7B61FF' }, { name: 'Transmit', v: x.trans, fill: C.panel, line: C.brand }]);
+    cur = { bits: bits, bw: s.bw, rtt: R, binary: /i/.test(s.unit), thr: x.thr, trans: x.trans };
+    if (pl) pl.show();
+  }
+  pl = new Player({ strips: ['l5', 'l5b'], ms: 6000, alive: lessonAlive(), draw: draw });
+  $('#l5s').oninput = upd; $('#l5r').oninput = upd; $('#l5u').onchange = upd; $('#l5bw').onchange = upd;
+  $('#l5c').onclick = function () {
+    var v = readAnswer('#l5a'), fb = $('#l5fb');
+    if (near(v, ans)) lessonDone(fb, 'Right: transmitting ' + t.mb * 8 + ' Mb at ' + t.bw + ' Mbps takes ' + fmtT(tt) + '. Add the ' + t.rtt + ' ms RTT: ' + fmtT(t.rtt / 1000 + tt) + '. Throughput = ' + t.mb * 8 + ' Mb ÷ ' + fmtT(t.rtt / 1000 + tt) + ' = ' + fmtN(ans) + ' Mbps.');
+    else if (near(v, t.bw)) wrong(fb, 'That is the link\'s bandwidth. The transfer also spends one RTT before data arrives.');
+    else if (near(v, t.mb * 8 / (t.rtt / 1000))) wrong(fb, 'You divided by the RTT only. The transfer time also includes the transmit time.');
+    else if (near(v, ans / 8)) wrong(fb, 'That is in MB per second. The task asks for megabits per second.');
+    else wrong(fb, 'Not yet. Type the task into the boxes above and read the throughput under the figure.');
+  };
+  $('#l5h').onclick = function () { note($('#l5fb'), '💡 ' + t.mb + ' MB = ' + t.mb * 8 + ' Mb. Transfer time = ' + t.rtt + ' ms + ' + t.mb * 8 + ' Mb ÷ ' + t.bw + ' Mbps. Throughput = ' + t.mb * 8 + ' Mb ÷ transfer time.'); };
+  upd();
+}
+
+/* Lesson 6: across a switch and a router */
+var L6_NAMES = ['Host A', 'Switch', 'Router', 'Host B'];
+function l6Task() {
+  var bws = [pick([10e6, 100e6, 1e9]), pick([100e6, 1e9]), pick([10e6, 100e6])], ds = [pick([50, 100]), pick([1000, 5000, 20000]), pick([100e3, 500e3, 1000e3])];
+  var links = [{ bw: bws[0], dist: ds[0], medium: 'copper', q: 0 }, { bw: bws[1], dist: ds[1], medium: 'fiber', q: 0 }, { bw: bws[2], dist: ds[2], medium: 'fiber', q: 0 }];
+  var ans = pathTimes(12000, links).total, once = ans - 12000 / bws[1] - 12000 / bws[2];
+  if (ans - once < 0.05 * ans) return l6Task();   // counting the transmit time only once must give a clearly wrong answer
+  return { links: links, ans: ans };
+}
+function pingFmt(ms) { return ms >= 99.95 ? String(Math.round(ms)) : ms >= 9.995 ? ms.toFixed(1) : ms >= 1 ? ms.toFixed(2) : ms.toFixed(3); }
+function pingRun(size, links, qs, qr, n, dest) {   // Linux ping output; queues are random between 0 and their maximum, each way
+  var lines = [], rtts = [], pay = size - 28;
+  lines.push('PING ' + dest + ' (' + dest + ') ' + pay + '(' + size + ') bytes of data.');
+  for (var i = 1; i <= n; i++) {
+    var base = 0; links.forEach(function (L) { base += 2 * (size * 8 / L.bw + propDelay(L.dist, L.medium)); });
+    var q = Math.random() * qs + Math.random() * qr + Math.random() * qs + Math.random() * qr, ms = base * 1000 + q;
+    rtts.push(ms); lines.push((size - 20) + ' bytes from ' + dest + ': icmp_seq=' + i + ' ttl=63 time=' + pingFmt(ms) + ' ms');
+  }
+  var mn = Math.min.apply(null, rtts), mx = Math.max.apply(null, rtts), avg = rtts.reduce(function (a, b) { return a + b; }, 0) / n, sq = rtts.reduce(function (a, b) { return a + b * b; }, 0) / n, md = Math.sqrt(Math.max(0, sq - avg * avg));
+  lines.push('', '--- ' + dest + ' ping statistics ---', n + ' packets transmitted, ' + n + ' received, 0% packet loss, time ' + Math.round((n - 1) * 1000 + rtts[n - 1]) + 'ms', 'rtt min/avg/max/mdev = ' + [mn, avg, mx, md].map(function (v) { return v.toFixed(3); }).join('/') + ' ms');
+  return { lines: lines, rtts: rtts };
+}
+function l6() {
+  var s = lessonState.l6, t = lessonState.task || (lessonState.task = l6Task());
+  lessonText(6, 'Across a switch and a router', {
+    intro: '<p>Switches and routers <b>store and forward</b>: each receives the whole packet before it sends it on. So every link adds its own transmit time and propagation delay.</p>' +
+      '<p>The <b>slowest link</b> is the bottleneck, drawn as the thinnest line. Press <b>Send</b> to watch one packet cross the path.</p>',
+    more: '<p class="soft formula">Latency = sum over the links of (Queue + Transmit + Propagation)</p>' +
+      '<p>The bottleneck sets the highest throughput the path can give, however wide the other links are. Its transmit time is usually the biggest part.</p>' +
+      '<p><b>Queues and jitter.</b> Queues grow and shrink with other traffic, so one packet waits longer than the next. That is why ping times vary from line to line. The variation is called <b>jitter</b>. The single packet in the figure waits the full queue at each device; the pings wait a random part of it, each way.</p>' +
+      '<p>A real ping time also includes the time the hosts take to answer. It is small on a fast computer and larger in a VM (virtual machine).</p>',
+    terms: [['Store and forward', 'a switch or router receives the whole packet before it sends it on the next link'], ['Bottleneck', 'the slowest link on the path; it limits the throughput'],
+      ['Queue', 'time a packet waits in a device\'s buffer behind other packets'], ['Jitter', 'how much the delay varies from one packet to the next'],
+      ['Ping', 'a command that sends small packets to a host and prints each RTT'], ['RTT', 'round-trip time: there and back'],
+      ['TTL', 'Time To Live: a counter in each packet that every router lowers by 1'], ['VM', 'virtual machine: a computer running inside another computer'],
+      ['ms', 'millisecond, a thousandth of a second'], ['m and km', 'meter and kilometer (1,000 m)'], ['Mbps and Gbps', 'megabits (10⁶) and gigabits (10⁹) per second']],
+    ctl: '<div class="row"><label>Packet size ' + numIn('l6s', s.size, 64, 65535, 'Packet size in bytes', 1) + ' bytes</label></div>' +
+      '<div class="links">' + s.links.map(function (L, i) { return '<div class="linkbox"><b>Link ' + (i + 1) + ': ' + L6_NAMES[i] + ' → ' + L6_NAMES[i + 1] + '</b><label>Bandwidth <select id="l6b' + i + '">' + rateOptions(L.bw) + '</select></label><label>Length ' + numIn('l6d' + i, L.dist / 1000, 0, 1e6, 'Link ' + (i + 1) + ' length in kilometers') + ' km</label><label>Medium <select id="l6m' + i + '">' + mediumOptions(L.medium) + '</select></label></div>'; }).join('') + '</div>' +
+      '<details class="fold"><summary>Queues at the switch and the router</summary><div class="row"><label>At the switch, up to ' + numIn('l6qs', s.qs, 0, 1e4, 'Queue at the switch in milliseconds') + ' ms</label><label>at the router, up to ' + numIn('l6qr', s.qr, 0, 1e4, 'Queue at the router in milliseconds') + ' ms</label></div></details>'
+  });
+  setTry('<p>A <b>1500-byte</b> packet crosses three links with no queuing: <b>' + t.links.map(function (L) { return fmtRate(L.bw) + ' over ' + fmtDist(L.dist) + ' of ' + MEDIUM_NAME[L.medium]; }).join('</b>, then <b>') + '</b>. What is its latency from Host A to Host B, in <b>ms</b>?</p>' + answerRow('l6', 'Latency in milliseconds'));
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">One packet from Host A to Host B</p>' + stripHTML('l6') +
+    '<div class="fig"><svg id="l6wire" role="img" aria-label="One packet crossing a switch and a router at the chosen time"></svg></div>' +
+    '<ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>the packet\'s bits</li><li><i style="background:#9DB3C1;height:9px"></i>a thicker link has more bandwidth</li></ul><div class="calcgrid" id="l6key"></div></div>' +
+    figFold('The same packet on a time diagram (time runs down)', stripHTML('l6b') + '<div class="fig"><svg id="l6st" role="img" aria-label="Space-time diagram: one packet crossing a switch and a router"></svg></div>' + ST_LEGEND) +
+    figFold('The delay on each link', '<div class="calcgrid" id="l6stats"></div>') +
+    figFold('Ping Host B from Host A', '<div class="row"><button class="btn small" id="l6ping">▶ Run 5 pings</button></div><div class="term" id="l6term" aria-live="polite"><span class="d">Press Run 5 pings.</span></div><p class="cmdnote">Linux output. Host B is at 192.168.20.20; the router lowers the TTL (Time To Live) from 64 to 63. Each RTT (round-trip time) is the request and the reply crossing all three links, plus the queues.</p>') +
+    figFold('Measure it on your own computers', '<div id="l6cmds"></div>');
+  var tl = new Timeline({ strips: ['l6', 'l6b'], wire: $('#l6wire'), st: $('#l6st'), detail: false, alive: lessonAlive() }), links = [];
+  function upd() {
+    var size = readF('#l6s', 64, 65535), qs = readF('#l6qs', 0, 1e4), qr = readF('#l6qr', 0, 1e4); if (size === null || qs === null || qr === null) return;
+    size = Math.round(size);
+    var ls = []; for (var i = 0; i < 3; i++) { var d = readF('#l6d' + i, 0, 1e6); if (d === null) return; ls.push({ bw: +$('#l6b' + i).value, dist: d * 1000, medium: $('#l6m' + i).value }); }
+    s.size = size; s.links = ls; s.qs = qs; s.qr = qr;
+    links = ls.map(function (L, i) { return { bw: L.bw, dist: L.dist, medium: L.medium, q: i === 1 ? qs / 1000 : i === 2 ? qr / 1000 : 0 }; });
+    tl.set(L6_NAMES, links, size * 8);
+    var r = pathTimes(size * 8, links), bott = 0, bi = 0; links.forEach(function (L, i) { if (size * 8 / L.bw > bott) { bott = size * 8 / L.bw; bi = i; } });
+    var noQ = pathTimes(size * 8, links.map(function (L) { return { bw: L.bw, dist: L.dist, medium: L.medium, q: 0 }; })).total;
+    var tLat = stat('Latency from Host A to Host B', fmtT(r.total), 'without queues: ' + fmtT(noQ), true), tBot = stat('Bottleneck', 'Link ' + (bi + 1) + ': ' + fmtRate(links[bi].bw), 'the most the path can carry');
+    $('#l6key').innerHTML = tLat + tBot;
+    $('#l6stats').innerHTML = r.hops.map(function (h, i) { return stat('Link ' + (i + 1), fmtT(h.q + h.T + h.P, 3), (h.q ? 'queue ' + fmtT(h.q, 3) + ' + ' : '') + 'transmit ' + fmtT(h.T, 3) + ' + propagation ' + fmtT(h.P, 3)); }).join('') + tLat + tBot;
+  }
+  $('#l6s').oninput = upd; $('#l6qs').oninput = upd; $('#l6qr').oninput = upd;
+  for (var i = 0; i < 3; i++) { $('#l6b' + i).onchange = upd; $('#l6d' + i).oninput = upd; $('#l6m' + i).onchange = upd; }
+  $('#l6ping').onclick = function () {
+    var run = pingRun(s.size, s.links, s.qs, s.qr, 5, '192.168.20.20'), term = $('#l6term'), b = this, ok = lessonAlive(), k = 0;
+    b.disabled = true; term.innerHTML = '<span class="d">$ ping -c 5 -s ' + (s.size - 28) + ' 192.168.20.20</span>\n' + esc(run.lines[0]);
+    (function next() {
+      if (!ok()) { b.disabled = false; return; }
+      k++; if (k > run.lines.length - 1) { b.disabled = false; return; }
+      term.innerHTML += '\n' + esc(run.lines[k]); setTimeout(next, reduceMotion ? 0 : (k <= 5 ? 450 : 120));
+    })();
+  };
+  renderCommands($('#l6cmds'));
+  $('#l6c').onclick = function () {
+    var v = readAnswer('#l6a') / 1000, fb = $('#l6fb'), cut = 12000 / t.links[0].bw, P = 0;
+    t.links.forEach(function (L) { P += propDelay(L.dist, L.medium); });
+    var r = pathTimes(12000, t.links);
+    if (near(v, t.ans)) lessonDone(fb, 'Right: ' + r.hops.map(function (h) { return '(' + fmtT(h.T, 3) + ' + ' + fmtT(h.P, 3) + ')'; }).join(' + ') + ' = ' + fmtN(t.ans * 1000) + ' ms. Every link transmits the whole packet again.');
+    else if (near(v, cut + P) || near(v, P + 12000 / Math.min(t.links[0].bw, t.links[1].bw, t.links[2].bw))) wrong(fb, 'You counted the transmit time once. With store and forward, every link transmits the whole packet again.');
+    else if (near(v, 2 * t.ans)) wrong(fb, 'That is a round trip. The task asks for one way.');
+    else if (near(v, t.ans * 1000) || near(v, t.ans / 1000)) wrong(fb, 'Check your units: the answer is in milliseconds.');
+    else wrong(fb, 'Not yet. Type the task\'s links into the boxes above, set the queues to 0, and read the latency under the figure.');
+  };
+  $('#l6h').onclick = function () { note($('#l6fb'), '💡 For each link: 12,000 bits ÷ its bandwidth, plus its length ÷ the signal speed. Add the three links.'); };
+  upd();
+}
+
+/* ===================================================== CALCULATOR: one link */
+var calcState = { size: 1500, unit: 'B', bw: 100e6, dist: 1000e3, medium: 'fiber', q: 0, rtt: '' };
+var C_PRESETS = {
+  lan: { name: 'Local Ethernet: 1500 bytes, 1 Gbps, 100 m of copper', size: 1500, unit: 'B', bw: 1e9, dist: 100, medium: 'copper' },
+  wifi: { name: 'Wi-Fi: 1500 bytes, 300 Mbps, 20 m', size: 1500, unit: 'B', bw: 300e6, dist: 20, medium: 'radio' },
+  home: { name: 'Home broadband: 1 MB, 50 Mbps, 5 km of copper', size: 1, unit: 'MB', bw: 50e6, dist: 5000, medium: 'copper' },
+  cross: { name: 'Across a continent: 1 MB, 100 Mbps, 4,000 km of fiber', size: 1, unit: 'MB', bw: 100e6, dist: 4000e3, medium: 'fiber' },
+  ocean: { name: 'Under an ocean: 10 MB, 10 Gbps, 6,000 km of fiber', size: 10, unit: 'MB', bw: 10e9, dist: 6000e3, medium: 'fiber' },
+  sat: { name: 'Satellite: 1 MB, 45 Mbps, 71,572 km up and down', size: 1, unit: 'MB', bw: 45e6, dist: 71572e3, medium: 'radio' },
+  classic: { name: '1 MB over 1 Gbps with a 100 ms RTT', size: 1, unit: 'MB', bw: 1e9, dist: 10000e3, medium: 'fiber' }
+};
+var calcTL = null;
+function bestRate(bps) { var u = bps >= 1e9 ? 'Gbps' : bps >= 1e6 ? 'Mbps' : bps >= 1e3 ? 'kbps' : 'bps'; return [bps / rateMult(u), u]; }
+function setCalcInputs() {
+  var s = calcState, r = bestRate(s.bw);
+  $('#c_size').value = s.size; $('#c_unit').value = s.unit; $('#c_bw').value = r[0]; $('#c_bwu').value = r[1];
+  if (s.dist >= 1000 || s.dist === 0) { $('#c_dist').value = s.dist / 1000; $('#c_distu').value = '1000'; } else { $('#c_dist').value = s.dist; $('#c_distu').value = '1'; }
+  $('#c_med').value = s.medium; $('#c_q').value = s.q; $('#c_rtt').value = s.rtt;
+}
+function calcRead() {
+  var size = readF('#c_size', 0, 1e15), bw = readF('#c_bw', 1e-9, 1e15), d = readF('#c_dist', 0, 1e12), q = readF('#c_q', 0, 1e9), rtt = readF('#c_rtt', 0, 1e9, true);
+  if (size === null || bw === null || d === null || q === null || rtt === null) return false;
+  var bps = bw * rateMult($('#c_bwu').value);
+  if (size * unitBits($('#c_unit').value) <= 0) { $('#c_size').setAttribute('aria-invalid', 'true'); return false; }
+  calcState.size = size; calcState.unit = $('#c_unit').value; calcState.bw = bps; calcState.dist = d * +$('#c_distu').value; calcState.medium = $('#c_med').value; calcState.q = q; calcState.rtt = rtt;
+  return true;
+}
+function calc() {
+  if (!calcRead()) { $('#c_err').textContent = 'Check the boxes marked in red: each needs a number, and the size and bandwidth must be more than 0.'; return; }
+  $('#c_err').textContent = '';
+  var s = calcState, bits = s.size * unitBits(s.unit), bin = /i/.test(s.unit), L = { bw: s.bw, dist: s.dist, medium: s.medium, q: s.q / 1000 };
+  var h = pathTimes(bits, [L]).hops[0], P = h.P, T = h.T, Q = h.q, lat = h.end, rtt = s.rtt === '' ? 2 * P : s.rtt / 1000, x = transfer(bits, s.bw, rtt);
+  var one = dxb(P, s.bw), two = dxb(rtt, s.bw);
+  $('#c_key').innerHTML = stat('One-way latency', fmtT(lat), T > P ? 'transmit is the bigger part' : 'propagation is the bigger part', true) + stat('RTT × bandwidth', fmtBits(two), fmtBytes(two, bin) + ': the window that fills the pipe') +
+    stat('Transfer time', fmtT(x.time), 'RTT + transmit') + stat('Effective throughput', fmtRate(x.thr), fmtN(100 * x.thr / s.bw, 3) + '% of the bandwidth', true);
+  $('#c_stats').innerHTML =
+    stat('Size', fmtBits(bits), fmtBytes(bits, bin)) + stat('Bit width', fmtT(bitWidth(s.bw)), 'one bit lasts this long') + stat('Bit length on the wire', fmtDist(bitLength(s.bw, s.medium)), 'in ' + MEDIUM_NAME[s.medium]) +
+    stat('Queue', fmtT(Q)) + stat('Transmit', fmtT(T), 'size ÷ bandwidth') + stat('Propagation', fmtT(P), 'distance ÷ speed') + stat('One-way latency', fmtT(lat), T > P ? 'bandwidth-bound: transmit is bigger' : 'latency-bound: propagation is bigger', true) +
+    stat('RTT', fmtT(rtt), s.rtt === '' ? '2 × propagation' : 'as typed') + stat('One-way delay × bandwidth', fmtBits(one), fmtBytes(one, bin) + ' on the link') + stat('RTT × bandwidth', fmtBits(two), fmtBytes(two, bin) + ': the window that fills the pipe', true) +
+    stat('Transfer time', fmtT(x.time), 'RTT + transmit') + stat('Effective throughput', fmtRate(x.thr), fmtN(100 * x.thr / s.bw, 3) + '% of the bandwidth', true);
+  $('#c_work').innerHTML = [
+    'Size: ' + fmtN(s.size) + ' ' + s.unit + ' × ' + fmtN(unitBits(s.unit)) + ' bits = ' + fmtN(bits, 6) + ' bits.',
+    'Transmit = ' + fmtN(bits, 6) + ' bits ÷ ' + fmtN(s.bw) + ' bits/s = ' + fmtT(T, 5) + '.',
+    'Propagation = ' + fmtN(s.dist) + ' m ÷ ' + fmtN(SPEED[s.medium]) + ' m/s = ' + fmtT(P, 5) + '.',
+    'One-way latency = ' + fmtT(Q, 4) + ' + ' + fmtT(T, 4) + ' + ' + fmtT(P, 4) + ' = ' + fmtT(lat, 5) + '.',
+    'RTT × bandwidth = ' + fmtT(rtt, 4) + ' × ' + fmtRate(s.bw) + ' = ' + fmtBits(two, 5) + ' = ' + fmtBytes(two, bin, 5) + '.',
+    'Transfer time = ' + fmtT(rtt, 4) + ' + ' + fmtT(T, 4) + ' = ' + fmtT(x.time, 5) + '; throughput = ' + fmtN(bits, 6) + ' bits ÷ ' + fmtT(x.time, 5) + ' = ' + fmtRate(x.thr, 5) + '.'
+  ].map(function (t) { return '<li>' + t + '</li>'; }).join('');
+  calcTL.set(['Host A', 'Host B'], [L], bits);
+  drawBar($('#c_bar'), [{ name: 'Queue', v: Q, fill: C.amberSoft, line: C.amber }, { name: 'Transmit', v: T, fill: C.panel, line: C.brand }, { name: 'Propagation', v: P, fill: '#E7E1FF', line: '#7B61FF' }]);
+  drawUsage($('#c_use'), { rtt: rtt, trans: T, bw: s.bw, thr: x.thr });
+  if (P > 0) drawPipe($('#c_pipe'), { delay: P, bw: s.bw, mode: 'one', binary: bin }); else { var f = new Fig($('#c_pipe'), 0, 10, 0, 0.6, 1.5); f.text(5, 0.3, 'With no distance there is no pipe: the delay × bandwidth product is 0.', { fs: 8.4, color: C.muted }); }
+  writeLink();
+}
+
+/* ===================================================== CALCULATOR: a path of links */
+var pathState = { size: 1500, n: 1, links: [{ bw: 100e6, dist: 100, medium: 'copper', q: 0 }, { bw: 1e9, dist: 20000, medium: 'fiber', q: 0.5 }, { bw: 10e6, dist: 500e3, medium: 'fiber', q: 2 }] };
+var PATH_NAMES = { 1: ['Host A', 'Host B'], 2: ['Host A', 'Router', 'Host B'], 3: ['Host A', 'Switch', 'Router', 'Host B'], 4: ['Host A', 'Switch', 'Router 1', 'Router 2', 'Host B'] };
+var pathTL = null;
+function renderPathLinks() {
+  var names = PATH_NAMES[pathState.links.length];
+  $('#p_links').innerHTML = pathState.links.map(function (L, i) {
+    var r = bestRate(L.bw);
+    return '<div class="linkbox"><b>Link ' + (i + 1) + ': ' + names[i] + ' → ' + names[i + 1] + '</b>' +
+      '<label>Bandwidth ' + numIn('pb' + i, r[0], 1e-9, 1e15, 'Link ' + (i + 1) + ' bandwidth') + '<select id="pu' + i + '" aria-label="Link ' + (i + 1) + ' bandwidth unit">' + rateUnitOptions(r[1]) + '</select></label>' +
+      '<label>Length ' + numIn('pd' + i, L.dist / 1000, 0, 1e9, 'Link ' + (i + 1) + ' length in kilometers') + ' km</label>' +
+      '<label>Medium <select id="pm' + i + '">' + mediumOptions(L.medium) + '</select></label>' +
+      '<label>Queue at ' + names[i] + ' ' + numIn('pq' + i, L.q, 0, 1e9, 'Queue at ' + names[i] + ' in milliseconds') + ' ms</label></div>';
+  }).join('');
+  pathState.links.forEach(function (L, i) { ['#pb', '#pd', '#pq'].forEach(function (p) { $(p + i).oninput = pathCalc; }); $('#pu' + i).onchange = pathCalc; $('#pm' + i).onchange = pathCalc; });
+  $('#p_add').disabled = pathState.links.length >= 4; $('#p_del').disabled = pathState.links.length <= 1;
+}
+function pathCalc() {
+  var size = readF('#p_size', 1, 65535), n = readF('#p_n', 1, 100000), ok = size !== null && n !== null, links = [];
+  pathState.links.forEach(function (L, i) {
+    var b = readF('#pb' + i, 1e-9, 1e15), d = readF('#pd' + i, 0, 1e9), q = readF('#pq' + i, 0, 1e9);
+    if (b === null || d === null || q === null) { ok = false; return; }
+    links.push({ bw: b * rateMult($('#pu' + i).value), dist: d * 1000, medium: $('#pm' + i).value, q: q });
+  });
+  if (!ok) { $('#p_err').textContent = 'Check the boxes marked in red.'; return; }
+  $('#p_err').textContent = ''; pathState.size = Math.round(size); pathState.n = Math.round(n); pathState.links = links;
+  var bits = pathState.size * 8, L = links.map(function (x) { return { bw: x.bw, dist: x.dist, medium: x.medium, q: x.q / 1000 }; }), r = pathTimes(bits, L), names = PATH_NAMES[links.length];
+  var bi = 0; L.forEach(function (x, i) { if (x.bw < L[bi].bw) bi = i; });
+  var msg = messageTime(bits, pathState.n, L);
+  $('#p_key').innerHTML = stat('One packet, Host A to Host B', fmtT(r.total), 'every link transmits it again', true) + stat('Bottleneck', 'Link ' + (bi + 1) + ': ' + fmtRate(L[bi].bw), 'the most this path can carry') +
+    (pathState.n > 1 ? stat('All ' + fmt(pathState.n) + ' packets', fmtT(msg), 'one every ' + fmtT(bits / L[bi].bw, 3) + ' after the first', true) : '');
+  $('#p_stats').innerHTML = r.hops.map(function (h, i) { return stat('Link ' + (i + 1), fmtT(h.q + h.T + h.P, 4), (h.q ? 'queue ' + fmtT(h.q, 3) + ' + ' : '') + 'transmit ' + fmtT(h.T, 3) + ' + propagation ' + fmtT(h.P, 3)); }).join('') +
+    stat('One packet, Host A to Host B', fmtT(r.total), 'every link transmits it again', true) + stat('Bottleneck', 'Link ' + (bi + 1) + ': ' + fmtRate(L[bi].bw), 'the most this path can carry') +
+    (pathState.n > 1 ? stat('All ' + fmt(pathState.n) + ' packets', fmtT(msg), 'one every ' + fmtT(bits / L[bi].bw, 3) + ' after the first', true) + stat('Throughput for the message', fmtRate(bits * pathState.n / msg), 'the bottleneck limits it') : '');
+  $('#p_work').innerHTML = r.hops.map(function (h, i) { return '<li>Link ' + (i + 1) + ': ' + fmtT(h.q, 4) + ' + ' + fmt(bits) + ' bits ÷ ' + fmtRate(h.bw) + ' (' + fmtT(h.T, 4) + ') + ' + fmtDist(links[i].dist) + ' ÷ ' + fmtN(SPEED[links[i].medium]) + ' m/s (' + fmtT(h.P, 4) + ') = ' + fmtT(h.q + h.T + h.P, 5) + '.</li>'; }).join('') +
+    '<li>One packet: ' + fmtT(r.total, 5) + '.</li>' + (pathState.n > 1 ? '<li>' + fmt(pathState.n) + ' packets sent back to back: the last arrives (' + fmt(pathState.n) + ' − 1) × ' + fmtT(bits / L[bi].bw, 4) + ' after the first, at ' + fmtT(msg, 5) + '.</li>' : '');
+  pathTL.set(names, L, bits);
+}
+
+function calcInit() {
+  $('#c_unit').innerHTML = sizeUnitOptions('B'); $('#c_bwu').innerHTML = rateUnitOptions('Mbps'); $('#c_med').innerHTML = mediumOptions('fiber');
+  $('#c_preset').innerHTML = '<option value="">choose…</option>' + Object.keys(C_PRESETS).map(function (k) { return '<option value="' + k + '">' + esc(C_PRESETS[k].name) + '</option>'; }).join('');
+  $('#c_preset').onchange = function () {
+    var P = C_PRESETS[this.value]; if (!P) return;
+    calcState.size = P.size; calcState.unit = P.unit; calcState.bw = P.bw; calcState.dist = P.dist; calcState.medium = P.medium; calcState.q = 0; calcState.rtt = '';
+    setCalcInputs(); calc();
+  };
+  ['#c_size', '#c_bw', '#c_dist', '#c_q', '#c_rtt'].forEach(function (id) { $(id).oninput = calc; });
+  ['#c_unit', '#c_bwu', '#c_distu', '#c_med'].forEach(function (id) { $(id).onchange = calc; });
+  $('#c_strip').innerHTML = stripHTML('c_'); $('#c_stripb').innerHTML = stripHTML('c_b');
+  $('#p_strip').innerHTML = stripHTML('p_', 'Send one packet'); $('#p_stripb').innerHTML = stripHTML('p_b', 'Send one packet');
+  calcTL = new Timeline({ strips: ['c_', 'c_b'], wire: $('#c_wire'), st: $('#c_st'), detail: true, alive: function () { return current === 'calc'; } });
+  pathTL = new Timeline({ strips: ['p_', 'p_b'], wire: $('#p_wire'), st: $('#p_st'), detail: false, alive: function () { return current === 'calc'; } });
+  function seg(path) { $('#c_one').hidden = path; $('#c_path').hidden = !path; $('#c_seg1').setAttribute('aria-pressed', String(!path)); $('#c_seg2').setAttribute('aria-pressed', String(path)); }
+  $('#c_seg1').onclick = function () { seg(false); }; $('#c_seg2').onclick = function () { seg(true); };
+  $('#p_size').oninput = pathCalc; $('#p_n').oninput = pathCalc;
+  $('#p_add').onclick = function () { if (pathState.links.length < 4) { pathState.links.push({ bw: 1e9, dist: 10000, medium: 'fiber', q: 0 }); renderPathLinks(); pathCalc(); } };
+  $('#p_del').onclick = function () { if (pathState.links.length > 1) { pathState.links.pop(); renderPathLinks(); pathCalc(); } };
+  setCalcInputs(); renderPathLinks(); renderCommands($('#c_cmds'));
+}
+function calcShow() { setCalcInputs(); calc(); pathCalc(); }
+
+/* ===================================================== CHALLENGE: question generators
+   Each question carries p: its kind and inputs, so the logic test can re-check the answer independently.
+   Number answers are right within 1%. */
+function numQ(tag, text, answer, unit, hint, explain, p) { return { tag: tag, text: text, input: 'number', answer: answer, unit: unit, hint: hint, explain: explain, p: p }; }
+function choiceQ(tag, text, right, wrongs, hint, explain, p) {
+  var ch = [right]; wrongs.forEach(function (w) { if (ch.indexOf(w) < 0) ch.push(w); });
+  ch = shuffle(ch); return { tag: tag, text: text, input: 'choice', choices: ch, answer: ch.indexOf(right), hint: hint, explain: explain, p: p };
+}
+var KM_FIBER = function () { return rnd(1, 60) * 100; };
+/* Easy */
+function unitQ() {
+  var v = rnd(1, 4);
+  if (v === 1) { var n = pick([2, 5, 12, 25, 40, 100, 250]); return numQ('unit', 'A file is <b>' + n + ' MB</b>. How many <b>megabits (Mb)</b> is that?', n * 8, 'Mb', 'A byte is 8 bits.', n + ' MB × 8 = ' + n * 8 + ' Mb.', { kind: 'mb2mbit', n: n }); }
+  if (v === 2) { var k = pick([2, 4, 8, 16, 64, 100]); return numQ('unit', 'How many <b>bytes</b> are in <b>' + k + ' KiB</b>?', k * 1024, 'bytes', 'KiB is a binary unit: powers of 2.', '1 KiB = 1,024 bytes, so ' + k + ' KiB = ' + fmt(k * 1024) + ' bytes.', { kind: 'kib', n: k }); }
+  if (v === 3) { var r = pick([8, 40, 100, 160, 1000]); return numQ('unit', 'A link carries <b>' + r + ' Mbps</b>. How many <b>MB per second</b> is that?', r / 8, 'MB/s', 'Divide bits by 8 to get bytes.', r + ' Mbps ÷ 8 = ' + fmtN(r / 8) + ' MB/s.', { kind: 'mbps2mbs', n: r }); }
+  var m = pick([1, 2, 4, 10]); return numQ('unit', 'How many <b>bytes</b> are in <b>' + m + ' MiB</b>?', m * 1048576, 'bytes', '1 MiB = 2²⁰ bytes.', '1 MiB = 1,048,576 bytes, so ' + m + ' MiB = ' + fmt(m * 1048576) + ' bytes.', { kind: 'mib', n: m });
+}
+var COMPARE = [
+  [['1 MB', 8e6], ['1 MiB', 8 * 1048576]], [['100 Mbps', 100e6], ['10 MB per second', 80e6]], [['1 Gb', 1e9], ['100 MB', 8e8]],
+  [['64 KiB', 8 * 65536], ['65 KB', 8 * 65000]], [['1 Gbps', 1e9], ['100 MB per second', 8e8]], [['500 kb', 5e5], ['64 KB', 512000]]
+];
+function compareQ() {
+  var c = pick(COMPARE), a = c[0], b = c[1], right = a[1] > b[1] ? a[0] : b[0], other = right === a[0] ? b[0] : a[0];
+  return choiceQ('unit', 'Which is <b>bigger</b>: <b>' + a[0] + '</b> or <b>' + b[0] + '</b>?', right, [other], 'Turn both into bits. MB and KB are powers of 10; MiB and KiB are powers of 2. A lowercase b is a bit.',
+    a[0] + ' = ' + fmtN(a[1], 6) + ' bits and ' + b[0] + ' = ' + fmtN(b[1], 6) + ' bits, so ' + right + ' is bigger.', { kind: 'compare', a: a[1], b: b[1], la: a[0], lb: b[0] });
+}
+function bitWidthQ() {
+  if (Math.random() < 0.6) { var r = pick([1, 2, 4, 5, 10, 20, 25, 50, 100]); return numQ('bit', 'A link runs at <b>' + r + ' Mbps</b>. How long does one bit last, in <b>µs</b> (microseconds)?', 1 / r, 'µs', 'Bit width = 1 ÷ bandwidth. At 1 Mbps it is 1 µs.', '1 ÷ ' + r + ' Mbps = ' + fmtN(1 / r) + ' µs.', { kind: 'bitw_us', r: r }); }
+  var g = pick([1, 2, 10, 25, 40, 100]); return numQ('bit', 'A link runs at <b>' + g + ' Gbps</b>. How long does one bit last, in <b>ns</b> (nanoseconds)?', 1 / g, 'ns', 'Bit width = 1 ÷ bandwidth. At 1 Gbps it is 1 ns.', '1 ÷ ' + g + ' Gbps = ' + fmtN(1 / g) + ' ns.', { kind: 'bitw_ns', r: g });
+}
+function propQ() {
+  var v = rnd(1, 3);
+  if (v === 1) { var d = KM_FIBER(); return numQ('prop', 'What is the propagation delay over <b>' + fmt(d) + ' km of fiber</b> (2 × 10⁸ m/s), in <b>ms</b>?', d / 200, 'ms', 'Propagation = distance ÷ speed. Fiber covers 200 km per ms.', fmt(d * 1000) + ' m ÷ 2 × 10⁸ m/s = ' + fmtN(d / 200) + ' ms.', { kind: 'prop', m: d * 1000, medium: 'fiber', unit: 'ms' }); }
+  if (v === 2) { var m = pick([23, 46, 115, 230, 460, 690]); return numQ('prop', 'What is the propagation delay over <b>' + m + ' m of copper cable</b> (2.3 × 10⁸ m/s), in <b>µs</b>?', m / 230, 'µs', 'Copper covers 230 m per µs.', m + ' m ÷ 2.3 × 10⁸ m/s = ' + fmtN(m / 230) + ' µs.', { kind: 'prop', m: m, medium: 'copper', unit: 'us' }); }
+  var km = pick([35786, 36000, 30000, 15000, 3000]); return numQ('prop', 'A radio signal travels <b>' + fmt(km) + ' km</b> (3 × 10⁸ m/s). What is the propagation delay, in <b>ms</b>?', km / 300, 'ms', 'Radio covers 300 km per ms.', fmt(km * 1000) + ' m ÷ 3 × 10⁸ m/s = ' + fmtN(km / 300) + ' ms.', { kind: 'prop', m: km * 1000, medium: 'radio', unit: 'ms' });
+}
+function transQ() {
+  var s = pick([64, 500, 1000, 1500, 9000]), b = pick([1, 10, 100, 1000]);
+  return numQ('trans', 'How long does it take to transmit a <b>' + fmt(s) + '-byte</b> packet at <b>' + fmtRate(b * 1e6) + '</b>, in <b>µs</b>?', s * 8 / b, 'µs', 'Transmit = size in bits ÷ bandwidth. Bits ÷ Mbps gives µs.', fmt(s) + ' × 8 = ' + fmt(s * 8) + ' bits, and ' + fmt(s * 8) + ' ÷ ' + fmtRate(b * 1e6) + ' = ' + fmtN(s * 8 / b) + ' µs.', { kind: 'trans_us', s: s, b: b });
+}
+var TERMS = [
+  ['Bandwidth', 'how many bits per second a link can carry'],
+  ['Throughput', 'how many bits per second a transfer actually delivers, measured from start to finish'],
+  ['Latency', 'how long one packet takes to get from one host to the other'],
+  ['Delay × bandwidth', 'how many bits fit on the link at one time'],
+  ['Jitter', 'how much the delay changes from one packet to the next']
+];
+function termQ() {
+  var i = rnd(0, TERMS.length - 1), others = shuffle(TERMS.filter(function (t, j) { return j !== i; }).map(function (t) { return t[0]; })).slice(0, 3);
+  return choiceQ('term', 'Which term means <b>' + TERMS[i][1] + '</b>?', TERMS[i][0], others, 'In the pipe picture: width, length, volume, the rate you actually get, and how much the waiting changes.',
+    TERMS[i][0] + ' is ' + TERMS[i][1] + '. ' + (i === 0 ? 'It is the pipe\'s width, set by the link.' : i === 1 ? 'It is never more than the slowest link\'s bandwidth, and waiting for the RTT makes it lower.' : i === 2 ? 'It adds up queue, transmit, and propagation delay.' : i === 3 ? 'It is the pipe\'s volume.' : 'Queues that grow and shrink cause it.'), { kind: 'term', i: i });
+}
+/* Medium */
+function latQ() {
+  var s, b, d, q, T, P;
+  do { s = pick([500, 1000, 1500, 9000]); b = pick([10, 100, 1000]); d = rnd(1, 50) * 100; q = pick([0, 1, 2, 5]); T = s * 8 / b / 1000; P = d / 200; }
+  while (T < 0.05 * (q + T + P) || P < 0.05 * (q + T + P) || (q > 0 && q < 0.05 * (q + T + P)));   // leaving out any part gives a clearly wrong answer
+  return numQ('lat', 'A <b>' + fmt(s) + '-byte</b> packet waits <b>' + q + ' ms</b> in a queue, then crosses <b>' + fmt(d) + ' km of fiber</b> at <b>' + fmtRate(b * 1e6) + '</b>. What is its latency, in <b>ms</b>?', q + T + P, 'ms',
+    'Add the queue, the transmit time (bits ÷ bandwidth), and the propagation delay (200 km per ms in fiber).', q + ' + ' + fmtN(T) + ' (transmit) + ' + fmtN(P) + ' (propagation) = ' + fmtN(q + T + P) + ' ms.', { kind: 'lat', s: s, b: b, d: d, q: q });
+}
+function rttQ() {
+  var d = rnd(1, 20) * 500;
+  return numQ('prop', 'Two hosts are <b>' + fmt(d) + ' km</b> apart over fiber. Ignoring transmit and queuing time, what is the <b>RTT</b> (round-trip time), in <b>ms</b>?', d / 100, 'ms', 'A round trip crosses the distance twice. Fiber covers 200 km per ms.',
+    '2 × ' + fmt(d) + ' km ÷ 200 km per ms = ' + fmtN(d / 100) + ' ms.', { kind: 'rtt', d: d });
+}
+function bitLenQ() {
+  var b = pick([1, 10, 100, 1000, 10000]), med = pick(['copper', 'fiber']), v = SPEED[med] / (b * 1e6);
+  return numQ('bit', 'How long is one bit on <b>' + MEDIUM_NAME[med] + '</b> (' + (med === 'fiber' ? '2.0' : '2.3') + ' × 10⁸ m/s) at <b>' + fmtRate(b * 1e6) + '</b>, in <b>meters</b>?', v, 'm', 'Bit length = signal speed ÷ bandwidth.',
+    fmtN(SPEED[med]) + ' m/s ÷ ' + fmtN(b * 1e6) + ' bits/s = ' + fmtN(v) + ' m per bit.', { kind: 'bitlen', b: b, medium: med });
+}
+function dxbQ() {
+  var d = pick([5, 10, 20, 25, 40, 50, 80, 100]), b = pick([10, 45, 100, 1000]);
+  return numQ('pipe', 'A link has a one-way delay of <b>' + d + ' ms</b> and a bandwidth of <b>' + b + ' Mbps</b>. How many <b>KB</b> fit in the pipe (one-way delay × bandwidth)?', d * b / 8, 'KB', 'ms × Mbps gives kilobits. Divide by 8 for kilobytes.',
+    d + ' ms × ' + b + ' Mbps = ' + fmt(d * b) + ' kb, and ÷ 8 = ' + fmtN(d * b / 8) + ' KB.', { kind: 'dxb', d: d, b: b });
+}
+function onWireQ() {
+  var d = rnd(1, 20) * 100, b = pick([10, 100, 1000]), v = d * 1000 / 2e8 * b * 1e6;
+  return numQ('pipe', 'A sender sends without a pause over <b>' + fmt(d) + ' km of fiber</b> at <b>' + fmtRate(b * 1e6) + '</b>. How many <b>bits</b> are on the link at once?', v, 'bits', 'Bits on the link = propagation delay × bandwidth.',
+    'Propagation = ' + fmtN(d / 200) + ' ms, and ' + fmtN(d / 200) + ' ms × ' + fmtRate(b * 1e6) + ' = ' + fmt(v) + ' bits.', { kind: 'onwire', d: d, b: b });
+}
+function domQ() {
+  var s, b, d, med, T, P;
+  do { s = pick([64, 500, 1500, 9000, 1e5, 1e6]); b = pick([1e6, 10e6, 100e6, 1e9, 10e9]); med = pick(['fiber', 'copper']); d = pick([0.1, 1, 10, 100, 1000, 5000]) * 1000; T = s * 8 / b; P = d / SPEED[med]; } while (Math.max(T, P) / Math.min(T, P) < 3);
+  var right = T > P ? 'Transmit' : 'Propagation';
+  return choiceQ('lat', 'A <b>' + fmtBytes(s * 8, false) + '</b> message crosses <b>' + fmtDist(d) + ' of ' + MEDIUM_NAME[med] + '</b> at <b>' + fmtRate(b) + '</b>. Which delay is bigger?', right, ['Transmit', 'Propagation', 'They are about equal'],
+    'Work out both: size × 8 ÷ bandwidth, and distance ÷ signal speed.', 'Transmit = ' + fmtT(T) + ' and propagation = ' + fmtT(P) + ', so ' + right.toLowerCase() + ' dominates.', { kind: 'dom', s: s, b: b, d: d, medium: med });
+}
+/* Hard */
+function thrQ() {
+  var mb, b, r, t, v;
+  do { mb = pick([1, 2, 5, 10, 25, 100]); b = pick([10, 45, 100, 1000]); r = pick([20, 40, 50, 80, 100, 200]); t = r / 1000 + mb * 8 / b; v = mb * 8 / t; } while (v > 0.9 * b);   // never answerable with the bandwidth itself
+  return numQ('thr', 'A <b>' + mb + ' MB</b> file is fetched over a <b>' + fmtRate(b * 1e6) + '</b> link with an <b>RTT of ' + r + ' ms</b>. What is the effective throughput, in <b>Mbps</b>?', v, 'Mbps', 'Transfer time = RTT + size ÷ bandwidth. Throughput = size ÷ transfer time.',
+    'Transfer time = ' + r + ' ms + ' + mb * 8 + ' Mb ÷ ' + b + ' Mbps = ' + fmtT(t) + '. Throughput = ' + mb * 8 + ' Mb ÷ ' + fmtT(t) + ' = ' + fmtN(v) + ' Mbps.', { kind: 'thr', mb: mb, b: b, r: r });
+}
+function windowQ() {
+  if (Math.random() < 0.5) {
+    var r = pick([10, 20, 40, 50, 80, 100, 200]), b = pick([10, 45, 100, 1000]);
+    return numQ('pipe', 'A path has an <b>RTT of ' + r + ' ms</b> and a bandwidth of <b>' + b + ' Mbps</b>. How big a window, in <b>KB</b>, does the sender need to keep the pipe full?', r * b / 8, 'KB', 'The sender must keep sending for a whole RTT: window = RTT × bandwidth.',
+      r + ' ms × ' + b + ' Mbps = ' + fmt(r * b) + ' kb = ' + fmtN(r * b / 8) + ' KB.', { kind: 'win', r: r, b: b });
+  }
+  var w = pick([16, 32, 64, 128]), rr = pick([10, 20, 50, 100, 200]), bb = 1000, v = w * 8 / rr;
+  return numQ('pipe', 'A sender may have only <b>' + w + ' KB</b> in flight. The path has an <b>RTT of ' + rr + ' ms</b> and a bandwidth of <b>1 Gbps</b>. What is the most throughput it can get, in <b>Mbps</b>?', v, 'Mbps', 'Each RTT the sender can send one window. Throughput = window ÷ RTT.',
+    w + ' KB = ' + w * 8 + ' kb, and ' + w * 8 + ' kb ÷ ' + rr + ' ms = ' + fmtN(v) + ' Mbps: far below the 1 Gbps link.', { kind: 'winthr', w: w, r: rr, b: bb });
+}
+function pathQ() {
+  var k = pick([2, 3]), links = [], q = [0];
+  for (var i = 0; i < k; i++) links.push({ bw: pick([10e6, 100e6, 1e9]), dist: pick([0.1, 1, 10, 100, 500, 1000]) * 1000, medium: 'fiber', q: 0 });
+  for (var j = 1; j < k; j++) { var qq = pick([0, 0, 1, 2]); links[j].q = qq / 1000; q.push(qq); }
+  var tot = pathTimes(12000, links).total * 1000, names = PATH_NAMES[k], extra = 0;
+  for (var m = 1; m < k; m++) extra += 12000 / links[m].bw * 1000;
+  if (extra < 0.05 * tot) return pathQ();   // counting the transmit time only once must give a clearly wrong answer
+  return numQ('path', 'A <b>1500-byte</b> packet goes ' + links.map(function (L, i) { return (i ? (L.q ? 'waits <b>' + q[i] + ' ms</b> at the ' + names[i] + ', then ' : 'then ') : '') + 'crosses <b>' + fmtDist(L.dist) + ' of fiber</b> at <b>' + fmtRate(L.bw) + '</b>'; }).join(', ') + '. Every device stores and forwards. What is the latency from Host A to Host B, in <b>ms</b>?', tot, 'ms',
+    'For each link add the queue, 12,000 bits ÷ bandwidth, and length ÷ 2 × 10⁸ m/s.', pathTimes(12000, links).hops.map(function (h) { return fmtT(h.q + h.T + h.P, 4); }).join(' + ') + ' = ' + fmtN(tot) + ' ms.', { kind: 'path', links: links.map(function (L) { return [L.bw, L.dist, L.q * 1000]; }) });
+}
+function msgQ() {
+  var n = pick([5, 10, 20, 100]), b1 = pick([100e6, 1e9]), b2 = pick([10e6, 100e6]), d1 = pick([100, 1000]), d2 = pick([10e3, 100e3, 1000e3]);
+  var links = [{ bw: b1, dist: d1, medium: 'fiber', q: 0 }, { bw: b2, dist: d2, medium: 'fiber', q: 0 }], first = pathTimes(12000, links).total, bott = 12000 / Math.min(b1, b2), v = messageTime(12000, n, links) * 1000;
+  return numQ('path', 'Host A sends <b>' + n + ' packets of 1500 bytes</b> back to back to a router over <b>' + fmtDist(d1) + '</b> at <b>' + fmtRate(b1) + '</b>. The router sends them on over <b>' + fmtDist(d2) + '</b> at <b>' + fmtRate(b2) + '</b>. All fiber. When does the last packet reach Host B, in <b>ms</b>?', v, 'ms',
+    'The first packet takes the full store-and-forward time. After that, one packet arrives every bottleneck transmit time.', 'The first arrives at ' + fmtT(first, 4) + '. The rest follow every ' + fmtT(bott, 3) + ' (the slower link): ' + fmtT(first, 4) + ' + ' + (n - 1) + ' × ' + fmtT(bott, 3) + ' = ' + fmtN(v) + ' ms.', { kind: 'msg', n: n, b1: b1, b2: b2, d1: d1, d2: d2 });
+}
+function fasterQ() {
+  var mb, b, r, a, c;
+  do { mb = pick([0.01, 0.1, 1, 10, 100]); b = pick([10, 100, 1000]); r = pick([10, 50, 100, 200]); a = r / 1000 + mb * 8 / (10 * b); c = r / 2000 + mb * 8 / b; } while (Math.max(a, c) / Math.min(a, c) < 1.2);
+  var right = a < c ? '10 times the bandwidth' : 'Half the RTT';
+  return choiceQ('thr', 'You fetch a <b>' + fmtBytes(mb * 8e6, false) + '</b> file over <b>' + b + ' Mbps</b> with an <b>RTT of ' + r + ' ms</b>. Which makes the transfer finish sooner?', right, ['10 times the bandwidth', 'Half the RTT'],
+    'Transfer time = RTT + size ÷ bandwidth. Which part is bigger now?', '10 times the bandwidth: ' + fmtT(a) + '. Half the RTT: ' + fmtT(c) + '. ' + (a < c ? 'The transfer is bandwidth-bound.' : 'The transfer is latency-bound.'), { kind: 'faster', mb: mb, b: b, r: r });
+}
+function savedQ() {
+  var mb = pick([1, 10, 100, 500]), b1 = pick([10, 50, 100]), b2 = b1 * pick([2, 4, 10]), r = pick([20, 50, 100]), v = (mb * 8 / b1 - mb * 8 / b2) * 1000;
+  return numQ('thr', 'A <b>' + mb + ' MB</b> transfer with an <b>RTT of ' + r + ' ms</b> moves from a <b>' + b1 + ' Mbps</b> link to a <b>' + b2 + ' Mbps</b> link. How many <b>ms</b> sooner does it finish?', v, 'ms', 'The RTT is the same before and after. Only the transmit time changes.',
+    mb * 8 + ' Mb ÷ ' + b1 + ' Mbps − ' + mb * 8 + ' Mb ÷ ' + b2 + ' Mbps = ' + fmtN(v) + ' ms. The RTT cancels out.', { kind: 'saved', mb: mb, b1: b1, b2: b2, r: r });
+}
+var GEN = {
+  E: [unitQ, compareQ, bitWidthQ, propQ, transQ, termQ],
+  M: [latQ, rttQ, bitLenQ, dxbQ, onWireQ, domQ],
+  H: [thrQ, windowQ, pathQ, msgQ, fasterQ, savedQ]
+};
+function makeRound(level, n) {
+  var out = [], bag = [];
+  while (out.length < n) { if (!bag.length) bag = shuffle(GEN[level].slice()); out.push(bag.pop()()); }
+  return out;
+}
+
+/* ===================================================== CHALLENGE: play */
+var BADGES = [
+  { id: 'first', b: '🎯', t: 'First round', d: 'Finish a challenge round' },
+  { id: 'perfect', b: '💯', t: 'Perfect 10', d: 'Answer all ten questions right' },
+  { id: 'streak', b: '🔥', t: 'On fire', d: 'Five right answers in a row' },
+  { id: 'unit', b: '📐', t: 'Unit master', d: 'Three or more unit and bit questions right in a round, with none missed' },
+  { id: 'pipe', b: '🛢️', t: 'Pipe filler', d: 'Every delay × bandwidth question right in a round (at least two)' },
+  { id: 'bottleneck', b: '🧭', t: 'Bottleneck finder', d: 'Three path or throughput questions right in a Hard round' },
+  { id: 'sprint', b: '⚡', t: 'Speed runner', d: 'Eight right answers in a sprint' },
+  { id: 'learned', b: '📘', t: 'Scholar', d: 'Finish all six lessons' }
+];
+function earn(id) { if (progress.badges[id]) return false; progress.badges[id] = Date.now(); store.set('progress', progress); return true; }
+function renderShelf() {
+  $('#badgeShelf').innerHTML = BADGES.map(function (b) { return '<span class="badge' + (progress.badges[b.id] ? '' : ' locked') + '" title="' + esc(b.d) + '"><span class="b" aria-hidden="true">' + b.b + '</span>' + b.t + '<span class="sr" style="position:absolute;left:-9999px">' + (progress.badges[b.id] ? ' (earned)' : ' (not yet earned)') + '</span></span>'; }).join('');
+  var best = progress.best; $('#bestLine').textContent = 'Best scores: Easy ' + (best.E || 0) + ', Medium ' + (best.M || 0) + ', Hard ' + (best.H || 0) + (best.S ? ', Sprint ' + best.S : '');
+}
+var game = null;
+function startRound() {
+  var level = ($('.level[aria-pressed=true]') || $('.level')).getAttribute('data-level'), sprint = $('#sprint').checked;
+  game = { level: level, sprint: sprint, qs: makeRound(level, sprint ? 40 : 10), i: 0, score: 0, streak: 0, bestStreak: 0, right: 0, answered: 0, log: [], tags: {}, ends: sprint ? Date.now() + 120000 : 0, timer: null };
+  $('#ch-setup').hidden = true; $('#ch-end').hidden = true; $('#ch-play').hidden = false;
+  $('#q_timerbar').hidden = !sprint;
+  if (sprint) game.timer = setInterval(tick, 250);
+  showQ();
+}
+function tick() {
+  if (!game) return; var left = game.ends - Date.now();
+  $('#q_timer').style.width = Math.max(0, left / 1200) + '%';
+  if (left <= 0) { clearInterval(game.timer); endRound(); }
+}
+function chips() {
+  $('#q_n').textContent = game.sprint ? 'Answered ' + game.answered : 'Question ' + Math.min(game.i + 1, game.qs.length) + ' of ' + game.qs.length;
+  $('#q_score').textContent = '★ ' + game.score;
+  $('#q_streak').textContent = '🔥 streak ' + game.streak;
+}
+function showQ() {
+  if (!game) return; chips();
+  var q = game.qs[game.i], body = $('#q_body'); q.hinted = false;
+  var answerUI = q.input === 'choice'
+    ? '<div class="choices">' + q.choices.map(function (c, i) { return '<button class="choice" data-i="' + i + '">' + esc(c) + '</button>'; }).join('') + '</div>'
+    : '<div class="row"><input type="number" step="any" id="q_in" aria-label="Your answer in ' + esc(q.unit) + '"><span>' + esc(q.unit) + '</span><button class="btn" id="q_ok">Check</button></div>';
+  body.innerHTML = '<p class="qtext">' + q.text + '</p>' + answerUI +
+    '<div class="row"><button class="btn alt small" id="q_hint">Hint (−3)</button></div><div class="feedback" id="q_fb" aria-live="polite"></div><div class="row" id="q_nextrow" hidden><button class="btn amber" id="q_next">Next →</button></div>';
+  $('#q_hint').onclick = function () { if (q.hinted || q.done) return; q.hinted = true; var fb = $('#q_fb'); fb.className = 'feedback'; fb.style.background = 'var(--amber-soft)'; fb.innerHTML = '💡 ' + q.hint; };
+  if (q.input === 'choice') $$('.choice', body).forEach(function (b) { b.onclick = function () { answer(+b.getAttribute('data-i'), b); }; });
+  else { $('#q_ok').onclick = function () { answer(readAnswer('#q_in')); }; $('#q_in').onkeydown = function (e) { if (e.key === 'Enter') answer(readAnswer('#q_in')); }; $('#q_in').focus(); }
+  $('#q_next').onclick = nextQ;
+}
+function rightText(q) { return q.input === 'choice' ? q.choices[q.answer] : fmtN(q.answer, 4) + ' ' + q.unit; }
+function answer(v, btn) {
+  var q = game.qs[game.i]; if (q.done) return;
+  if (q.input === 'number' && !isFinite(v)) { var f0 = $('#q_fb'); f0.className = 'feedback'; f0.style.background = ''; f0.innerHTML = 'Type a number first.'; return; }
+  q.done = true;
+  var ok = q.input === 'choice' ? v === q.answer : near(v, q.answer, 0.01), fb = $('#q_fb'); fb.style.background = '';
+  game.answered++;
+  if (ok) {
+    game.right++; game.streak++; game.bestStreak = Math.max(game.bestStreak, game.streak);
+    var pts = 10 + Math.min(game.streak - 1, 5) * 2 - (q.hinted ? 3 : 0); game.score += pts;
+    game.tags[q.tag] = (game.tags[q.tag] || 0) + 1;
+    fb.className = 'feedback ok pop'; fb.innerHTML = '<b>Correct! +' + pts + '</b>' + (game.streak >= 3 ? ' 🔥 ' + game.streak + ' in a row' : '') + '<br>' + q.explain;
+  } else {
+    game.streak = 0; game.tags[q.tag + '_miss'] = 1;
+    fb.className = 'feedback bad'; fb.innerHTML = '<b>Not quite.</b> The answer is <b>' + esc(rightText(q)) + '</b>.<br>' + q.explain;
+  }
+  game.log.push({ q: q.text, ok: ok, right: rightText(q) });
+  if (q.input === 'choice') $$('#q_body .choice').forEach(function (b, i) { b.disabled = true; if (i === q.answer) b.classList.add('right'); else if (b === btn) b.classList.add('wrong'); });
+  else { $('#q_in').disabled = true; $('#q_ok').disabled = true; }
+  $('#q_hint').disabled = true; $('#q_nextrow').hidden = false; $('#q_next').focus(); chips();
+}
+function nextQ() { game.i++; if (game.i >= game.qs.length || (game.sprint && Date.now() > game.ends)) endRound(); else showQ(); }
+function code(level, score, right, total) {   // completion code with a checksum (deters casual editing; not secure)
+  var s = 'BL|' + level + '|' + score + '|' + right + '|' + total, h = 2166136261;
+  for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+  return level + score + '-' + right + 'of' + total + '-' + (h % 1679616).toString(36).toUpperCase().padStart(4, '0');
+}
+function checkCode(c) {
+  var m = /^([EMHS])(\d+)-(\d+)of(\d+)-([0-9A-Z]{4})$/.exec(String(c).trim().toUpperCase().replace('OF', 'of'));
+  if (!m) return null; return code(m[1], +m[2], +m[3], +m[4]) === m[0] ? { level: m[1], score: +m[2], right: +m[3], total: +m[4] } : false;
+}
+function endRound() {
+  if (!game) return; clearInterval(game.timer);
+  var g = game, total = g.sprint ? g.answered : g.qs.length, pct = total ? g.right / total : 0, stars = pct >= 0.9 ? 3 : pct >= 0.7 ? 2 : pct >= 0.5 ? 1 : 0;
+  var lvl = g.sprint ? 'S' : g.level, fresh = [];
+  if (g.answered && earn('first')) fresh.push('first');
+  if (!g.sprint && g.right === 10 && earn('perfect')) fresh.push('perfect');
+  if (g.bestStreak >= 5 && earn('streak')) fresh.push('streak');
+  if ((g.tags.unit || 0) + (g.tags.bit || 0) >= 3 && !g.tags.unit_miss && !g.tags.bit_miss && earn('unit')) fresh.push('unit');
+  if ((g.tags.pipe || 0) >= 2 && !g.tags.pipe_miss && earn('pipe')) fresh.push('pipe');
+  if (g.level === 'H' && !g.sprint && (g.tags.path || 0) + (g.tags.thr || 0) >= 3 && earn('bottleneck')) fresh.push('bottleneck');
+  if (g.sprint && g.right >= 8 && earn('sprint')) fresh.push('sprint');
+  var newBest = g.score > (progress.best[lvl] || 0); if (newBest) progress.best[lvl] = g.score;
+  store.set('progress', progress); addXP(g.score);
+  var cd = code(lvl, g.score, g.right, total), lname = { E: 'Easy', M: 'Medium', H: 'Hard', S: 'Sprint' }[lvl];
+  $('#ch-play').hidden = true; var end = $('#ch-end'); end.hidden = false;
+  end.innerHTML = '<h2>' + (stars === 3 ? 'Outstanding!' : stars === 2 ? 'Great work!' : stars === 1 ? 'Good start!' : 'Keep practicing!') + '</h2>' +
+    '<div class="stars" aria-label="' + stars + ' of 3 stars">' + '★★★'.slice(0, stars) + '<span style="color:#D3E3EC">' + '★★★'.slice(0, 3 - stars) + '</span></div>' +
+    '<p style="font-size:19px"><b>' + g.score + ' points</b> · ' + g.right + ' of ' + total + ' right · best streak ' + g.bestStreak + (newBest ? ' · <span class="oneway">new best for ' + lname + '!</span>' : '') + '</p>' +
+    (fresh.length ? '<h3>New badges</h3><div class="badges">' + fresh.map(function (id) { var b = BADGES.filter(function (x) { return x.id === id; })[0]; return '<span class="badge pop"><span class="b">' + b.b + '</span>' + b.t + '</span>'; }).join('') + '</div>' : '') +
+    '<h3>Completion code</h3><p>If you are asked for it, copy this code.</p><span class="code" id="ccode">' + cd + '</span> <button class="btn alt small" id="ccopy">Copy</button>' +
+    '<div class="row" style="margin-top:16px"><button class="btn amber" id="again">Play again</button>' + (g.level !== 'H' ? '<button class="btn" id="harder">Try ' + (g.level === 'E' ? 'Medium' : 'Hard') + '</button>' : '') + '<button class="btn alt" id="toLearn">Review the lessons</button></div>' +
+    '<details><summary>Review your answers</summary><ol class="list">' + g.log.map(function (l) { return '<li>' + (l.ok ? '<span class="yes">✓</span> ' : '<span class="no">✗</span> ') + l.q + ' <i>Answer: ' + esc(l.right) + '</i></li>'; }).join('') + '</ol></details>';
+  $('#ccopy').onclick = function () { copyText(cd, $('#ccopy')); };
+  $('#again').onclick = function () { startRound(); };
+  if ($('#harder')) $('#harder').onclick = function () { setLevel(g.level === 'E' ? 'M' : 'H'); startRound(); };
+  $('#toLearn').onclick = function () { go('learn'); };
+  if (stars === 3) burst();
+  game = null; renderShelf(); writeLink();
+}
+function burst() {
+  if (reduceMotion) return;
+  var b = document.createElement('div'); b.className = 'burst'; b.setAttribute('aria-hidden', 'true');
+  for (var i = 0; i < 40; i++) { var s = document.createElement('span'); s.textContent = pick(['★', '✦', '●', '▲']); s.style.left = rnd(0, 100) + '%'; s.style.color = pick(['#00A2D7', '#F5A524', '#13A88A', '#7B61FF']); s.style.animationDelay = (Math.random() * 0.6) + 's'; b.appendChild(s); }
+  document.body.appendChild(b); setTimeout(function () { if (b.parentNode) b.parentNode.removeChild(b); }, 2800);
+}
+function setLevel(l) { $$('.level').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-level') === l)); }); }
+
+/* ===================================================== navigation and links */
+var VIEWS = ['home', 'learn', 'calc', 'challenge'], current = 'home', calcShown = false;
+function go(mode) {
+  current = VIEWS.indexOf(mode) >= 0 ? mode : 'home';
+  lessonState.token++;
+  VIEWS.forEach(function (v) { $('#view-' + v).hidden = v !== current; });
+  $$('.modes button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === current)); });
+  if (current === 'learn') openLesson(lessonState.i);
+  if (current === 'challenge') { if (game) { clearInterval(game.timer); game = null; } $('#ch-setup').hidden = false; $('#ch-play').hidden = true; $('#ch-end').hidden = true; renderShelf(); }
+  if (current === 'calc') calcShow();
+  window.scrollTo(0, 0); writeLink();
+}
+function writeLink() {
+  try {
+    var q = new URLSearchParams(); q.set('mode', current);
+    if (current === 'learn') q.set('lesson', lessonState.i + 1);   // 0 is the lesson map
+    if (current === 'calc') { var s = calcState; q.set('size', s.size); q.set('unit', s.unit); q.set('bw', s.bw); q.set('dist', s.dist); q.set('medium', s.medium); if (s.q) q.set('q', s.q); if (s.rtt !== '') q.set('rtt', s.rtt); }
+    if (current === 'challenge') q.set('level', ($('.level[aria-pressed=true]') || $('.level')).getAttribute('data-level'));
+    if (window.history && history.replaceState) history.replaceState(null, '', location.pathname + '?' + q.toString());
+  } catch (e) { /* some embeds block history changes */ }
+}
+function readLink() {
+  var q; try { q = new URLSearchParams(location.search); } catch (e) { return null; }
+  if (q.get('lesson') !== null && q.get('lesson') !== '') lessonState.i = clamp((+q.get('lesson') || 0) - 1, -1, LESSONS.length - 1);   // lesson=0 opens the lesson map
+  if (/^[EMH]$/.test(q.get('level') || '')) setLevel(q.get('level'));
+  function num(k, lo, hi) { var raw = q.get(k); if (raw === null || raw === '') return null; var v = +raw; return isFinite(v) && v >= lo && v <= hi ? v : null; }
+  var v;
+  if ((v = num('size', 0, 1e15)) !== null) calcState.size = v;
+  if (unitBits(q.get('unit') || '')) calcState.unit = q.get('unit');
+  if ((v = num('bw', 1e-9, 1e15)) !== null) calcState.bw = v;
+  if ((v = num('dist', 0, 1e12)) !== null) calcState.dist = v;
+  if (SPEED[q.get('medium') || '']) calcState.medium = q.get('medium');
+  if ((v = num('q', 0, 1e9)) !== null) calcState.q = v;
+  if ((v = num('rtt', 0, 1e9)) !== null) calcState.rtt = v;
+  return q.get('mode');
+}
+
+/* ===================================================== start */
+function init() {
+  var mode = readLink();   // read the link before anything rewrites it
+  drawHero(); showXP(false); calcInit(); renderShelf();
+  $$('.modes button').forEach(function (b) { b.onclick = function () { go(b.getAttribute('data-mode')); }; });
+  $$('[data-go]').forEach(function (b) { b.onclick = function () { go(b.getAttribute('data-go')); }; });
+  $('#home').onclick = function () { go('home'); };
+  $$('.level').forEach(function (b) { b.onclick = function () { setLevel(b.getAttribute('data-level')); writeLink(); }; });
+  $('#ch-start').onclick = startRound;
+  $('#q_quit').onclick = function () { endRound(); };
+  $('#resetProgress').onclick = function () { progress = { xp: 0, lessons: {}, badges: {}, best: {} }; store.set('progress', progress); showXP(false); renderShelf(); if (current === 'learn') renderStepper(); };
+  $('#verifyBtn').onclick = function () { var r = checkCode($('#verifyIn').value); $('#verifyOut').innerHTML = r ? '<span class="yes">Valid:</span> ' + { E: 'Easy', M: 'Medium', H: 'Hard', S: 'Sprint' }[r.level] + ', ' + r.score + ' points, ' + r.right + ' of ' + r.total + ' right.' : '<span class="no">Not a valid code.</span>'; };
+  go(VIEWS.indexOf(mode) >= 0 ? mode : 'home');
+}
+init();
+window.BandwidthLatencyVisualizer = { SPEED: SPEED, propDelay: propDelay, transDelay: transDelay, bitWidth: bitWidth, bitLength: bitLength, dxb: dxb, pathTimes: pathTimes, messageTime: messageTime, transfer: transfer, windowThroughput: windowThroughput,
+  pingRun: pingRun, GEN: GEN, makeRound: makeRound, code: code, checkCode: checkCode, near: near,
+  currentQuestion: function () { return game ? { input: game.qs[game.i].input, answer: game.qs[game.i].answer } : null; } };
+})();
+</script>
+</body>
+</html>

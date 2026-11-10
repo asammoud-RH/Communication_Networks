@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fragmentation Visualizer</title>
+<meta name="description" content="Learn how IP fragments a datagram when a link's MTU is too small: fragment sizes, header fields, re-fragmentation, reassembly, the DF bit, and path MTU discovery.">
+<style>
+/* ===================================================== theme (shared by all apps) */
+:root {
+  --brand: #00A2D7; --brand-dark: #0081AD; --navy: #0B3D5C; --ink: #1B2A35; --muted: #5B6B78;
+  --panel: #CFE6F0; --panel-soft: #EAF5FA; --bg: #F4F8FB; --line: #D3E3EC; --white: #FFFFFF;
+  --amber: #F5A524; --amber-soft: #FDF0D5; --ok: #13A88A; --ok-soft: #E1F5EF; --bad: #E5484D; --bad-soft: #FDE8E9;
+  --gray: #E4E4E4; --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Roboto, Arial, sans-serif;
+  --mono: Consolas, "SF Mono", Menlo, "DejaVu Sans Mono", "Courier New", monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: var(--font); font-size: 16px; line-height: 1.5; color: var(--ink); background: var(--bg); }
+h1, h2, h3 { color: var(--navy); line-height: 1.25; }
+h2 { font-size: 22px; margin: 0 0 8px; }
+h3 { font-size: 17px; margin: 18px 0 6px; }
+p { margin: 6px 0; }
+a { color: var(--brand-dark); }
+code, .mono { font-family: var(--mono); font-size: 0.92em; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* header bar */
+.topbar { background: var(--navy); color: #fff; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 0 var(--brand); }
+.topbar .in { max-width: 1180px; margin: 0 auto; padding: 8px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 19px; background: none; border: 0; color: #fff; cursor: pointer; padding: 4px 2px; }
+.brand svg { width: 30px; height: 30px; }
+.modes { display: flex; gap: 4px; background: rgba(255,255,255,.12); border-radius: 999px; padding: 4px; }
+.modes button { border: 0; background: transparent; color: #fff; padding: 6px 14px; border-radius: 999px; cursor: pointer; font-weight: 600; }
+.modes button[aria-pressed=true] { background: #fff; color: var(--navy); }
+.spacer { flex: 1; }
+.pill { background: var(--amber); color: #3a2600; font-weight: 700; border-radius: 999px; padding: 4px 12px; white-space: nowrap; }
+
+main { max-width: 1180px; margin: 0 auto; padding: 18px 16px 40px; }
+
+/* cards: heavy top and right edge, softened */
+.card { background: var(--white); border: 1px solid var(--line); border-top: 4px solid var(--brand); border-right: 4px solid var(--brand); border-radius: var(--radius); padding: 16px 18px; }
+.card + .card { margin-top: 14px; }
+.soft { background: var(--panel-soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; }
+
+/* buttons */
+.btn { border: 2px solid var(--brand); background: var(--brand); color: #fff; border-radius: 8px; padding: 7px 16px; cursor: pointer; font-weight: 600; }
+.btn:hover:not(:disabled) { background: var(--brand-dark); border-color: var(--brand-dark); }
+.btn.alt { background: #fff; color: var(--brand-dark); }
+.btn.alt:hover:not(:disabled) { background: var(--panel-soft); }
+.btn.amber { background: var(--amber); border-color: var(--amber); color: #3a2600; }
+.btn.amber:hover:not(:disabled) { background: #e3931a; border-color: #e3931a; }
+.btn.small { padding: 4px 10px; font-size: 14px; }
+.btn:disabled { opacity: .45; cursor: default; }
+.row { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 10px 0; }
+.row label { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; max-width: 100%; }
+input[type=text], select { max-width: 100%; }
+.row label > select { min-width: 0; }
+input[type=text], input[type=number], select { border: 1px solid #9DB3C1; border-radius: 6px; padding: 5px 8px; background: #fff; }
+input[type=number] { width: 5.6em; }
+input[type=range] { accent-color: var(--brand); width: 200px; max-width: 100%; }
+.addr { font-family: var(--mono); white-space: nowrap; }
+
+/* start screen */
+.hero { background: linear-gradient(135deg, var(--navy), #0E6A92 60%, var(--brand)); color: #fff; border-radius: 14px; padding: 28px 26px; display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; align-items: center; }
+.hero h1 { color: #fff; font-size: 32px; margin: 0 0 8px; }
+.hero p { font-size: 17px; max-width: 560px; }
+.hero svg { width: 100%; height: auto; max-height: 220px; }
+.modecards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 18px; }
+.modecard { display: flex; flex-direction: column; gap: 6px; }
+.modecard .icon { font-size: 30px; line-height: 1; }
+.modecard h2 { margin: 4px 0; }
+.modecard p { flex: 1; color: var(--muted); }
+.skills { columns: 2; margin: 8px 0 0; padding-left: 20px; }
+@media (max-width: 880px) { .hero { grid-template-columns: 1fr; } .modecards { grid-template-columns: 1fr; } .skills { columns: 1; } }
+
+/* learn: stepper */
+.stepper { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+.stepper button { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 5px 12px 5px 5px; cursor: pointer; font-size: 14px; }
+.stepper .num { display: inline-flex; width: 26px; height: 26px; border-radius: 50%; align-items: center; justify-content: center; background: var(--panel); color: var(--navy); font-weight: 700; }
+.stepper button[aria-current=step] { border-color: var(--brand); box-shadow: 0 0 0 2px var(--brand) inset; }
+.stepper button.done .num { background: var(--ok); color: #fff; }
+.progress { height: 8px; background: var(--panel); border-radius: 999px; overflow: hidden; margin: 0 0 12px; }
+.progress > div { height: 100%; background: linear-gradient(90deg, var(--brand), var(--ok)); width: 0; transition: width .4s; }
+.lesson { display: grid; grid-template-columns: minmax(300px, 0.85fr) minmax(0, 1.15fr); gap: 16px; align-items: start; }
+.lesson > * { min-width: 0; }
+@media (max-width: 980px) { .lesson { grid-template-columns: 1fr; } }
+.tryit { border-left: 5px solid var(--amber); background: var(--amber-soft); border-radius: 8px; padding: 10px 14px; margin-top: 14px; }
+.tryit h3 { margin-top: 0; }
+.feedback { border-radius: 8px; padding: 8px 12px; margin-top: 8px; }
+.feedback.ok { background: var(--ok-soft); border: 1px solid var(--ok); }
+.feedback.bad { background: var(--bad-soft); border: 1px solid var(--bad); }
+.feedback:empty { display: none; }
+.navrow { display: flex; justify-content: space-between; gap: 10px; margin-top: 16px; }
+
+/* figures */
+.fig { overflow-x: auto; }
+.fig svg { display: block; width: 100%; height: auto; min-width: 520px; }
+.figtitle { font-weight: 600; color: var(--navy); margin: 4px 0; }
+.legend { list-style: none; padding: 0; margin: 6px 0; display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 14px; color: var(--muted); }
+.legend i { display: inline-block; width: 22px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; }
+
+.list { padding-left: 20px; margin: 6px 0; }
+.list li { margin: 3px 0; }
+.yes { color: var(--ok); font-weight: 700; }
+.no { color: var(--bad); font-weight: 700; }
+.oneway { color: #B86E00; font-weight: 700; }
+
+/* step list and terminal output */
+.log { padding-left: 22px; margin: 6px 0; }
+.log li { margin: 4px 0; }
+.log li.now { font-weight: 600; }
+.log li.result { list-style: none; margin-left: -22px; padding: 6px 10px; border-radius: 8px; background: var(--panel-soft); font-weight: 700; }
+.term { background: #0F2533; color: #E8F4FA; border-radius: 8px; padding: 8px 10px; font-family: var(--mono); font-size: 13.5px; white-space: pre-wrap; word-break: break-word; margin: 6px 0; min-height: 2.6em; }
+.term .e { color: #FFB4B6; } .term .g { color: #9FE3CF; } .term .d { color: #8FB3C6; }
+details { margin-top: 8px; }
+summary { cursor: pointer; color: var(--brand-dark); font-weight: 600; }
+
+/* commands */
+.cmdtabs { display: flex; gap: 4px; margin: 8px 0; flex-wrap: wrap; }
+.cmdtabs button { border: 1px solid var(--line); background: #fff; padding: 5px 14px; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: 600; }
+.cmdtabs button[aria-pressed=true] { background: var(--navy); color: #fff; border-color: var(--navy); }
+.cmd { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; align-items: center; background: #0F2533; color: #E8F4FA; border-radius: 8px; padding: 8px 10px; margin: 6px 0 2px; }
+.cmd code { white-space: pre-wrap; word-break: break-all; font-size: 14px; }
+.cmd button { background: transparent; border: 1px solid #5E8BA3; color: #E8F4FA; border-radius: 6px; padding: 2px 8px; cursor: pointer; font-size: 13px; }
+.cmdnote { font-size: 14px; color: var(--muted); margin: 0 0 8px; }
+
+/* calculator and fragment cards */
+.calcgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin: 10px 0; }
+.stat { background: var(--panel-soft); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.stat .k { font-size: 13px; color: var(--muted); }
+.stat .v { font-family: var(--mono); font-size: 17px; font-weight: 700; color: var(--navy); word-break: break-all; }
+.fcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin: 8px 0; }
+.fcard { background: #fff; border: 1px solid var(--line); border-left: 6px solid var(--brand); border-radius: 8px; padding: 6px 10px; font-size: 14px; }
+.fcard b { color: var(--navy); }
+.fcard .m { font-family: var(--mono); font-size: 13px; }
+.links { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.linkbox { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
+.linkbox b { color: var(--navy); display: block; font-size: 14px; }
+
+/* challenge */
+.levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 12px 0; }
+@media (max-width: 760px) { .levels { grid-template-columns: 1fr; } }
+.level { text-align: left; cursor: pointer; border: 2px solid var(--line); background: #fff; border-radius: 12px; padding: 12px 14px; }
+.level[aria-pressed=true] { border-color: var(--amber); box-shadow: 0 0 0 3px var(--amber-soft); }
+.level b { display: block; font-size: 18px; color: var(--navy); }
+.qhead { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { background: var(--panel-soft); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-weight: 600; font-size: 14px; }
+.chip.fire { background: var(--amber-soft); border-color: var(--amber); }
+.qtext { font-size: 19px; margin: 12px 0; }
+.qtext code, .qtext .addr, .choice code, .feedback code { white-space: normal; overflow-wrap: anywhere; }
+.choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
+.choice { text-align: left; border: 2px solid var(--line); background: #fff; border-radius: 10px; padding: 10px 12px; cursor: pointer; }
+.choice:hover:not(:disabled) { border-color: var(--brand); }
+.choice.right { border-color: var(--ok); background: var(--ok-soft); }
+.choice.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.timer { height: 8px; background: var(--panel); border-radius: 999px; overflow: hidden; }
+.timer > div { height: 100%; background: var(--amber); width: 100%; }
+.stars { font-size: 44px; letter-spacing: 6px; color: var(--amber); }
+.badges { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0; }
+.badge { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 4px 12px 4px 6px; }
+.badge .b { font-size: 22px; }
+.badge.locked { opacity: .45; filter: grayscale(1); }
+.code { font-family: var(--mono); font-size: 22px; font-weight: 700; letter-spacing: 2px; background: var(--panel-soft); border: 2px dashed var(--brand); border-radius: 8px; padding: 6px 14px; display: inline-block; }
+.pop { animation: pop .45s ease-out; }
+@keyframes pop { 0% { transform: scale(.9); } 60% { transform: scale(1.04); } 100% { transform: scale(1); } }
+.burst { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 20; }
+.burst span { position: absolute; top: -20px; font-size: 22px; animation: fall 1.8s ease-in forwards; }
+@keyframes fall { to { transform: translateY(105vh) rotate(360deg); opacity: .2; } }
+@media (prefers-reduced-motion: reduce) { .pop, .burst span { animation: none !important; } .progress > div { transition: none; } }
+
+footer { max-width: 1180px; margin: 0 auto; padding: 0 16px 30px; font-size: 14px; color: var(--muted); }
+footer .card { border-top-width: 1px; border-right-width: 1px; }
+@media print { .topbar, .navrow, .btn, footer, .stepper, .tryit button { display: none !important; } body { background: #fff; } .card { border: 1px solid #999; } }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="in">
+    <button class="brand" id="home" aria-label="Fragmentation Visualizer home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="7" fill="#00A2D7"/><rect x="5" y="9" width="22" height="5" rx="2" fill="#fff"/><rect x="5" y="18" width="10" height="5" rx="2" fill="#CFE6F0"/><rect x="17" y="18" width="7" height="5" rx="2" fill="#F5A524"/></svg>
+      Fragmentation Visualizer
+    </button>
+    <nav class="modes" aria-label="Mode">
+      <button data-mode="learn" aria-pressed="false">Learn</button>
+      <button data-mode="calc" aria-pressed="false">Calculator</button>
+      <button data-mode="challenge" aria-pressed="false">Challenge</button>
+    </nav>
+    <span class="spacer"></span>
+    <span class="pill" id="xp" title="Points from lessons and challenges">★ 0 points</span>
+  </div>
+</header>
+
+<main id="main">
+<!-- ===================================================== start screen -->
+<section id="view-home">
+  <div class="hero">
+    <div>
+      <h1>Fragmentation Visualizer</h1>
+      <p>Every link has a largest packet it can carry. When an IP (Internet Protocol) datagram meets a smaller link, IP cuts it into fragments, and only the destination puts them back together. See where the cuts fall, read every header field, and find the largest packet a path can carry with real ping commands.</p>
+    </div>
+    <svg id="heroFig" viewBox="0 0 360 200" role="img" aria-label="A datagram cut into three fragments at a router"></svg>
+  </div>
+  <div class="modecards">
+    <div class="card modecard">
+      <div class="icon" aria-hidden="true">📘</div>
+      <h2>Learn</h2>
+      <p>Six short lessons with live figures and animations. Each one ends with a quick task. Best for a first visit.</p>
+      <button class="btn" data-go="learn">Start learning</button>
+    </div>
+    <div class="card modecard">
+      <div class="icon" aria-hidden="true">🧮</div>
+      <h2>Calculator</h2>
+      <p>Type a packet size and the MTU of every link on the path. Get every fragment's header fields, the overhead, the result with Don't Fragment set, and the commands.</p>
+      <button class="btn alt" data-go="calc">Open the calculator</button>
+    </div>
+    <div class="card modecard">
+      <div class="icon" aria-hidden="true">🏆</div>
+      <h2>Challenge</h2>
+      <p>Ten fresh questions, three levels, streaks, badges, and a completion code.</p>
+      <button class="btn amber" data-go="challenge">Take the challenge</button>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3 style="margin-top:0">What you will be able to do</h3>
+    <ul class="skills">
+      <li>Tell whether a datagram fits a link's MTU (Maximum Transmission Unit)</li>
+      <li>Find how many data bytes each fragment carries</li>
+      <li>Fill in each fragment's Ident, M flag, Offset, and Total Length</li>
+      <li>Follow a datagram as routers fragment it again on smaller links</li>
+      <li>Explain reassembly, and why one lost fragment loses the whole datagram</li>
+      <li>Use the DF (Don't Fragment) bit, ping, tracepath, and Wireshark to find a path's MTU</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===================================================== learn -->
+<section id="view-learn" hidden>
+  <div class="progress" aria-hidden="true"><div id="lprog"></div></div>
+  <nav class="stepper" id="stepper" aria-label="Lessons"></nav>
+  <div class="lesson">
+    <div class="card" id="ltext"></div>
+    <div id="lfig"></div>
+  </div>
+</section>
+
+<!-- ===================================================== calculator -->
+<section id="view-calc" hidden>
+  <div class="card">
+    <h2>Fragmentation calculator</h2>
+    <p>Describe what the source sends and the MTU of every link from the source to the destination. The calculator assumes a 20-byte IP header with no options.</p>
+    <div class="row">
+      <label>Size <input type="number" id="c_size" min="1" max="65515" value="1392"></label>
+      <label>What is it? <select id="c_kind">
+        <option value="ping">ping payload (-s, -l): + 8-byte ICMP header</option>
+        <option value="udp">UDP payload: + 8-byte UDP header</option>
+        <option value="data">IP data (after the IP header)</option>
+      </select></label>
+    </div>
+    <div class="row">
+      <label>DF (Don't Fragment) bit <select id="c_df">
+        <option value="0">clear: routers may fragment</option>
+        <option value="1">set: never fragment</option>
+      </select></label>
+      <label>Preset <select id="c_preset">
+        <option value="">choose…</option>
+        <option value="classic">A small link in the middle: 1500, 532, 1500</option>
+        <option value="refrag">Two smaller links: 1500, 1000, 576</option>
+        <option value="tunnel">A tunnel: 1500, 1400, 1500</option>
+        <option value="local">One Ethernet link: 1500</option>
+      </select></label>
+    </div>
+    <h3>Links from the source to the destination</h3>
+    <div class="links" id="c_links"></div>
+    <div class="row"><button class="btn alt small" id="c_add">+ Add a link</button><button class="btn alt small" id="c_del">− Remove the last link</button></div>
+    <p id="c_err" class="no" aria-live="polite"></p>
+    <div class="calcgrid" id="c_stats"></div>
+    <div id="c_df_out"></div>
+  </div>
+  <div class="card">
+    <p class="figtitle">The path and the fragments on each link</p>
+    <div class="fig"><svg id="c_path" role="img" aria-label="The path from Host A to Host B and the fragments on each link"></svg></div>
+    <ul class="legend"><li><i style="background:#0B3D5C"></i>20-byte IP header</li><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>data bytes, drawn to scale</li></ul>
+  </div>
+  <div class="card">
+    <h2>Fragments that reach the destination</h2>
+    <div class="fcards" id="c_cards"></div>
+    <details><summary>Every link, fragment by fragment</summary><div id="c_all"></div></details>
+  </div>
+  <div class="card">
+    <h2>Commands for this test</h2>
+    <div id="c_cmds"></div>
+  </div>
+</section>
+
+<!-- ===================================================== challenge -->
+<section id="view-challenge" hidden>
+  <div class="card" id="ch-setup">
+    <h2>Challenge</h2>
+    <p>Answer ten questions. A correct answer earns 10 points, and a streak adds a bonus. A hint costs 3 points. Every answer comes with an explanation. Use a 20-byte IP header unless a question says otherwise.</p>
+    <div class="levels" id="levels">
+      <button class="level" data-level="E" aria-pressed="true"><b>Easy</b>Does it fit? Data per fragment, number of fragments, the Offset field, ping sizes.</button>
+      <button class="level" data-level="M" aria-pressed="false"><b>Medium</b>Last fragments, Total Length, byte ranges, Wireshark's offsets, ping fragments.</button>
+      <button class="level" data-level="H" aria-pressed="false"><b>Hard</b>Re-fragmentation on a path, missing fragments, the DF bit, and path MTU.</button>
+    </div>
+    <div class="row">
+      <label><input type="checkbox" id="sprint"> Sprint: as many as you can in 2 minutes</label>
+      <button class="btn amber" id="ch-start">Start</button>
+    </div>
+    <h3>Your badges</h3>
+    <div class="badges" id="badgeShelf"></div>
+    <p id="bestLine" class="mono"></p>
+  </div>
+  <div class="card" id="ch-play" hidden>
+    <div class="qhead">
+      <div class="chips"><span class="chip" id="q_n"></span><span class="chip" id="q_score"></span><span class="chip fire" id="q_streak"></span></div>
+      <button class="btn alt small" id="q_quit">End round</button>
+    </div>
+    <div class="timer" id="q_timerbar" hidden><div id="q_timer"></div></div>
+    <div id="q_body"></div>
+  </div>
+  <div class="card" id="ch-end" hidden></div>
+</section>
+</main>
+
+<footer>
+  <div class="card">
+    <p><strong>About this app.</strong> Fragmentation Visualizer works offline in any current browser. It models IPv4 (IP version 4) with a 20-byte header and no options. A ping payload adds the 8-byte ICMP (Internet Control Message Protocol) header, and a UDP (User Datagram Protocol) payload adds the 8-byte UDP header. Routers fragment every fragment that is too big on its own, the way Linux does. Ping output follows Linux iputils ping and Windows ping: Linux ping sets DF by default and learns the path MTU; Windows ping sets DF only with -f. Linux never remembers a path MTU below 552 bytes, and it waits 30 seconds for missing fragments. Progress and badges are kept in this browser only.</p>
+    <details>
+      <summary>Settings</summary>
+      <div class="row"><button class="btn alt small" id="resetProgress">Reset my progress</button></div>
+    </details>
+    <details>
+      <summary>For instructors: check a completion code</summary>
+      <div class="row"><label>Code <input type="text" id="verifyIn" size="22" spellcheck="false"></label><button class="btn small" id="verifyBtn">Check</button><span id="verifyOut" aria-live="polite"></span></div>
+    </details>
+  </div>
+</footer>
+
+<script>
+(function () {
+'use strict';
+var APP_ID = 'fragviz';
+
+/* ===================================================== small helpers */
+var $ = function (s, r) { return (r || document).querySelector(s); };
+var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+function fmt(n) { return Number(n).toLocaleString('en-US'); }
+var reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+/* storage that never throws (some embeds block it) */
+var store = {
+  get: function (k, d) { try { var v = window.localStorage.getItem(APP_ID + '.' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set: function (k, v) { try { window.localStorage.setItem(APP_ID + '.' + k, JSON.stringify(v)); } catch (e) { /* ignore */ } }
+};
+
+/* ===================================================== the fragmentation model
+   A datagram or fragment: { off: first data byte (in bytes), len: data bytes, mf: More fragments flag }.
+   The IP header is 20 bytes with no options. */
+var HDR = 20, MIN_MTU = 68, MAX_DATA = 65515, LINUX_MIN_PMTU = 552;
+function maxData(mtu) { return Math.floor((mtu - HDR) / 8) * 8; }        // data bytes in every fragment but the last
+function fits(len, mtu) { return HDR + len <= mtu; }
+/* One link: split one datagram or fragment, the way Linux does (checked on a real kernel):
+   cut pieces of maxData bytes until the rest fits in one fragment (up to MTU - 20 bytes, any length). */
+function splitFrag(f, mtu) {
+  if (fits(f.len, mtu)) return [f];
+  var m = maxData(mtu), room = mtu - HDR, out = [], o = 0;
+  while (f.len - o > room) { out.push({ off: f.off + o, len: m, mf: true }); o += m; }
+  out.push({ off: f.off + o, len: f.len - o, mf: f.mf });
+  return out;
+}
+function countFrags(len, mtu) { return splitFrag({ off: 0, len: len, mf: false }, mtu).length; }
+/* a short worked explanation of one split */
+function explainSplit(len, mtu) {
+  var fr = splitFrag({ off: 0, len: len, mf: false }, mtu), m = maxData(mtu), room = mtu - HDR, n = fr.length, last = fr[n - 1].len;
+  if (n === 1) return '20 + ' + fmt(len) + ' = ' + fmt(len + HDR) + ' ≤ ' + fmt(mtu) + ', so it fits in one datagram.';
+  return 'Every fragment but the last carries ' + fmt(m) + ' bytes (' + fmt(mtu) + ' − 20 = ' + fmt(room) + (room === m ? '' : ', rounded down to a multiple of 8') + '). ' +
+    (n - 1) + ' × ' + fmt(m) + ' = ' + fmt((n - 1) * m) + ', and the last ' + fmt(last) + ' bytes fit in one fragment' + (last > m ? ' (the last one may carry up to ' + fmt(room) + ')' : '') + ': ' + n + ' fragments.';
+}
+/* Send `data` bytes over links with these MTUs. Link 0 starts at the source host.
+   With df set, the first link whose MTU is too small drops the datagram (link 0: a local error at the source). */
+function sendPath(data, mtus, df) {
+  var frags = [{ off: 0, len: data, mf: false }], hops = [];
+  for (var i = 0; i < mtus.length; i++) {
+    var big = frags.some(function (f) { return !fits(f.len, mtus[i]); });
+    if (big && df) return { hops: hops, ok: false, dropAt: i, mtu: mtus[i], frags: frags };
+    var next = []; frags.forEach(function (f) { next = next.concat(splitFrag(f, mtus[i])); });
+    frags = next; hops.push({ mtu: mtus[i], frags: frags, split: big });
+  }
+  return { hops: hops, ok: true, dropAt: -1, frags: frags };
+}
+function totalLen(f) { return HDR + f.len; }
+function offField(f) { return f.off / 8; }
+function newIdent() { return rnd(4096, 65535); }
+function hex4(n) { var s = n.toString(16).toUpperCase(); while (s.length < 4) s = '0' + s; return '0x' + s; }
+/* what the user typed -> IP data bytes */
+var KINDS = { ping: { add: 8, name: 'ping payload' }, udp: { add: 8, name: 'UDP payload' }, data: { add: 0, name: 'IP data' } };
+
+/* ===================================================== theme colors for figures */
+var C = { brand: '#00A2D7', navy: '#0B3D5C', ink: '#1B2A35', panel: '#CFE6F0', soft: '#EAF5FA', gray: '#E4E4E4', amber: '#F5A524', ok: '#13A88A', bad: '#E5484D', oneway: '#D98A00', white: '#FFFFFF', muted: '#5B6B78' };
+var CAT = [
+  { line: '#00A2D7', fill: '#CFE6F0' }, { line: '#7B61FF', fill: '#E7E1FF' },
+  { line: '#E08B00', fill: '#FCE9C6' }, { line: '#13A88A', fill: '#D3F1E8' }, { line: '#D6457A', fill: '#F9DCE7' }
+];
+
+/* ===================================================== figure library (inches, y up, sizes in points) */
+var NS = 'http://www.w3.org/2000/svg', figN = 0;
+function el(tag, at, parent) { var e = document.createElementNS(NS, tag); if (at) for (var k in at) if (at[k] !== null && at[k] !== undefined) e.setAttribute(k, at[k]); if (parent) parent.appendChild(e); return e; }
+function r4(v) { return Math.round(v * 10000) / 10000; }
+function Fig(svg, x0, x1, y0, y1, k) {
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  svg.setAttribute('viewBox', '0 0 ' + r4(x1 - x0) + ' ' + r4(y1 - y0));
+  this.svg = svg; this.x0 = x0; this.y1 = y1; this.k = k || 1.2; this.id = 'f' + (++figN);
+  var defs = el('defs', null, svg);
+  var m = el('marker', { id: this.id + 'a', viewBox: '0 0 10 10', refX: 10, refY: 5, markerWidth: 0.13, markerHeight: 0.13, markerUnits: 'userSpaceOnUse', orient: 'auto' }, defs);
+  el('path', { d: 'M0 0L10 5L0 10z', fill: C.ink }, m);
+  var m2 = el('marker', { id: this.id + 'r', viewBox: '0 0 10 10', refX: 10, refY: 5, markerWidth: 0.13, markerHeight: 0.13, markerUnits: 'userSpaceOnUse', orient: 'auto' }, defs);
+  el('path', { d: 'M0 0L10 5L0 10z', fill: C.bad }, m2);
+  this.root = el('g', { 'font-family': 'Segoe UI, system-ui, -apple-system, Helvetica Neue, Roboto, Arial, sans-serif' }, svg);
+}
+Fig.prototype.X = function (x) { return r4(x - this.x0); };
+Fig.prototype.Y = function (y) { return r4(this.y1 - y); };
+Fig.prototype.pt = function (v) { return r4(v / 72); };
+Fig.prototype.g = function (p) { return el('g', null, p || this.root); };
+Fig.prototype.rect = function (x, y, w, h, o) {
+  o = o || {};
+  return el('rect', { x: this.X(x), y: this.Y(y + h), width: r4(Math.max(0, w)), height: r4(h), rx: o.rx ? r4(o.rx) : null, fill: o.fill || C.white,
+    stroke: o.stroke || C.brand, 'stroke-width': this.pt(o.lw || 1.1), 'stroke-dasharray': o.dash ? o.dash.map(this.pt, this).join(' ') : null }, o.parent || this.root);
+};
+Fig.prototype.slab = function (x, y, w, h, o) {   // slab box: thin outline, heavy top and right edges
+  o = o || {};
+  var g = this.g(o.parent);
+  g.box = this.rect(x, y, w, h, { fill: o.fill || C.white, stroke: o.stroke || C.brand, lw: 1.1, parent: g });
+  el('path', { d: 'M' + this.X(x) + ' ' + this.Y(y + h) + 'H' + this.X(x + w) + 'V' + this.Y(y), fill: 'none', stroke: o.stroke || C.brand,
+    'stroke-width': this.pt(o.thick || 3.4), 'stroke-linecap': 'square' }, g);
+  if (o.text) this.text(x + w / 2, y + h / 2, o.text, { fs: o.fs || 10, bold: o.bold, parent: g, color: o.color });
+  return g;
+};
+Fig.prototype.line = function (x1, y1, x2, y2, o) {
+  o = o || {};
+  return el('line', { x1: this.X(x1), y1: this.Y(y1), x2: this.X(x2), y2: this.Y(y2), stroke: o.color || C.ink, 'stroke-width': this.pt(o.lw || 1.3),
+    'stroke-dasharray': o.dash ? o.dash.map(this.pt, this).join(' ') : null }, o.parent || this.root);
+};
+Fig.prototype.poly = function (pts, o) {
+  o = o || {}; var self = this;
+  return el('polyline', { points: pts.map(function (p) { return self.X(p[0]) + ',' + self.Y(p[1]); }).join(' '), fill: 'none', stroke: o.color || C.ink,
+    'stroke-width': this.pt(o.lw || 1.5), 'stroke-dasharray': o.dash ? o.dash.map(this.pt, this).join(' ') : null, 'stroke-linejoin': 'round' }, o.parent || this.root);
+};
+Fig.prototype.arrow = function (x1, y1, x2, y2, o) { o = o || {}; var l = this.line(x1, y1, x2, y2, o); l.setAttribute('marker-end', 'url(#' + this.id + (o.color === C.bad ? 'r' : 'a') + ')'); return l; };
+Fig.prototype.text = function (x, y, s, o) {   // centered on y; no dominant-baseline, so every browser places it the same
+  o = o || {};
+  var size = (o.fs || 9.5) * this.k / 72, lh = size * 1.3, lines = String(s).split('\n'), n = lines.length;
+  var t = el('text', { 'font-size': r4(size), fill: o.color || C.ink, 'fill-opacity': o.opacity, 'text-anchor': o.ha === 'left' ? 'start' : o.ha === 'right' ? 'end' : 'middle',
+    'font-style': o.italic ? 'italic' : null, 'font-weight': o.bold ? 'bold' : null }, o.parent || this.root);
+  var yc = this.Y(y), self = this;
+  lines.forEach(function (ln, i) { var ts = el('tspan', { x: self.X(x), y: r4(yc + (i - (n - 1) / 2) * lh + size * 0.35) }, t); ts.textContent = ln; });
+  return t;
+};
+Fig.prototype.tw = function (s, fs) { return String(s).length * (fs * this.k / 72) * 0.55; };
+Fig.prototype.label = function (x, y, s, o) {   // text on a white patch, for labels that sit on lines
+  o = o || {}; var w = this.tw(s, o.fs || 8.5) + 0.12, hh = (o.fs || 8.5) * this.k / 72 * 1.5;
+  this.rect(x - w / 2, y - hh / 2, w, hh, { fill: o.bg || '#fff', stroke: o.bg || '#fff', lw: 0.1, rx: 0.05, parent: o.parent });
+  return this.text(x, y, s, o);
+};
+
+/* ===================================================== figure: a datagram inside a frame (lesson 1) */
+function drawFrame(svg, total, mtu, linkName) {
+  var f = new Fig(svg, 0, 11, 0, 3.5, 2.0), L0 = 1.9, L1 = 9.9, maxB = Math.max(total, mtu) * 1.06;
+  var X = function (b) { return L0 + b / maxB * (L1 - L0); };
+  f.text(0.1, 3.2, linkName + ': MTU ' + fmt(mtu) + ' bytes', { fs: 9, ha: 'left', bold: true, color: C.navy });
+  // the frame's payload area = the MTU
+  f.rect(X(0), 1.75, X(mtu) - X(0), 0.7, { fill: C.soft, stroke: C.navy, lw: 1.2, dash: [4, 3], rx: 0.04 });
+  f.text((X(0) + X(mtu)) / 2, 2.1, 'room for one IP datagram: the MTU', { fs: 7.8, color: C.muted, italic: true });
+  f.rect(X(0) - 0.86, 1.75, 0.82, 0.7, { fill: C.gray, stroke: C.muted, lw: 1 }); f.text(X(0) - 0.45, 2.1, 'frame\nheader', { fs: 7 });
+  f.rect(X(mtu) + 0.04, 1.75, 0.82, 0.7, { fill: C.gray, stroke: C.muted, lw: 1 }); f.text(X(mtu) + 0.45, 2.1, 'trailer', { fs: 7 });
+  // the datagram
+  var y = 0.7, hw = Math.max(0.08, X(HDR) - X(0)), over = total > mtu, end = X(Math.min(total, mtu));
+  f.rect(X(0), y, hw, 0.55, { fill: C.navy, stroke: C.navy, lw: 1 });
+  f.rect(X(0) + hw, y, Math.max(0.02, end - X(0) - hw), 0.55, { fill: C.panel, stroke: C.brand, lw: 1.2 });
+  if (over) f.rect(X(mtu), y, X(total) - X(mtu), 0.55, { fill: '#FDE8E9', stroke: C.bad, lw: 1.4 });
+  f.text(X(0) - 0.1, y + 0.27, 'Datagram', { fs: 8.2, ha: 'right', bold: true, color: C.navy });
+  var lab = '20 + ' + fmt(total - HDR) + ' = ' + fmt(total) + ' bytes';
+  if (f.tw(lab, 8) < end - X(0) - hw - 0.1) f.text((X(0) + hw + end) / 2, y + 0.27, lab, { fs: 8 });
+  else f.text(X(total) + 0.1, y + 0.27, lab, { fs: 8, ha: 'left' });
+  f.line(X(mtu), 0.45, X(mtu), 2.55, { color: over ? C.bad : C.ok, lw: 2 });
+  f.text(Math.min(X(mtu), 8.4), 0.22, over ? '✗ ' + fmt(total - mtu) + ' bytes too big' : '✓ fits, ' + fmt(mtu - total) + ' to spare', { fs: 8.2, bold: true, color: over ? C.bad : C.ok });
+  return f;
+}
+
+/* ===================================================== figure: cutting the data (lesson 2) */
+function drawCut(svg, data, mtu, stage) {
+  // stage: 0 nothing, 1 show MTU - 20, 2 show rounded size, 3 show cuts, 4 show fragments
+  var m = maxData(mtu), frs = splitFrag({ off: 0, len: data, mf: false }, mtu), n = frs.length;
+  var top = stage >= 4 ? 1.75 + Math.min(n, 12) * 0.74 : 2.7;
+  var f = new Fig(svg, 0, 11, 0, top, 2.0), L0 = 1.95, L1 = 10.6, X = function (b) { return L0 + b / data * (L1 - L0); };
+  var y = top - 1.0;
+  f.text(L0 - 0.1, y + 0.22, 'Data', { fs: 8.5, ha: 'right', bold: true, color: C.navy });
+  f.rect(X(0), y, X(data) - X(0), 0.44, { fill: C.panel, stroke: C.brand, lw: 1.2 });
+  f.text(X(0), y + 0.62, '0', { fs: 7.5, color: C.muted }); f.text(X(data), y + 0.62, fmt(data), { fs: 7.5, color: C.muted, ha: 'right' });
+  if (stage >= 3 && n > 1) frs.forEach(function (fr, i) {
+    if (i) { f.line(X(fr.off), y - 0.1, X(fr.off), y + 0.54, { color: C.bad, lw: 2, dash: [3, 2] }); f.text(X(fr.off), y + 0.62, fmt(fr.off), { fs: 7.5, color: C.bad, bold: true }); }
+    if (X(fr.off + fr.len) - X(fr.off) > 0.75) f.text((X(fr.off) + X(fr.off + fr.len)) / 2, y + 0.22, fmt(fr.len), { fs: 8, bold: true });
+  });
+  if (stage < 3 || n === 1) f.text((X(0) + X(data)) / 2, y + 0.22, fmt(data) + ' data bytes', { fs: 8 });
+  if (stage >= 4) frs.slice(0, 12).forEach(function (fr, i) {
+    var yy = y - 0.85 - i * 0.74, col = CAT[i % CAT.length];
+    f.text(L0 - 0.4, yy + 0.2, i === 11 && n > 12 ? '… ' + n + ' in all' : 'Fragment ' + (i + 1), { fs: 7.8, ha: 'right', bold: true, color: C.navy });
+    var hw = 0.3;
+    f.rect(X(fr.off) - hw, yy, hw, 0.4, { fill: C.navy, stroke: C.navy, lw: 1 });
+    f.rect(X(fr.off), yy, Math.max(0.02, X(fr.off + fr.len) - X(fr.off)), 0.4, { fill: col.fill, stroke: col.line, lw: 1.3 });
+    var t = '20 + ' + fmt(fr.len) + ' = ' + fmt(totalLen(fr)) + (totalLen(fr) <= mtu ? ' ≤ ' + fmt(mtu) + ' ✓' : '');
+    f.text(X(fr.off) + f.tw(t, 7.2) > 10.9 ? X(fr.off + fr.len) : X(fr.off), yy - 0.15, t, { fs: 7.2, ha: X(fr.off) + f.tw(t, 7.2) > 10.9 ? 'right' : 'left', color: C.muted });
+  });
+  if (stage >= 1 && stage < 4) {
+    f.text(L0 - 1.8, 0.45, stage === 1 ? 'Room for data: ' + fmt(mtu) + ' − 20 = ' + fmt(mtu - HDR) + ' bytes' : 'Round down to a multiple of 8: ' + fmt(mtu - HDR) + ' → ' + fmt(m) + ' (' + (m / 8) + ' × 8)', { fs: 8.6, ha: 'left', bold: true, color: '#9A6500' });
+  }
+  return f;
+}
+
+/* ===================================================== figure: header fields of the original and each fragment (lesson 3) */
+function drawHeaders(svg, data, mtu, ident, hiIdx) {
+  var frs = splitFrag({ off: 0, len: data, mf: false }, mtu), rows = [{ off: 0, len: data, mf: false, orig: true }].concat(frs.length > 1 ? frs : []);
+  var MAXR = 9; if (rows.length > MAXR + 1) rows = rows.slice(0, MAXR + 1);
+  var RH = 0.7, BH = 0.48, top = 0.6 + rows.length * RH + (frs.length > 1 ? 0.5 : 0) + 0.2 + (frs.length > MAXR ? 0.4 : 0);
+  var f = new Fig(svg, 0, 11, 0, top, 2.0);
+  var cols = [['Ident', 0.95], ['M', 0.45], ['Offset', 0.85], ['Total Len.', 1.15]], X0 = 1.85, y = top - 0.85;
+  var hdrW = cols.reduce(function (s, c) { return s + c[1]; }, 0), DX = X0 + hdrW + 0.15, DW = 10.85 - DX;
+  var x = X0; cols.forEach(function (c) { f.text(x + c[1] / 2, top - 0.25, c[0], { fs: 7.6, bold: true, color: C.navy }); x += c[1]; });
+  f.text(DX + DW / 2, top - 0.25, 'Bytes of the original data', { fs: 7.6, bold: true, color: C.navy });
+  rows.forEach(function (r, i) {
+    if (i === 1) { f.text(0.1, y + 0.24, '(b) Fragments', { fs: 7.8, ha: 'left', italic: true, color: C.muted }); y -= 0.45; }
+    var hi = !r.orig && hiIdx === i - 1;
+    f.text(X0 - 0.1, y + BH / 2, r.orig ? '(a) Original' : 'Fragment ' + i, { fs: 7.6, ha: 'right', bold: true, color: C.navy });
+    var vals = [hex4(ident), r.mf ? '1' : '0', String(offField(r)), String(totalLen(r))], xx = X0;
+    cols.forEach(function (c, j) {
+      f.rect(xx, y, c[1], BH, { fill: hi ? C.amber : j === 1 && r.mf ? '#FCE9C6' : '#fff', stroke: C.navy, lw: 1 });
+      f.text(xx + c[1] / 2, y + BH / 2, vals[j], { fs: 7.8, bold: j > 0 });
+      xx += c[1];
+    });
+    var col = r.orig ? { fill: C.panel, line: C.brand } : CAT[(i - 1) % CAT.length], dx0 = DX + r.off / data * DW, dw = Math.max(0.05, r.len / data * DW);
+    f.rect(DX, y, DW, BH, { fill: '#fff', stroke: '#C9DCE6', lw: 0.8, dash: [3, 2] });
+    f.rect(dx0, y, dw, BH, { fill: col.fill, stroke: col.line, lw: 1.3 });
+    var lab = fmt(r.off) + '–' + fmt(r.off + r.len - 1) + ' (' + fmt(r.len) + ')';
+    if (f.tw(lab, 7.2) < dw - 0.08) f.text(dx0 + dw / 2, y + BH / 2, lab, { fs: 7.2 });
+    else if (dx0 > DX + f.tw(lab, 7.2) + 0.1) f.text(dx0 - 0.06, y + BH / 2, lab, { fs: 7.2, ha: 'right' });
+    else f.text(dx0 + dw + 0.06, y + BH / 2, lab, { fs: 7.2, ha: 'left' });
+    y -= RH;
+  });
+  if (frs.length > MAXR) f.text(X0, y + 0.35, '… and ' + (frs.length - MAXR) + ' more fragments', { fs: 7.6, ha: 'left', italic: true, color: C.muted });
+  return { f: f, frags: frs };
+}
+
+/* ===================================================== figure: the path and the fragments on each link
+   res comes from sendPath. Returns a stage for the animation. */
+var NODE_W = 1.15, NODE_H = 0.62;
+function nodeName(i, n) { return i === 0 ? 'Host A' : i === n ? 'Host B' : 'R' + i; }
+function drawPath(svg, mtus, res, opt) {
+  opt = opt || {};
+  var n = mtus.length, ROWS = 9, rowH = 0.6;
+  var shown = res.hops.map(function (h) { return Math.min(h.frags.length, ROWS); });
+  var maxRows = Math.max(1, Math.max.apply(null, shown.concat([res.ok ? 0 : 1])));
+  // top to bottom: ICMP arrow, link labels, nodes, status labels, lane titles, lanes
+  var icmpRow = opt.icmp && !res.ok && res.dropAt > 0 ? 0.36 : 0;   // room for the ICMP label above its arrow
+  var W = 11, top = 0.85 + NODE_H + 0.55 + maxRows * rowH + 0.3 + icmpRow;
+  var f = new Fig(svg, 0, W, 0, top, 2.0), yN = top - 0.92 - icmpRow - NODE_H, laneTop = yN - 0.4, xs = [];
+  var span = W - 0.4 - NODE_W;
+  for (var i = 0; i <= n; i++) xs.push(0.2 + (n ? i * span / n : 0));
+  var cy = yN + NODE_H / 2, boxes = [], maxT = 0;
+  res.hops.forEach(function (h) { h.frags.forEach(function (fr) { maxT = Math.max(maxT, totalLen(fr)); }); });
+  if (!res.ok) res.frags.forEach(function (fr) { maxT = Math.max(maxT, totalLen(fr)); });
+  // links and their labels
+  for (i = 0; i < n; i++) {
+    var xa = xs[i] + NODE_W, xb = xs[i + 1], dropped = !res.ok && res.dropAt === i;
+    f.line(xa, cy, xb, cy, { lw: 2.2, color: dropped ? C.bad : C.navy });
+    f.text((xa + xb) / 2, cy + 0.42, 'Link ' + (i + 1), { fs: 7.4, color: dropped ? C.bad : C.muted });
+    f.text((xa + xb) / 2, cy + 0.17, 'MTU ' + mtus[i], { fs: 8, bold: true, color: dropped ? C.bad : C.navy });
+  }
+  for (i = 0; i <= n; i++) {
+    var isHost = i === 0 || i === n, split = i < n && res.hops[i] && res.hops[i].split;
+    boxes.push(f.slab(xs[i], yN, NODE_W, NODE_H, { text: nodeName(i, n), fill: isHost ? '#fff' : C.soft, fs: 8.6, bold: true }));
+    if (split) f.text(xs[i] + NODE_W / 2, yN - 0.2, i === 0 ? '✂ fragments' : '✂ again', { fs: 7.4, bold: true, color: '#9A6500' });
+    if (!res.ok && res.dropAt === i) f.text(xs[i] + NODE_W / 2, yN - 0.2, i === 0 ? '✗ won\'t send' : '✗ drops it', { fs: 7.4, bold: true, color: C.bad });
+  }
+  if (opt.icmp && !res.ok && res.dropAt > 0) {
+    var yI = yN + NODE_H + 0.62;
+    f.arrow(xs[res.dropAt] + NODE_W / 2, yI, xs[0] + NODE_W / 2, yI, { color: C.bad, lw: 1.4, dash: [4, 3] });
+    f.line(xs[res.dropAt] + NODE_W / 2, yN + NODE_H, xs[res.dropAt] + NODE_W / 2, yI, { color: C.bad, lw: 1.4, dash: [4, 3] });
+    f.text(xs[0] + NODE_W / 2, yI + 0.3, 'ICMP: fragmentation needed, MTU ' + res.mtu, { fs: 7.4, bold: true, color: C.bad, ha: 'left' });
+  }
+  // lanes: the fragments on each link, drawn to scale
+  var lanes = [];
+  for (i = 0; i < n; i++) {
+    var c0 = xs[i] + NODE_W / 2 + 0.08, c1 = xs[i + 1] + NODE_W / 2 - 0.08, cw = c1 - c0;
+    if (i > 0) f.line(xs[i] + NODE_W / 2, 0.1, xs[i] + NODE_W / 2, laneTop - 0.1, { color: '#D3E3EC', lw: 0.8 });
+    var hop = res.hops[i];
+    if (!hop) { if (!res.ok && res.dropAt === i) f.text((c0 + c1) / 2, laneTop - 0.3, i === 0 ? 'nothing is sent' : 'nothing crosses', { fs: 7.6, italic: true, color: C.bad }); lanes.push(null); continue; }
+    var whole = hop.frags.length === 1 && !hop.frags[0].mf && hop.frags[0].off === 0;
+    f.text((c0 + c1) / 2, laneTop - 0.08, whole ? 'whole datagram' : hop.frags.length + ' fragments', { fs: 7.8, bold: true, color: C.navy });
+    var lane = [], lfs = cw < 2.4 ? 6.6 : 7.2;
+    hop.frags.slice(0, ROWS).forEach(function (fr, j) {
+      var y = laneTop - 0.45 - j * rowH, tw = totalLen(fr) / maxT * (cw - 0.05), hw = Math.max(0.04, HDR / maxT * (cw - 0.05));
+      if (j === ROWS - 1 && hop.frags.length > ROWS) { f.text(c0, y + 0.08, '+ ' + (hop.frags.length - ROWS + 1) + ' more', { fs: 7.4, ha: 'left', italic: true, color: C.muted }); return; }
+      f.rect(c0, y, hw, 0.2, { fill: C.navy, stroke: C.navy, lw: 0.6 });
+      f.rect(c0 + hw, y, Math.max(0.02, tw - hw), 0.2, { fill: C.panel, stroke: C.brand, lw: 0.9 });
+      f.text(c0, y - 0.15, 'Off ' + offField(fr) + ' · ' + fr.len + ' B · M ' + (fr.mf ? 1 : 0), { fs: lfs, ha: 'left', color: C.ink });
+      lane.push(fr);
+    });
+    lanes.push(lane);
+  }
+  var layer = f.g();
+  return { f: f, xs: xs, cy: cy, yI: yN + NODE_H + 0.62, boxes: boxes, layer: layer, n: n };
+}
+/* move one chip along a link */
+function moveChip(stage, x0, x1, y, label, opt, tok, alive) {
+  opt = opt || {};
+  return new Promise(function (resolve) {
+    if (!stage || !alive(tok)) { resolve(); return; }
+    var f = stage.f, g = el('g', null, stage.layer), w = Math.max(0.42, label.length * 0.075 + 0.16), h = 0.26;
+    el('rect', { x: r4(-w / 2), y: r4(-h / 2), width: r4(w), height: h, rx: 0.06, fill: opt.fill || '#fff', stroke: opt.stroke || C.brand, 'stroke-width': f.pt(1.6) }, g);
+    var t = el('text', { 'font-size': r4(7.4 * f.k / 72), 'text-anchor': 'middle', y: r4(7.4 * f.k / 72 * 0.35), fill: C.ink, 'font-weight': 'bold' }, g); t.textContent = label;
+    var X0 = f.X(x0), X1 = f.X(x1), Y = f.Y(y);
+    function place(u) { g.setAttribute('transform', 'translate(' + r4(X0 + (X1 - X0) * u) + ',' + Y + ')'); }
+    if (reduceMotion) { place(1); setTimeout(function () { if (g.parentNode) g.parentNode.removeChild(g); resolve(); }, 250); return; }
+    var dur = (opt.dur || 900), t0 = null;
+    function frame(now) {
+      if (t0 === null) t0 = now;
+      if (!alive(tok)) { if (g.parentNode) g.parentNode.removeChild(g); resolve(); return; }
+      var u = Math.min(1, (now - t0) / dur); place(u);
+      if (u < 1) requestAnimationFrame(frame); else setTimeout(function () { if (!opt.keep && g.parentNode) g.parentNode.removeChild(g); resolve(g); }, 90);
+    }
+    place(0); requestAnimationFrame(frame);
+  });
+}
+function flashNode(stage, i, color) {
+  if (!stage || !stage.boxes[i]) return;
+  var r = stage.boxes[i].box, old = r.getAttribute('fill'); r.setAttribute('fill', color || C.amber);
+  setTimeout(function () { r.setAttribute('fill', old); }, reduceMotion ? 300 : 600);
+}
+/* animate a whole send: link by link, each fragment as a chip */
+function animatePath(stage, res, speed, tok, alive, onStep) {
+  var chain = Promise.resolve(), n = stage.n;
+  res.hops.forEach(function (hop, i) {
+    chain = chain.then(function () {
+      if (!alive(tok)) return;
+      if (hop.split) flashNode(stage, i);
+      if (onStep) onStep(i, hop);
+      var xa = stage.xs[i] + NODE_W, xb = stage.xs[i + 1], legs = [];
+      var list = hop.frags.slice(0, 8);
+      list.forEach(function (fr, j) {
+        legs.push(sleep(reduceMotion ? 0 : j * 260 / speed).then(function () { return moveChip(stage, xa, xb, stage.cy - 0.22 - (j % 2) * 0.0, String(fr.len), { dur: 950 / speed }, tok, alive); }));
+      });
+      return Promise.all(legs).then(function () { flashNode(stage, i + 1, i + 1 === n ? C.ok : C.amber); });
+    });
+  });
+  if (!res.ok) chain = chain.then(function () {
+    if (!alive(tok)) return;
+    var i = res.dropAt; flashNode(stage, i, C.bad);
+    if (onStep) onStep(i, null);
+    if (i > 0) return moveChip(stage, stage.xs[i] + NODE_W / 2, stage.xs[0] + NODE_W / 2 + 0.3, stage.yI, 'ICMP', { fill: '#FDE8E9', stroke: C.bad, dur: 900 / speed }, tok, alive);
+  });
+  return chain;
+}
+
+/* ===================================================== figure: the reassembly buffer (lesson 5) */
+function drawBuffer(svg, frags, got, data, knownTotal, lost) {
+  var f = new Fig(svg, 0, 11, 0, 2.5, 2.0), L0 = 1.5, L1 = 10.6, X = function (b) { return L0 + b / data * (L1 - L0); }, y = 1.25;
+  f.text(L0 - 0.1, y + 0.25, 'Buffer', { fs: 8.2, ha: 'right', bold: true, color: C.navy });
+  f.rect(X(0), y, X(data) - X(0), 0.5, { fill: '#fff', stroke: '#9DB3C1', lw: 1, dash: [3, 2] });
+  frags.forEach(function (fr, i) {
+    var col = CAT[i % CAT.length], have = got.indexOf(i) >= 0, x0 = X(fr.off), w = X(fr.off + fr.len) - x0;
+    if (have) f.rect(x0, y, w, 0.5, { fill: col.fill, stroke: col.line, lw: 1.4 });
+    else if (lost === i) f.rect(x0, y, w, 0.5, { fill: '#FDE8E9', stroke: C.bad, lw: 1.2, dash: [3, 2] });
+    var lab = have ? '#' + (i + 1) : lost === i ? 'lost' : '?';
+    if (w > 0.35) f.text(x0 + w / 2, y + 0.25, lab, { fs: 8.2, bold: true, color: have ? C.ink : lost === i ? C.bad : C.muted });
+    f.line(x0, y - 0.05, x0, y + 0.55, { color: '#B9CCD7', lw: 0.7 });
+    f.text(x0, y - 0.17, String(offField(fr)), { fs: 7.3, color: C.muted });
+  });
+  f.text(L0 - 0.1, y - 0.17, 'Offset', { fs: 7.3, ha: 'right', color: C.muted, italic: true });
+  f.text(0.1, 2.25, knownTotal ? 'Size known: ' + fmt(data) + ' bytes (from the fragment with M = 0)' : 'Size not known yet: it comes with the last fragment (M = 0)', { fs: 8, ha: 'left', bold: true, color: knownTotal ? C.ok : '#9A6500' });
+  if (knownTotal) f.line(X(data), y - 0.1, X(data), y + 0.62, { color: C.ok, lw: 2.2 });
+  var have = 0; got.forEach(function (i) { have += frags[i].len; });
+  f.text(0.1, 0.3, 'Received ' + fmt(have) + ' of ' + (knownTotal ? fmt(data) : '?') + ' data bytes in ' + got.length + ' fragment' + (got.length === 1 ? '' : 's'), { fs: 8, ha: 'left', color: C.ink });
+  return f;
+}
+
+/* ===================================================== ping output, as Linux iputils ping and Windows ping print it
+   The path: Host A 192.168.1.10, link k is 192.168.k.0/24, router Rk answers from its address on link k, Host B is .20 on the last link. */
+function routerAddr(k) { return k === 1 ? '192.168.1.1' : '192.168.' + k + '.2'; }
+function destAddr(n) { return '192.168.' + n + '.20'; }
+function msTime(s) { return (0.35 + ((s * 37) % 23) / 100).toFixed(3); }
+/* mode: 'want' (Linux default), 'do' (-M do), 'dont' (-M dont); 'win' (Windows default), 'winf' (Windows -f) */
+function pingRun(mode, payload, mtus, count, dest) {
+  var n = mtus.length, total = payload + 28, data = payload + 8, lines = [], ttl = 64 - (n - 1), win = mode === 'win' || mode === 'winf';
+  dest = dest || destAddr(n); count = count || 3;
+  var pmtu = mtus[0], locked = false, received = 0, attempts = [];
+  lines.push(win ? { t: 'Pinging ' + dest + ' with ' + payload + ' bytes of data:' } : { t: 'PING ' + dest + ' (' + dest + ') ' + payload + '(' + total + ') bytes of data.' });
+  for (var s = 1; s <= count; s++) {
+    var df, local = false;
+    if (mode === 'do' || mode === 'winf') { df = true; if (total > pmtu) local = true; }
+    else if (mode === 'want') { df = !locked && total <= pmtu; }
+    else df = false;
+    if (local) {
+      lines.push(win ? { t: 'Packet needs to be fragmented but DF set.', c: 'e' } : { t: 'ping: local error: message too long, mtu=' + pmtu, c: 'e' });
+      attempts.push({ seq: s, local: true, df: true, res: { hops: [], ok: false, dropAt: 0, mtu: pmtu, frags: [{ off: 0, len: data, mf: false }] } });
+      continue;
+    }
+    // with DF clear the source fragments to the MTU it knows (its link, or a smaller learned path MTU); routers fragment further
+    var path = [Math.min(mtus[0], pmtu)].concat(mtus.slice(1));
+    var res = sendPath(data, path, df);
+    attempts.push({ seq: s, df: df, res: res });
+    if (res.ok) { received++; lines.push(win ? { t: 'Reply from ' + dest + ': bytes=' + payload + ' time<1ms TTL=' + ttl, c: 'g' } : { t: data + ' bytes from ' + dest + ': icmp_seq=' + s + ' ttl=' + ttl + ' time=' + msTime(s) + ' ms', c: 'g' }); }
+    else {
+      var r = routerAddr(res.dropAt);
+      lines.push(win ? { t: 'Reply from ' + r + ': Packet needs to be fragmented but DF set.', c: 'e' } : { t: 'From ' + r + ' icmp_seq=' + s + ' Frag needed and DF set (mtu = ' + res.mtu + ')', c: 'e' });
+      if (res.mtu < pmtu) { if (!win && res.mtu < LINUX_MIN_PMTU) { pmtu = LINUX_MIN_PMTU; locked = true; } else pmtu = res.mtu; }
+    }
+  }
+  return { lines: lines, received: received, learned: pmtu, attempts: attempts };
+}
+function termHTML(lines) { return lines.map(function (l) { return '<span class="' + (l.c || '') + '">' + esc(l.t) + '</span>'; }).join('\n'); }
+
+/* ===================================================== commands panel */
+var cmdState = { os: 'linux', ifL: 'eth0', ifW: 'Ethernet', dest: '192.168.2.20' };
+function renderCommands(box, o) {
+  if (o.dest && !cmdState.destEdited) cmdState.dest = o.dest;
+  var L = cmdState.ifL, W = cmdState.ifW, D = cmdState.dest, N = o.payload, M = o.mtu || 1400;
+  var sets = {
+    linux: [
+      ['See your interface and its MTU', 'ip link show dev ' + L],
+      ['Send 3 pings with a ' + N + '-byte payload (an IP datagram of ' + (N + 28) + ' bytes). If the datagram is bigger than your link, Linux fragments it at the source.', 'ping -c 3 -s ' + N + ' ' + D],
+      ['Set DF and never fragment. If it is too big, ping prints the MTU that stopped it.', 'ping -c 3 -M do -s ' + N + ' ' + D],
+      ['Clear DF, so routers may fragment', 'ping -c 3 -M dont -s ' + N + ' ' + D],
+      ['Find the path MTU, router by router', 'tracepath -n ' + D],
+      ['See the path MTU your host has learned for this destination', 'ip route get ' + D],
+      ['Make your link\'s MTU smaller to test (lasts until a restart)', 'sudo ip link set dev ' + L + ' mtu ' + M],
+      ['Undo: put the MTU back to 1500', 'sudo ip link set dev ' + L + ' mtu 1500'],
+      ['Forget every path MTU your host has learned', 'sudo ip route flush cache']
+    ],
+    win: [
+      ['See the MTU of every adapter', 'netsh interface ipv4 show subinterfaces'],
+      ['Send 3 pings with a ' + N + '-byte payload. Windows sends them with DF clear, so routers may fragment.', 'ping -n 3 -l ' + N + ' ' + D],
+      ['Set DF. If it is too big, Windows prints "Packet needs to be fragmented but DF set."', 'ping -n 3 -f -l ' + N + ' ' + D],
+      ['Make the adapter\'s MTU smaller to test (Command Prompt as administrator, lasts until a restart)', 'netsh interface ipv4 set subinterface "' + W + '" mtu=' + M + ' store=active'],
+      ['Undo: put the MTU back to 1500', 'netsh interface ipv4 set subinterface "' + W + '" mtu=1500 store=active']
+    ],
+    ws: [
+      ['Show only fragments: More fragments is set, or the offset is above 0', 'ip.flags.mf == 1 || ip.frag_offset > 0'],
+      ['Show packets that have DF set', 'ip.flags.df == 1'],
+      ['Show the routers\' "fragmentation needed" messages (ICMP type 3, code 4)', 'icmp.type == 3 && icmp.code == 4'],
+      ['Find one fragment by its Offset field. The filter counts 8-byte units: 185 means byte 1480.', 'ip.frag_offset == 185']
+    ]
+  };
+  var notes = {
+    linux: 'Linux ping sets DF by default. When a router answers "Frag needed", Linux remembers that MTU for the destination and fragments later pings itself. ip link set needs the interface name from ip link show.',
+    win: 'Windows has no tracepath. To find a path MTU, lower the ping -f -l size until replies come back; the path MTU is that size plus 28. Find the adapter name with netsh interface ipv4 show subinterfaces.',
+    ws: 'In the packet details, Wireshark shows "Fragment Offset" in bytes (1480), but the filter field counts 8-byte units (185). Wireshark also puts each datagram back together and lists its fragments, for example [3 IPv4 Fragments (2980 bytes)].'
+  };
+  var rows = sets[cmdState.os];
+  box.innerHTML = '<div class="cmdtabs" role="group" aria-label="Tool"><button data-os="linux" aria-pressed="' + (cmdState.os === 'linux') + '">Linux</button><button data-os="win" aria-pressed="' + (cmdState.os === 'win') + '">Windows</button><button data-os="ws" aria-pressed="' + (cmdState.os === 'ws') + '">Wireshark filters</button></div>' +
+    (cmdState.os === 'ws' ? '' : '<div class="row"><label>Interface name <input type="text" class="ifname" size="12" value="' + esc(cmdState.os === 'linux' ? L : W) + '" spellcheck="false"></label><label>Destination <input type="text" class="dest" size="15" value="' + esc(D) + '" spellcheck="false"></label></div>') +
+    rows.map(function (r) { return '<p class="cmdnote" style="margin-top:8px">' + esc(r[0]) + '</p><div class="cmd"><code>' + esc(r[1]) + '</code><button type="button" data-copy="' + esc(r[1]) + '">Copy</button></div>'; }).join('') +
+    '<p class="cmdnote" style="margin-top:10px">' + esc(notes[cmdState.os]) + '</p>';
+  $$('[data-os]', box).forEach(function (b) { b.onclick = function () { cmdState.os = b.getAttribute('data-os'); renderCommands(box, o); }; });
+  if ($('.ifname', box)) $('.ifname', box).onchange = function () { var v = this.value.trim() || (cmdState.os === 'linux' ? 'eth0' : 'Ethernet'); if (cmdState.os === 'linux') cmdState.ifL = v; else cmdState.ifW = v; renderCommands(box, o); };
+  if ($('.dest', box)) $('.dest', box).onchange = function () { var v = this.value.trim(); if (/^[\w.:-]{1,60}$/.test(v)) { cmdState.dest = v; cmdState.destEdited = true; } renderCommands(box, o); };
+  $$('[data-copy]', box).forEach(function (b) { b.onclick = function () { copyText(b.getAttribute('data-copy'), b); }; });
+}
+function copyText(t, btn) {
+  function done(ok) { var o = btn.textContent; btn.textContent = ok ? 'Copied' : 'Select it'; setTimeout(function () { btn.textContent = o; }, 1200); }
+  try { if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(t).then(function () { done(true); }, function () { fallback(); }); return; } } catch (e) { /* fall through */ }
+  fallback();
+  function fallback() { var ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); var ok = false; try { ok = document.execCommand('copy'); } catch (e) { ok = false; } document.body.removeChild(ta); done(ok); }
+}
+/* fragment cards (calculator and lessons) */
+function fragCards(frags, ident) {
+  return frags.map(function (fr, i) {
+    var col = CAT[i % CAT.length];
+    return '<div class="fcard" style="border-left-color:' + col.line + '"><b>Fragment ' + (i + 1) + '</b><div class="m">Ident ' + hex4(ident) + ' · M ' + (fr.mf ? 1 : 0) + '<br>Offset ' + offField(fr) + ' (' + fmt(fr.off) + ' bytes)<br>Total Length ' + fmt(totalLen(fr)) + '<br>data bytes ' + fmt(fr.off) + '–' + fmt(fr.off + fr.len - 1) + ' (' + fmt(fr.len) + ')</div></div>';
+  }).join('');
+}
+
+/* ===================================================== points */
+var progress = store.get('progress', { xp: 0, lessons: {}, badges: {}, best: {} });
+function addXP(n) { progress.xp += n; store.set('progress', progress); showXP(true); }
+function showXP(pop) { var e = $('#xp'); e.textContent = '★ ' + progress.xp + ' points'; if (pop && !reduceMotion) { e.classList.remove('pop'); void e.offsetWidth; e.classList.add('pop'); } }
+
+/* ===================================================== LEARN */
+var LINKS = [   // [long description, MTU, short name]
+  ['Ethernet', 1500, 'Ethernet'], ['PPPoE (Point-to-Point Protocol over Ethernet), used by many DSL (Digital Subscriber Line) providers', 1492, 'PPPoE'], ['A typical VPN (Virtual Private Network) tunnel', 1400, 'VPN tunnel'],
+  ['A small point-to-point link', 532, 'Point-to-point link'], ['Ethernet with jumbo frames', 9000, 'Jumbo Ethernet'], ['The smallest MTU that IPv4 allows', 68, 'IPv4 minimum']
+];
+var lessonState = { i: store.get('lesson', 0), task: null, token: 0,
+  l1: { link: 0, total: 1420 }, l2: { data: 1400, mtu: 532, stage: 4 }, l3: { data: 1400, mtu: 532, ident: newIdent(), hi: -1 },
+  l4: { data: 1400, mtus: [1500, 532, 1500] }, l5: null, l6: { mtu2: 1400, payload: 1472, mode: 'want', speed: 0.5 } };
+var LESSONS = [
+  { t: 'What an MTU is', setup: l1 },
+  { t: 'Cutting a datagram', setup: l2 },
+  { t: 'The header fields', setup: l3 },
+  { t: 'Across an internetwork', setup: l4 },
+  { t: 'Reassembly and loss', setup: l5 },
+  { t: 'Avoid it: DF and path MTU', setup: l6 }
+];
+function alive(tok) { return tok === lessonState.token; }
+function renderStepper() {
+  var st = $('#stepper');
+  st.innerHTML = LESSONS.map(function (L, i) { return '<button data-l="' + i + '" class="' + (progress.lessons[i] ? 'done' : '') + '"' + (i === lessonState.i ? ' aria-current="step"' : '') + '><span class="num">' + (progress.lessons[i] ? '✓' : i + 1) + '</span>' + L.t + '</button>'; }).join('');
+  $$('[data-l]', st).forEach(function (b) { b.onclick = function () { openLesson(+b.getAttribute('data-l')); }; });
+  $('#lprog').style.width = (Object.keys(progress.lessons).length / LESSONS.length * 100) + '%';
+}
+function openLesson(i) {
+  lessonState.token++;   // stops any animation from the previous lesson
+  if (lessonState.i !== i) lessonState.task = null;
+  lessonState.i = Math.max(0, Math.min(LESSONS.length - 1, i)); store.set('lesson', lessonState.i);
+  renderStepper(); $('#lfig').innerHTML = ''; LESSONS[lessonState.i].setup();
+  $('#ltext').insertAdjacentHTML('beforeend', '<div class="navrow"><button class="btn alt" id="lprev"' + (lessonState.i === 0 ? ' disabled' : '') + '>← Back</button>' +
+    (lessonState.i < LESSONS.length - 1 ? '<button class="btn" id="lnext">Next lesson →</button>' : '<button class="btn amber" id="lnext">Take the challenge →</button>') + '</div>');
+  $('#lprev').onclick = function () { openLesson(lessonState.i - 1); };
+  $('#lnext').onclick = function () { if (lessonState.i < LESSONS.length - 1) openLesson(lessonState.i + 1); else go('challenge'); };
+  writeLink();
+}
+function lessonDone(fb, msg) {
+  fb.className = 'feedback ok'; fb.innerHTML = '✓ ' + msg + (progress.lessons[lessonState.i] ? '' : ' <b>+20 points</b>');
+  if (!progress.lessons[lessonState.i]) { progress.lessons[lessonState.i] = true; addXP(20); renderStepper(); if (Object.keys(progress.lessons).length === LESSONS.length) earn('learned'); }
+}
+function wrong(fb, msg) { fb.className = 'feedback bad'; fb.innerHTML = msg; }
+function lessonHead(n, title, body) { $('#ltext').innerHTML = '<p class="mono" style="color:var(--muted);margin:0">Lesson ' + n + ' of 6</p><h2>' + title + '</h2>' + body; }
+function numIn(id, v, min, max, label) { return '<input type="number" id="' + id + '" min="' + min + '" max="' + max + '" value="' + v + '"' + (label ? ' aria-label="' + esc(label) + '"' : '') + '>'; }
+function readNum(id, min, max) { var v = +$(id).value; if ($(id).value === '' || !Number.isInteger(v) || v < min || v > max) { $(id).setAttribute('aria-invalid', 'true'); return null; } $(id).removeAttribute('aria-invalid'); return v; }
+function tryBox(html) { return '<div class="tryit"><h3>Try it</h3>' + html + '</div>'; }
+
+/* Lesson 1: what an MTU is */
+function l1() {
+  var s = lessonState.l1, t = lessonState.task || (lessonState.task = { k: pick([1, 2, 3]) }), tl = LINKS[t.k];
+  lessonHead(1, 'What an MTU is',
+    '<p>An IP datagram travels inside a link-layer frame. The <b>MTU (Maximum Transmission Unit)</b> is the largest IP datagram that fits in one frame of that link. Every link technology has its own MTU.</p>' +
+    '<p>A datagram is a <b>20-byte header</b> plus its <b>data</b>. Its Total Length field counts both, up to 65,535 bytes.</p>' +
+    '<p>If the datagram fits, the link carries it as it is. If not, IP must <b>fragment</b> it: cut it into smaller datagrams that each fit. A host normally sends datagrams that fit its own link, so fragmentation usually happens at a <b>router</b> whose next link has a smaller MTU.</p>' +
+    '<div class="row"><label>Link <select id="l1link">' + LINKS.map(function (L, i) { return '<option value="' + i + '"' + (i === s.link ? ' selected' : '') + '>' + esc(L[2]) + ' (' + L[1] + ')</option>'; }).join('') + '</select></label></div>' +
+    '<div class="row"><label>Datagram size <input type="range" id="l1r" min="68" max="10000" value="' + s.total + '"></label>' + numIn('l1n', s.total, 68, 65535, 'Datagram size in bytes') + '<span>bytes</span></div>' +
+    tryBox('<p>Choose <b>' + esc(tl[2]) + '</b> and set the datagram to the <b>largest size that fits</b> without fragmentation.</p><div class="feedback" id="l1fb" aria-live="polite"></div>'));
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">The datagram and the link\'s frame</p><div class="fig"><svg id="l1svg" role="img" aria-label="A datagram compared with the room in one frame of the link"></svg></div>' +
+    '<ul class="legend"><li><i style="background:#0B3D5C"></i>IP header (20 bytes)</li><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>data</li><li><i style="background:#FDE8E9;border:1px solid #E5484D"></i>too big for the link</li></ul><div class="soft" id="l1facts"></div></div>' +
+    '<div class="card"><p class="figtitle">Common MTUs</p><ul class="list">' + LINKS.map(function (L) { return '<li><b class="mono">' + fmt(L[1]) + '</b>: ' + esc(L[0]) + '</li>'; }).join('') + '</ul><p class="cmdnote">Wi-Fi also carries 1500-byte datagrams, so a home network is a 1500-byte path. Tunnels and VPNs add their own headers, so they leave less room.</p></div>';
+  function upd(fromRange) {
+    if (fromRange) $('#l1n').value = $('#l1r').value; else { var v = readNum('#l1n', 68, 65535); if (v === null) return; $('#l1r').value = Math.min(10000, v); }
+    s.total = +$('#l1n').value; s.link = +$('#l1link').value;
+    var L = LINKS[s.link]; drawFrame($('#l1svg'), s.total, L[1], L[2]);
+    var n = countFrags(s.total - HDR, L[1]);
+    $('#l1facts').innerHTML = s.total <= L[1] ? '<span class="yes">Fits.</span> The link carries the datagram as it is.' : '<span class="no">Too big.</span> IP must cut it into <b>' + n + '</b> fragments (lesson 2), or drop it if Don\'t Fragment is set (lesson 6).';
+    var fb = $('#l1fb');
+    if (s.link === t.k && s.total === tl[1]) lessonDone(fb, 'Right: on this link the largest datagram is ' + fmt(tl[1]) + ' bytes, the MTU itself: 20 bytes of header and ' + fmt(tl[1] - HDR) + ' bytes of data.');
+    else if (s.link === t.k && s.total < tl[1]) { fb.className = 'feedback'; fb.innerHTML = 'It fits. Can it be bigger?'; }
+    else if (s.link === t.k) { fb.className = 'feedback'; fb.innerHTML = 'Too big for this link. Look at the red part.'; }
+    else { fb.className = 'feedback'; fb.innerHTML = ''; }
+  }
+  $('#l1r').oninput = function () { upd(true); }; $('#l1n').oninput = function () { upd(false); }; $('#l1link').onchange = function () { upd(false); };
+  upd(false);
+}
+
+/* Lesson 2: cutting a datagram */
+function l2() {
+  var s = lessonState.l2, t = lessonState.task || (lessonState.task = { mtu: pick([1000, 576, 620, 1006, 700, 900, 1250, 1300, 810]) });
+  lessonHead(2, 'Cutting a datagram',
+    '<p>Each fragment is a complete IP datagram with its <b>own 20-byte header</b>. So a fragment can carry at most <b>MTU − 20</b> data bytes.</p>' +
+    '<p>One more rule: every fragment except the last must carry a <b>multiple of 8</b> data bytes, because the header counts positions in 8-byte units (lesson 3). Round MTU − 20 down to a multiple of 8:</p>' +
+    '<p class="soft mono" style="text-align:center">data per fragment = ⌊(MTU − 20) ÷ 8⌋ × 8</p>' +
+    '<p>Fill fragments with that many bytes until what is left fits in one fragment. The last fragment carries all the rest: up to MTU − 20 bytes, and it need not be a multiple of 8. (Linux cuts this way. Usually that is the same as dividing and rounding up; it can save one fragment when MTU − 20 is not a multiple of 8.)</p>' +
+    '<div class="row"><label>Data ' + numIn('l2d', s.data, 1, MAX_DATA, 'Data bytes') + ' bytes</label><label>MTU ' + numIn('l2m', s.mtu, MIN_MTU, 65535, 'MTU in bytes') + '</label><button class="btn alt small" id="l2go">▶ Show the steps</button></div>' +
+    '<ol class="log" id="l2steps"></ol>' +
+    tryBox('<p>The next link has an MTU of <b>' + t.mtu + '</b> bytes and the datagram has 4,000 data bytes. How many data bytes does <b>fragment 1</b> carry?</p><div class="row">' + numIn('l2a', '', 0, 9000, 'Your answer') + '<button class="btn small" id="l2c">Check</button><button class="btn alt small" id="l2h">Hint</button></div><div class="feedback" id="l2fb" aria-live="polite"></div>'));
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">Where the cuts fall</p><div class="fig"><svg id="l2svg" role="img" aria-label="The data bar with the cut positions and the fragments"></svg></div>' +
+    '<ul class="legend"><li><i style="background:#0B3D5C"></i>new 20-byte header</li><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>a piece of the data</li><li><i style="background:#E5484D"></i>a cut</li></ul></div>';
+  var timer = null;
+  function steps() {
+    var m = maxData(s.mtu), n = countFrags(s.data, s.mtu), last = s.data - (n - 1) * m;
+    var items = fits(s.data, s.mtu) ? ['20 + ' + fmt(s.data) + ' = ' + fmt(s.data + HDR) + ' ≤ ' + fmt(s.mtu) + ': it fits, so there is nothing to cut.'] :
+      ['Room for data: ' + fmt(s.mtu) + ' − 20 = ' + fmt(s.mtu - HDR) + ' bytes.', 'Round down to a multiple of 8: ' + fmt(m) + ' bytes per fragment.', 'Cut ' + fmt(m) + '-byte pieces until the rest fits in one fragment (at most ' + fmt(s.mtu - HDR) + ' bytes): ' + n + ' fragments.', 'The last fragment carries the rest: ' + fmt(s.data) + ' − ' + (n - 1) + ' × ' + fmt(m) + ' = ' + fmt(last) + ' bytes.'];
+    $('#l2steps').innerHTML = items.slice(0, fits(s.data, s.mtu) ? 1 : Math.max(0, s.stage)).map(function (x) { return '<li>' + x + '</li>'; }).join('');
+  }
+  function upd() {
+    var d = readNum('#l2d', 1, MAX_DATA), m = readNum('#l2m', MIN_MTU, 65535); if (d === null || m === null) return;
+    s.data = d; s.mtu = m; drawCut($('#l2svg'), d, m, fits(d, m) ? 4 : s.stage); steps();
+  }
+  $('#l2d').oninput = function () { s.stage = 4; upd(); }; $('#l2m').oninput = function () { s.stage = 4; upd(); };
+  $('#l2go').onclick = function () {
+    clearInterval(timer); s.stage = 0; upd(); var tok = lessonState.token;
+    timer = setInterval(function () { if (!alive(tok)) { clearInterval(timer); return; } s.stage++; upd(); if (s.stage >= 4) clearInterval(timer); }, reduceMotion ? 80 : 1100);
+  };
+  var ans = maxData(t.mtu);
+  $('#l2c').onclick = function () {
+    var v = +$('#l2a').value, fb = $('#l2fb');
+    if (v === ans) lessonDone(fb, 'Correct: ' + t.mtu + ' − 20 = ' + (t.mtu - HDR) + ', and the largest multiple of 8 that fits is ' + ans + '.');
+    else if (v === t.mtu - HDR) wrong(fb, 'Close. ' + v + ' is the room for data, but it must also be a multiple of 8.');
+    else wrong(fb, 'Not yet. Start from the MTU, take away the header, then round down to a multiple of 8. Try MTU ' + t.mtu + ' in the boxes above.');
+  };
+  $('#l2h').onclick = function () { wrong($('#l2fb'), 'Hint: ' + t.mtu + ' − 20 = ' + (t.mtu - HDR) + '. Is that a multiple of 8? If not, go down to the next one.'); };
+  upd();
+}
+
+/* Lesson 3: the header fields */
+function l3() {
+  var s = lessonState.l3, t = lessonState.task;
+  if (!t) {
+    var mtu = pick([532, 576, 620, 1006, 1000, 820]), m = maxData(mtu), data = rnd(2, 4) * m + rnd(1, m - 1), n = countFrags(data, mtu);
+    t = lessonState.task = { mtu: mtu, data: data, n: n, q: pick(['offset', 'total']), k: rnd(2, n) };
+  }
+  var frs = splitFrag({ off: 0, len: t.data, mf: false }, t.mtu), ans = t.q === 'offset' ? offField(frs[t.k - 1]) : totalLen(frs[frs.length - 1]);
+  lessonHead(3, 'The header fields',
+    '<p>Four header fields let the destination put the pieces back together:</p><ul class="list">' +
+    '<li><b>Ident</b> (Identification): a number the source picks for each datagram. Every fragment of one datagram has the <b>same Ident</b>.</li>' +
+    '<li><b>M</b> (More fragments) flag: <b>1</b> on every fragment except the last, <b>0</b> on the last.</li>' +
+    '<li><b>Offset</b>: where this fragment\'s data starts in the original data, counted in <b>8-byte units</b>. 512 bytes in is Offset 64.</li>' +
+    '<li><b>Total Length</b>: this fragment\'s own header plus data.</li></ul>' +
+    '<p>The Offset field has 13 bits, so it counts up to 8,191 units. Times 8 bytes, that covers the largest datagram (65,535 bytes). That is why fragments are cut on 8-byte boundaries.</p>' +
+    '<div class="row"><label>Data ' + numIn('l3d', s.data, 1, MAX_DATA, 'Data bytes') + ' bytes</label><label>MTU ' + numIn('l3m', s.mtu, MIN_MTU, 65535, 'MTU') + '</label></div>' +
+    tryBox('<p>A datagram with <b>' + fmt(t.data) + '</b> data bytes crosses a link with an MTU of <b>' + t.mtu + '</b>. ' + (t.q === 'offset' ? 'What is the <b>Offset field</b> of fragment ' + t.k + '?' : 'What is the <b>Total Length</b> of the last fragment?') + '</p><div class="row">' + numIn('l3a', '', 0, 65535, 'Your answer') + '<button class="btn small" id="l3c">Check</button><button class="btn alt small" id="l3h">Hint</button></div><div class="feedback" id="l3fb" aria-live="polite"></div>'));
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">Header fields of the original and of each fragment</p><div class="fig"><svg id="l3svg" role="img" aria-label="Ident, M, Offset and Total Length of the original datagram and of each fragment"></svg></div>' +
+    '<ul class="legend"><li><i style="background:#FCE9C6;border:1px solid #0B3D5C"></i>M = 1: more fragments follow</li><li><i style="background:#fff;border:1px dashed #9DB3C1"></i>the original data, end to end</li></ul><div class="soft" id="l3facts"></div></div>';
+  function upd() {
+    var d = readNum('#l3d', 1, MAX_DATA), m = readNum('#l3m', MIN_MTU, 65535); if (d === null || m === null) return;
+    s.data = d; s.mtu = m;
+    var r = drawHeaders($('#l3svg'), d, m, s.ident, -1), fr = r.frags;
+    $('#l3facts').innerHTML = fits(d, m) ? 'It fits: one datagram with M = 0 and Offset 0.' : fr.length + ' fragments. Each Offset is its first data byte ÷ 8: ' + fr.map(function (x) { return fmt(x.off) + ' ÷ 8 = ' + offField(x); }).join(', ') + '.';
+  }
+  $('#l3d').oninput = upd; $('#l3m').oninput = upd;
+  $('#l3c').onclick = function () {
+    var v = +$('#l3a').value, fb = $('#l3fb'), m = maxData(t.mtu);
+    if (v === ans) lessonDone(fb, t.q === 'offset' ? 'Correct. Fragment ' + t.k + ' starts at data byte ' + fmt((t.k - 1) * m) + ' = ' + (t.k - 1) + ' × ' + m + ', and ' + fmt((t.k - 1) * m) + ' ÷ 8 = ' + ans + '.' : 'Correct. The last fragment carries ' + fmt(t.data) + ' − ' + (frs.length - 1) + ' × ' + m + ' = ' + (ans - HDR) + ' data bytes, plus the 20-byte header: ' + ans + '.');
+    else if (t.q === 'offset' && v === (t.k - 1) * m) wrong(fb, 'That is the position in bytes. The Offset field counts 8-byte units.');
+    else if (t.q === 'total' && v === ans - HDR) wrong(fb, 'That is the data. Total Length also counts the header.');
+    else wrong(fb, 'Not yet. Type ' + fmt(t.data) + ' and ' + t.mtu + ' in the boxes above and look at the figure.');
+  };
+  $('#l3h').onclick = function () { wrong($('#l3fb'), 'Hint: each full fragment carries ' + maxData(t.mtu) + ' data bytes (' + t.mtu + ' − 20, rounded down to a multiple of 8).'); };
+  upd();
+}
+
+/* Lesson 4: across an internetwork (the core lesson) */
+var PRESETS = { classic: { data: 1400, mtus: [1500, 532, 1500] }, refrag: { data: 2980, mtus: [1500, 1000, 576] }, none: { data: 1400, mtus: [1500, 1500, 1500] }, puzzle: { data: 1400, mtus: [1500, 1000, 1500] } };
+function l4() {
+  var s = lessonState.l4;
+  lessonHead(4, 'Across an internetwork',
+    '<p>Each fragment is a complete datagram. Routers forward every fragment <b>on its own</b>, and every link wraps it in a new frame.</p>' +
+    '<p>When a fragment meets an even <b>smaller link</b>, the router fragments it <b>again</b>, with the same rules. Two details matter:</p><ul class="list">' +
+    '<li>The Offset still counts from the start of the <b>original</b> data.</li><li>The last piece keeps the M flag of the fragment it came from, so only the very last piece of the datagram has M = 0.</li></ul>' +
+    '<p>Routers <b>never reassemble</b>. Fragmenting twice can make more, oddly sized fragments than cutting once for the smallest link.</p>' +
+    '<div class="row"><label>Data ' + numIn('l4d', s.data, 1, MAX_DATA, 'Data bytes') + ' bytes</label><label>Example <select id="l4p"><option value="">choose…</option><option value="classic">1400 bytes over 1500, 532, 1500</option><option value="refrag">Fragment twice: 2980 bytes over 1500, 1000, 576</option><option value="none">No fragmentation</option></select></label></div>' +
+    '<div class="row">' + s.mtus.map(function (m, i) { return '<label>Link ' + (i + 1) + ' MTU ' + numIn('l4m' + i, m, MIN_MTU, 65535, 'Link ' + (i + 1) + ' MTU') + '</label>'; }).join('') + '</div>' +
+    '<div class="row"><button class="btn small" id="l4go">▶ Send</button><label>Speed <select id="l4sp"><option value="0.6">Slow</option><option value="1" selected>Normal</option><option value="1.8">Fast</option></select></label></div>' +
+    '<p id="l4cap" class="soft" aria-live="polite"></p>' +
+    tryBox('<p>Load the puzzle: 1400 data bytes, Link 2 at 1000. <b>Change only Link 3\'s MTU</b> so that <b>exactly four fragments</b> reach Host B.</p><div class="row"><button class="btn alt small" id="l4puz">Load the puzzle</button></div><div class="feedback" id="l4fb" aria-live="polite"></div>'));
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">How the hosts and routers are connected, and the fragments on each link</p><div class="fig"><svg id="l4svg" role="img" aria-label="Host A, routers R1 and R2, Host B, and the fragments on each link"></svg></div>' +
+    '<ul class="legend"><li><i style="background:#0B3D5C"></i>20-byte header</li><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>data, to scale</li><li><i style="background:#F5A524"></i>a router fragments</li></ul></div>' +
+    '<div class="card"><p class="figtitle">Fragments that reach Host B</p><div class="fcards" id="l4cards"></div></div>';
+  var ident = newIdent(), stage = null;
+  function upd() {
+    var d = readNum('#l4d', 1, MAX_DATA); if (d === null) return;
+    var ms = []; for (var i = 0; i < 3; i++) { var v = readNum('#l4m' + i, MIN_MTU, 65535); if (v === null) return; ms.push(v); }
+    s.data = d; s.mtus = ms; lessonState.token++;
+    var res = sendPath(d, ms, false); stage = drawPath($('#l4svg'), ms, res);
+    var last = res.frags;
+    $('#l4cards').innerHTML = fragCards(last, ident);
+    var splits = res.hops.map(function (h, i) { return h.split ? nodeName(i, 3) : null; }).filter(Boolean);
+    $('#l4cap').innerHTML = (splits.length ? '<b>' + splits.join(' and ') + '</b> fragment' + (splits.length === 1 ? 's' : '') + '. ' : 'Nobody fragments: the datagram fits every link. ') + '<b>' + last.length + '</b> packet' + (last.length === 1 ? '' : 's') + ' reach Host B, with ' + fmt(last.length * HDR) + ' bytes of headers in all.';
+    var fb = $('#l4fb');
+    if (d === 1400 && ms[0] >= 1420 && ms[1] === 1000 && last.length === 4) { var a = countFrags(976, ms[2]), b2 = countFrags(424, ms[2]); lessonDone(fb, 'Yes! With Link 3 at ' + ms[2] + ', R2 cuts the 976-byte fragment into ' + a + ' and the 424-byte one into ' + b2 + ': ' + a + ' + ' + b2 + ' = 4. Each is handled on its own.'); }
+    else if (d === 1400 && ms[1] === 1000) { fb.className = 'feedback'; fb.innerHTML = last.length < 4 ? 'Now ' + last.length + ' arrive. Make Link 3 smaller.' : 'Now ' + last.length + ' arrive. Make Link 3 a little bigger.'; }
+    else { fb.className = 'feedback'; fb.innerHTML = ''; }
+  }
+  function load(p) { var P = PRESETS[p]; $('#l4d').value = P.data; P.mtus.forEach(function (m, i) { $('#l4m' + i).value = m; }); upd(); }
+  $('#l4d').oninput = upd; for (var i = 0; i < 3; i++) $('#l4m' + i).oninput = upd;
+  $('#l4p').onchange = function () { if (this.value) load(this.value); };
+  $('#l4puz').onclick = function () { load('puzzle'); };
+  $('#l4go').onclick = function () {
+    upd(); var tok = lessonState.token, res = sendPath(s.data, s.mtus, false), b = $('#l4go'); b.disabled = true;
+    animatePath(stage, res, +$('#l4sp').value, tok, alive, function (i, hop) {
+      if (hop) $('#l4cap').innerHTML = 'Link ' + (i + 1) + ' (MTU ' + hop.mtu + '): ' + (hop.split ? '<b>' + nodeName(i, 3) + ' fragments.</b> ' : '') + hop.frags.length + (hop.frags.length === 1 ? ' packet crosses.' : ' fragments cross.');
+    }).then(function () { if (alive(tok)) { b.disabled = false; $('#l4cap').innerHTML += ' Host B has them all.'; } else b.disabled = false; });
+  };
+  upd();
+}
+
+/* Lesson 5: reassembly and loss */
+var L5_SCEN = { classic: { data: 1400, mtus: [1500, 532, 1500], name: '1400 bytes over a 532 link: 3 fragments' }, ping: { data: 3008, mtus: [1500], name: 'ping -s 3000 on Ethernet: 3 fragments' }, twice: { data: 2980, mtus: [1500, 1000, 576], name: 'Fragmented twice: 7 fragments' } };
+function l5() {
+  var t = lessonState.task;
+  if (!t) {
+    var mtu = pick([532, 576, 620, 1006, 1500]), m = maxData(mtu), n = rnd(4, 6), data = (n - 1) * m + rnd(8, m - 8), frs = splitFrag({ off: 0, len: data, mf: false }, mtu), miss = rnd(0, frs.length - 2);
+    t = lessonState.task = { mtu: mtu, data: data, frs: frs, miss: miss, order: shuffle(frs.map(function (x, i) { return i; }).filter(function (i) { return i !== miss; })) };
+  }
+  var st = lessonState.l5 || (lessonState.l5 = { scen: 'classic' });
+  lessonHead(5, 'Reassembly and loss',
+    '<p>Only the <b>destination host</b> reassembles. It collects the fragments that share one Ident (and the same source, destination, and protocol), in any order. Each Offset says where a piece goes.</p>' +
+    '<p>The fragment with <b>M = 0</b> reveals the full size: its Offset × 8 plus its data length. When every byte has arrived, IP hands the whole datagram to the protocol above it.</p>' +
+    '<p>IP <b>never recovers</b> a lost fragment. The destination waits (Linux waits 30 seconds), then throws away every fragment it holds. One lost fragment loses the <b>whole datagram</b>, and the sender must send all of it again. Fragments that never complete also tie up memory, which attackers have used.</p>' +
+    '<div class="row"><label>Example <select id="l5s">' + Object.keys(L5_SCEN).map(function (k) { return '<option value="' + k + '"' + (k === st.scen ? ' selected' : '') + '>' + L5_SCEN[k].name + '</option>'; }).join('') + '</select></label><label><input type="checkbox" id="l5lose"> Lose one fragment on the way</label></div>' +
+    '<div class="row"><button class="btn small" id="l5next">Deliver the next fragment</button><button class="btn alt small" id="l5all">Deliver them all</button><button class="btn alt small" id="l5new">New arrival order</button></div>' +
+    tryBox('<p>Host B holds these fragments of one datagram (MTU ' + t.mtu + '). One is missing. What is the <b>Offset field</b> of the missing fragment?</p><ul class="list mono">' + t.order.map(function (i) { var f = t.frs[i]; return '<li>Offset ' + offField(f) + ', M ' + (f.mf ? 1 : 0) + ', Total Length ' + totalLen(f) + '</li>'; }).join('') + '</ul><div class="row">' + numIn('l5a', '', 0, 8191, 'Offset of the missing fragment') + '<button class="btn small" id="l5c">Check</button><button class="btn alt small" id="l5h">Hint</button></div><div class="feedback" id="l5fb" aria-live="polite"></div>'));
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">Host B\'s reassembly buffer</p><div class="fig"><svg id="l5svg" role="img" aria-label="The reassembly buffer with the fragments received so far"></svg></div><ol class="log" id="l5log" aria-live="polite"></ol></div>';
+  var S = {};
+  function reset() {
+    lessonState.token++;
+    var sc = L5_SCEN[st.scen]; S.frags = sendPath(sc.data, sc.mtus, false).frags; S.data = sc.data;
+    S.order = shuffle(S.frags.map(function (x, i) { return i; })); S.got = []; S.lost = $('#l5lose').checked ? S.order[rnd(0, S.order.length - 1)] : -1; S.done = false;
+    $('#l5log').innerHTML = ''; $('#l5next').disabled = false; $('#l5all').disabled = false; draw();
+  }
+  function known() { return S.got.some(function (i) { return !S.frags[i].mf; }); }
+  function draw() { drawBuffer($('#l5svg'), S.frags, S.got, S.data, known(), S.got.length + (S.lost >= 0 ? 1 : 0) === S.frags.length ? S.lost : -1); }
+  function log(t, cls) { var li = document.createElement('li'); li.innerHTML = t; if (cls) li.className = cls; $('#l5log').appendChild(li); }
+  function step() {
+    if (S.done) return false;
+    var pending = S.order.filter(function (i) { return S.got.indexOf(i) < 0 && i !== S.lost; });
+    if (!pending.length) return false;
+    var i = pending[0], fr = S.frags[i]; S.got.push(i);
+    log('Fragment ' + (i + 1) + ' arrives: Offset ' + offField(fr) + ' (byte ' + fmt(fr.off) + '), ' + fmt(fr.len) + ' data bytes, M ' + (fr.mf ? 1 : 0) + (fr.mf ? '' : '. Now Host B knows the full size: ' + offField(fr) + ' × 8 + ' + fr.len + ' = ' + fmt(fr.off + fr.len) + ' bytes.'));
+    draw();
+    if (S.got.length === S.frags.length) { S.done = true; log('Every byte is here. IP passes the ' + fmt(S.data) + '-byte datagram up to the next protocol.', 'result'); finish(); }
+    else if (S.got.length + 1 === S.frags.length && S.lost >= 0) {
+      S.done = true; finish(); var tok = lessonState.token, secs = 30;
+      log('Fragment ' + (S.lost + 1) + ' was lost on the way. Host B starts its 30-second timer…');
+      var tick = setInterval(function () {
+        if (!alive(tok)) { clearInterval(tick); return; }
+        secs -= 5; if (secs > 0) return;
+        clearInterval(tick); draw();
+        log('Time is up. Host B throws away all ' + S.got.length + ' fragments. The whole datagram is lost; IP does not ask for the missing piece.' + (S.got.some(function (j) { return S.frags[j].off === 0; }) ? ' Because fragment 1 arrived, Host B may send an ICMP Time Exceeded message (fragment reassembly time exceeded).' : ''), 'result');
+      }, reduceMotion ? 30 : 400);
+    }
+    return true;
+  }
+  function finish() { $('#l5next').disabled = true; $('#l5all').disabled = true; }
+  $('#l5next').onclick = step;
+  $('#l5all').onclick = function () { var tok = lessonState.token; (function go() { if (!alive(tok)) return; if (step()) setTimeout(go, reduceMotion ? 0 : 450); })(); };
+  $('#l5new').onclick = reset; $('#l5lose').onchange = reset;
+  $('#l5s').onchange = function () { st.scen = this.value; reset(); };
+  var ans = offField(t.frs[t.miss]), m = maxData(t.mtu);
+  $('#l5c').onclick = function () {
+    var v = +$('#l5a').value, fb = $('#l5fb');
+    if (v === ans) lessonDone(fb, 'Correct. Every full fragment carries ' + m + ' bytes, so the Offsets go up in steps of ' + (m / 8) + ': ' + t.frs.map(offField).join(', ') + '. Offset ' + ans + ' is the gap.');
+    else if (v === ans * 8) wrong(fb, 'That is the position in bytes. The Offset field counts 8-byte units.');
+    else wrong(fb, 'Not yet. Sort the Offsets from smallest to largest and look for the gap.');
+  };
+  $('#l5h').onclick = function () { wrong($('#l5fb'), 'Hint: a full fragment here carries ' + t.mtu + ' − 20 → ' + m + ' bytes, so the Offsets go up by ' + m + ' ÷ 8 = ' + (m / 8) + '.'); };
+  reset();
+}
+
+/* Lesson 6: avoid fragmentation: DF, ICMP, and path MTU discovery */
+var L6_MODES = [['want', 'Linux: ping -s (DF set, learns the path MTU)'], ['do', 'Linux: ping -M do -s (DF set, never fragment)'], ['dont', 'Linux: ping -M dont -s (DF clear)'], ['win', 'Windows: ping -l (DF clear)'], ['winf', 'Windows: ping -f -l (DF set)']];
+function l6() {
+  var s = lessonState.l6, t = lessonState.task || (lessonState.task = { mtu2: pick([1492, 1450, 1400, 1280, 1000, 576].filter(function (m) { return m !== s.mtu2; })) });
+  lessonHead(6, 'Avoid it: DF and path MTU discovery',
+    '<p>Fragmentation costs extra headers, extra work, and the risk of losing the whole datagram. So hosts try to avoid it.</p>' +
+    '<p>The <b>DF (Don\'t Fragment)</b> flag tells routers: never fragment this datagram. A router that would have to fragment it <b>drops</b> it and sends back an ICMP (Internet Control Message Protocol) message, "Destination Unreachable: fragmentation needed" (type 3, code 4), that includes the MTU of the next link.</p>' +
+    '<p><b>Path MTU discovery</b> uses this: send with DF set, and when that message comes back, remember the smaller MTU for that destination. Linux ping works this way by default: the first big ping is lost, and the next ones are fragmented by Host A itself to fit.</p>' +
+    '<p>TCP (Transmission Control Protocol) avoids fragmentation by sending segments of at most MSS (Maximum Segment Size) = MTU − 40 bytes: 1460 on Ethernet. Large UDP datagrams and big pings still fragment. In <b>IPv6</b>, routers never fragment at all: only the source can, and a router answers "Packet Too Big". Every IPv6 link carries at least 1280 bytes.</p>' +
+    '<div class="row"><label>Link 2 MTU <select id="l6m">' + [1500, 1492, 1450, 1400, 1280, 1000, 576].map(function (m) { return '<option' + (m === s.mtu2 ? ' selected' : '') + '>' + m + '</option>'; }).join('') + '</select></label><label>Payload <input type="range" id="l6r" min="100" max="1472" value="' + s.payload + '"></label>' + numIn('l6n', s.payload, 0, 65500, 'Ping payload in bytes') + '</div>' +
+    '<div class="row"><label>Command <select id="l6mode">' + L6_MODES.map(function (m) { return '<option value="' + m[0] + '"' + (m[0] === s.mode ? ' selected' : '') + '>' + esc(m[1]) + '</option>'; }).join('') + '</select></label><button class="btn small" id="l6go">▶ Run 3 pings</button></div>' +
+    '<div class="row"><label>Animation speed <span aria-hidden="true">🐢</span><input type="range" id="l6sp" min="0.25" max="3" step="0.25" value="' + s.speed + '" aria-describedby="l6spo"><span aria-hidden="true">🐇</span></label><output id="l6spo" class="mono" for="l6sp">' + s.speed + '×</output></div>' +
+    tryBox('<p>Set Link 2 to <b>' + t.mtu2 + '</b>. With DF set, what is the <b>largest ping payload</b> (the number after -s or -l) that reaches Host B? Test your answer with the ping.</p><div class="row">' + numIn('l6a', '', 0, 65500, 'Largest payload') + '<button class="btn small" id="l6c">Check</button><button class="btn alt small" id="l6h">Hint</button></div><div class="feedback" id="l6fb" aria-live="polite"></div>'));
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">Host A pings Host B through R1</p><div class="fig"><svg id="l6svg" role="img" aria-label="Host A, router R1 and Host B; a ping and any ICMP message"></svg></div>' +
+    '<ul class="legend"><li><i style="background:#fff;border:2px solid #00A2D7"></i>a packet, with its data size</li><li><i style="background:#FDE8E9;border:2px solid #E5484D"></i>ICMP: fragmentation needed</li></ul>' +
+    '<p class="figtitle">What the terminal shows</p><div class="term" id="l6term" aria-live="polite"></div><p class="cmdnote" id="l6note"></p></div>' +
+    '<div class="card"><p class="figtitle">Try it on your own computer</p><div id="l6cmds"></div></div>';
+  function mtus() { return [1500, s.mtu2]; }
+  function upd(fromRange) {
+    if (fromRange) $('#l6n').value = $('#l6r').value; else { var v = readNum('#l6n', 0, 65500); if (v === null) return; $('#l6r').value = Math.min(1472, Math.max(100, v)); }
+    s.payload = +$('#l6n').value; s.mtu2 = +$('#l6m').value; s.mode = $('#l6mode').value; lessonState.token++;
+    var run = pingRun(s.mode, s.payload, mtus(), 3, '192.168.2.20');
+    drawPath($('#l6svg'), mtus(), run.attempts[0].res, { icmp: true });
+    $('#l6term').innerHTML = '<span class="d">$ ' + esc(cmdFor(s.mode, s.payload)) + '</span>';
+    $('#l6note').textContent = 'The datagram is ' + fmt(s.payload + 28) + ' bytes: the payload, the 8-byte ICMP header, and the 20-byte IP header. The path MTU is ' + Math.min(1500, s.mtu2) + '.';
+    renderCommands($('#l6cmds'), { payload: s.payload, mtu: s.mtu2, dest: '192.168.2.20' });
+    checkTry();
+  }
+  function cmdFor(mode, n) { return { want: 'ping -c 3 -s ' + n, do: 'ping -c 3 -M do -s ' + n, dont: 'ping -c 3 -M dont -s ' + n, win: 'ping -n 3 -l ' + n, winf: 'ping -n 3 -f -l ' + n }[mode] + ' 192.168.2.20'; }
+  $('#l6r').oninput = function () { upd(true); }; $('#l6n').oninput = function () { upd(false); };
+  $('#l6m').onchange = function () { upd(false); }; $('#l6mode').onchange = function () { upd(false); };
+  function sp() { return s.speed; }   // read at every step, so a change applies to the next packet even mid-run
+  $('#l6sp').oninput = function () { s.speed = +this.value; $('#l6spo').textContent = s.speed + '×'; };
+  $('#l6go').onclick = function () {
+    upd(false); var tok = lessonState.token, run = pingRun(s.mode, s.payload, mtus(), 3, '192.168.2.20'), term = $('#l6term'), b = $('#l6go'), lines = run.lines;
+    b.disabled = true;
+    term.innerHTML = '<span class="d">$ ' + esc(cmdFor(s.mode, s.payload)) + '</span>\n' + termHTML([lines[0]]);
+    var chain = Promise.resolve();
+    run.attempts.forEach(function (a, i) {
+      chain = chain.then(function () {
+        if (!alive(tok)) return;
+        var stage = drawPath($('#l6svg'), mtus(), a.res, { icmp: !a.res.ok && a.res.dropAt > 0 });
+        return (a.local ? sleep(reduceMotion ? 100 : 700 / sp()) : animatePath(stage, a.res, 1.3 * sp(), tok, alive)).then(function () {
+          if (!alive(tok)) return;
+          if (a.res.ok) return moveChip(stage, stage.xs[2], stage.xs[0] + NODE_W, stage.cy + 0.1, 'reply', { fill: C.amber, stroke: '#B86E00', dur: 900 / sp() }, tok, alive);
+        }).then(function () { if (alive(tok)) term.innerHTML += '\n' + termHTML([lines[i + 1]]); return sleep(reduceMotion ? 0 : 500 / sp()); });
+      });
+    });
+    chain.then(function () { b.disabled = false; });
+  };
+  function checkTry() { /* the answer is checked with the button */ }
+  var ans = Math.min(1500, t.mtu2) - 28;
+  $('#l6c').onclick = function () {
+    var v = +$('#l6a').value, fb = $('#l6fb');
+    if (v === ans) lessonDone(fb, 'Correct: the path MTU is ' + t.mtu2 + ', so the largest datagram is ' + t.mtu2 + ' bytes. Take away 20 (IP header) and 8 (ICMP header): ' + ans + '. One more byte and R1 answers "Frag needed".');
+    else if (v === t.mtu2 - 20) wrong(fb, 'Close. The ping payload sits after the 8-byte ICMP header too.');
+    else if (v === 1472) wrong(fb, '1472 fits Host A\'s own link, but the path is only as big as its smallest link.');
+    else wrong(fb, 'Not yet. Set Link 2 to ' + t.mtu2 + ', choose ping -M do, and try your number, then one more byte.');
+  };
+  $('#l6h').onclick = function () { wrong($('#l6fb'), 'Hint: payload + 8 (ICMP header) + 20 (IP header) must be at most the smallest MTU on the path.'); };
+  upd(false);
+}
+
+/* ===================================================== CALCULATOR */
+var calcState = { size: 1392, kind: 'ping', df: 0, mtus: [1500, 532, 1500], ident: newIdent() };
+var CALC_PRESETS = { classic: [1500, 532, 1500], refrag: [1500, 1000, 576], tunnel: [1500, 1400, 1500], local: [1500] };
+function calcLinks() {
+  $('#c_links').innerHTML = calcState.mtus.map(function (m, i) {
+    return '<div class="linkbox"><b>Link ' + (i + 1) + (i === 0 ? ' (Host A\'s own link)' : '') + '</b><label>MTU <input type="number" min="' + MIN_MTU + '" max="65535" value="' + m + '" data-li="' + i + '" aria-label="Link ' + (i + 1) + ' MTU"></label></div>';
+  }).join('');
+  $$('#c_links [data-li]').forEach(function (inp) { inp.oninput = function () { var v = +inp.value; if (inp.value === '' || !Number.isInteger(v) || v < MIN_MTU || v > 65535) { inp.setAttribute('aria-invalid', 'true'); $('#c_err').textContent = 'Each MTU must be a whole number from 68 to 65,535.'; return; } inp.removeAttribute('aria-invalid'); calcState.mtus[+inp.getAttribute('data-li')] = v; calc(); }; });
+  $('#c_add').disabled = calcState.mtus.length >= 4; $('#c_del').disabled = calcState.mtus.length <= 1;
+}
+function calcInit() {
+  $('#c_size').value = calcState.size; $('#c_kind').value = calcState.kind; $('#c_df').value = String(calcState.df);
+  $('#c_size').oninput = function () { calc(); }; $('#c_kind').onchange = calc; $('#c_df').onchange = calc;
+  $('#c_preset').onchange = function () { if (!this.value) return; calcState.mtus = CALC_PRESETS[this.value].slice(); if (this.value === 'classic') { $('#c_kind').value = 'ping'; $('#c_size').value = 1392; } if (this.value === 'refrag') { $('#c_kind').value = 'ping'; $('#c_size').value = 2972; } calcLinks(); calc(); this.value = ''; };
+  $('#c_add').onclick = function () { if (calcState.mtus.length < 4) { calcState.mtus.push(1500); calcLinks(); calc(); } };
+  $('#c_del').onclick = function () { if (calcState.mtus.length > 1) { calcState.mtus.pop(); calcLinks(); calc(); } };
+  calcLinks();
+}
+function calc() {
+  var err = $('#c_err'), size = +$('#c_size').value, kind = $('#c_kind').value, df = $('#c_df').value === '1', K = KINDS[kind];
+  var maxSize = MAX_DATA - K.add;
+  if ($('#c_size').value === '' || !Number.isInteger(size) || size < (kind === 'data' ? 1 : 0) || size > maxSize) { err.textContent = 'Type a whole number from ' + (kind === 'data' ? 1 : 0) + ' to ' + fmt(maxSize) + ': an IPv4 datagram is at most 65,535 bytes.'; return; }
+  if (calcState.mtus.some(function (m) { return !(m >= MIN_MTU && m <= 65535); })) return;
+  err.textContent = ''; calcState.size = size; calcState.kind = kind; calcState.df = df ? 1 : 0;
+  var mtus = calcState.mtus, data = size + K.add, total = data + HDR, res = sendPath(data, mtus, df), pmtu = Math.min.apply(null, mtus);
+  var stats = [['IP datagram (Total Length)', fmt(total) + ' bytes'], ['Path MTU (smallest link)', fmt(pmtu)]];
+  if (res.ok) {
+    var last = res.frags, wire = last.reduce(function (s, f) { return s + totalLen(f); }, 0);
+    stats = stats.concat([['Packets on Link 1', String(res.hops[0].frags.length)], ['Packets that reach Host B', String(last.length)], ['Bytes on the last link', fmt(wire)], ['Extra header bytes', fmt((last.length - 1) * HDR)], ['Efficiency on the last link', (data / wire * 100).toFixed(1) + '% data']]);
+  } else stats.push(['Result', res.dropAt === 0 ? 'Host A refuses to send it' : 'R' + res.dropAt + ' drops it']);
+  stats.push(['Largest ' + K.name + ' with DF set', fmt(Math.max(0, pmtu - HDR - K.add)) + ' bytes']);
+  $('#c_stats').innerHTML = stats.map(function (s) { return '<div class="stat"><div class="k">' + s[0] + '</div><div class="v">' + s[1] + '</div></div>'; }).join('');
+  // DF result and the terminal
+  var out = '';
+  if (df && !res.ok) out += '<p class="feedback bad">' + (res.dropAt === 0 ? 'The datagram is bigger than Host A\'s own link (' + mtus[0] + '), and DF forbids fragmenting, so Host A does not send it. The program gets an error at once.' : 'R' + res.dropAt + ' would have to fragment for Link ' + (res.dropAt + 1) + ' (MTU ' + res.mtu + '). DF is set, so it drops the datagram and sends Host A an ICMP "fragmentation needed" message that carries the MTU ' + res.mtu + '.') + '</p>';
+  else if (df) out += '<p class="feedback ok">The datagram fits every link, so DF changes nothing: it arrives whole.</p>';
+  if (kind === 'ping' && size <= 65500) {
+    var mL = df ? 'do' : 'dont', mW = df ? 'winf' : 'win', rl = pingRun(mL, size, mtus, 3), rw = pingRun(mW, size, mtus, 3);
+    out += '<div class="calcgrid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))"><div><p class="cmdnote">Linux: <code>ping -c 3 ' + (df ? '-M do' : '-M dont') + ' -s ' + size + ' ' + destAddr(mtus.length) + '</code></p><div class="term">' + termHTML(rl.lines) + '</div></div>' +
+      '<div><p class="cmdnote">Windows: <code>ping -n 3 ' + (df ? '-f ' : '') + '-l ' + size + ' ' + destAddr(mtus.length) + '</code></p><div class="term">' + termHTML(rw.lines) + '</div></div></div>' +
+      '<p class="cmdnote">Addresses in this model: Host A is 192.168.1.10, Link k is 192.168.k.0/24, and Host B is ' + destAddr(mtus.length) + '.' + (df && !res.ok && res.dropAt > 0 && res.mtu < LINUX_MIN_PMTU ? ' Linux never remembers a path MTU below 552 bytes, so it keeps getting the router\'s message.' : '') + '</p>';
+  }
+  $('#c_df_out').innerHTML = out;
+  drawPath($('#c_path'), mtus, res, { icmp: true });
+  $('#c_cards').innerHTML = res.ok ? fragCards(res.frags, calcState.ident) : '<p class="no">Nothing reaches Host B.</p>';
+  $('#c_all').innerHTML = res.hops.map(function (h, i) { return '<h3>Link ' + (i + 1) + ' (MTU ' + h.mtu + '): ' + h.frags.length + (h.frags.length === 1 ? ' packet' : ' packets') + '</h3><div class="fcards">' + fragCards(h.frags, calcState.ident) + '</div>'; }).join('');
+  renderCommands($('#c_cmds'), { payload: kind === 'ping' ? size : Math.max(0, pmtu - 28), mtu: pmtu < 1500 ? pmtu : 1400, dest: destAddr(mtus.length) });
+  writeLink();
+}
+
+/* ===================================================== CHALLENGE: question generators
+   Each question carries p: the inputs, so the logic test can re-check the answer independently. */
+var Q_MTUS = [532, 576, 620, 700, 810, 900, 1000, 1006, 1250, 1300, 1400, 1492, 1500];
+function numQ(type, tag, text, answer, hint, explain, p) { return { type: type, tag: tag, text: text, input: 'number', answer: answer, hint: hint, explain: explain, p: p }; }
+function choiceQ(type, tag, text, right, wrongs, hint, explain, p) {
+  var ch = [right]; wrongs.forEach(function (w) { if (ch.indexOf(w) < 0) ch.push(w); });
+  ch = shuffle(ch); return { type: type, tag: tag, text: text, input: 'choice', choices: ch, answer: ch.indexOf(right), hint: hint, explain: explain, p: p };
+}
+function needFrag(minFrags, maxFrags, mtuList) {   // data size and MTU with a given number of fragments
+  var M, m, D;
+  do { M = pick(mtuList || Q_MTUS); m = maxData(M); D = (rnd(minFrags, maxFrags) - 1) * m + rnd(1, m); } while (countFrags(D, M) < minFrags);
+  return { D: D, M: M, m: m, n: countFrags(D, M) };
+}
+/* Easy */
+function fitsQ() {
+  var M = pick([1500, 1492, 1400, 576, 532, 1280]), T = M + pick([-28, -20, -8, -1, 0, 1, 8, 20, 28]);
+  return choiceQ('fits', 'size', 'A datagram with a <b>Total Length of ' + fmt(T) + '</b> bytes reaches a link with an <b>MTU of ' + fmt(M) + '</b>. Must it be fragmented?', T > M ? 'Yes' : 'No', [T > M ? 'No' : 'Yes'],
+    'Compare the Total Length (header included) with the MTU.', T > M ? fmt(T) + ' > ' + fmt(M) + ': it is ' + (T - M) + ' bytes too big, so IP must fragment it (or drop it if DF is set).' : fmt(T) + ' ≤ ' + fmt(M) + ': it fits as it is. The MTU is the largest datagram, header included.', { kind: 'fits', T: T, M: M });
+}
+function perQ() {
+  var M = pick(Q_MTUS), m = maxData(M);
+  return numQ('per', 'size', 'A link has an <b>MTU of ' + M + '</b>. How many <b>data bytes</b> does each fragment carry, except the last one?', m,
+    'Take away the 20-byte header, then round down to a multiple of 8.', M + ' − 20 = ' + (M - HDR) + (M - HDR === m ? ', which is already a multiple of 8.' : ', rounded down to a multiple of 8: ' + m + '.'), { kind: 'per', M: M });
+}
+function countQ(level) {
+  var c = needFrag(2, level === 'E' ? 4 : 7);
+  return numQ('count', 'size', 'A datagram with <b>' + fmt(c.D) + ' data bytes</b> must cross a link with an <b>MTU of ' + c.M + '</b>. How many fragments does IP make?', c.n,
+    'Find the data per fragment first: ' + c.M + ' − 20, rounded down to a multiple of 8.', explainSplit(c.D, c.M), { kind: 'count', D: c.D, M: c.M });
+}
+function offQ() {
+  var k = rnd(1, 900), B = 8 * k;
+  return numQ('off', 'off', 'A fragment\'s data starts at <b>byte ' + fmt(B) + '</b> of the original data. What is its <b>Offset field</b>?', k,
+    'The Offset field counts 8-byte units.', fmt(B) + ' ÷ 8 = ' + k + '.', { kind: 'off', B: B });
+}
+function pingTotQ() {
+  var N = pick([56, 64, 100, 500, 1000, 1200, 1372, 1400, 1472, 1500, 2000, 3000, 4000, 8972]);
+  return numQ('ptot', 'size', 'On Linux, <code>ping -s ' + N + '</code> sends a ' + N + '-byte payload. What is the <b>Total Length</b> of the IP datagram, before any fragmentation?', N + 28,
+    'Add the 8-byte ICMP header and the 20-byte IP header.', N + ' + 8 (ICMP) + 20 (IP) = ' + (N + 28) + '. Linux prints it too: ' + N + '(' + (N + 28) + ') bytes of data.', { kind: 'ptot', N: N });
+}
+/* Medium */
+function lastTotQ() {
+  var c = needFrag(2, 6), last = c.D - (c.n - 1) * c.m;
+  return numQ('lastTot', 'size', 'A datagram with <b>' + fmt(c.D) + ' data bytes</b> crosses a link with an <b>MTU of ' + c.M + '</b>. What is the <b>Total Length</b> of the last fragment?', last + HDR,
+    'Full fragments carry ' + c.m + ' bytes each. What is left for the last one? Then add the header.', explainSplit(c.D, c.M) + ' The last carries ' + last + ' data bytes, plus 20 bytes of header: ' + (last + HDR) + '.', { kind: 'lastTot', D: c.D, M: c.M });
+}
+function kOffQ() {
+  var c = needFrag(3, 7), k = rnd(2, c.n);
+  return numQ('kOff', 'off', 'A datagram with <b>' + fmt(c.D) + ' data bytes</b> crosses a link with an <b>MTU of ' + c.M + '</b>. What is the <b>Offset field of fragment ' + k + '</b>?', (k - 1) * c.m / 8,
+    'Fragment ' + k + ' starts after ' + (k - 1) + ' full fragments of ' + c.m + ' bytes. Divide by 8.', 'Fragment ' + k + ' starts at byte ' + (k - 1) + ' × ' + c.m + ' = ' + fmt((k - 1) * c.m) + ', and ' + fmt((k - 1) * c.m) + ' ÷ 8 = ' + ((k - 1) * c.m / 8) + '.', { kind: 'kOff', D: c.D, M: c.M, k: k });
+}
+function rangeQ() {
+  var M = pick(Q_MTUS), m = maxData(M), j = rnd(1, 6), off = j * m / 8, len = pick([m, rnd(8, m - 1)]), T = len + HDR, a = off * 8, b = a + len - 1;
+  return choiceQ('range', 'off', 'A fragment has <b>Offset ' + off + '</b> and <b>Total Length ' + T + '</b>. Which bytes of the original data does it carry?', fmt(a) + ' to ' + fmt(b),
+    [fmt(off) + ' to ' + fmt(off + len - 1), fmt(a) + ' to ' + fmt(a + T - 1), fmt(a + 1) + ' to ' + fmt(b + 1), fmt(a) + ' to ' + fmt(a + len)],
+    'Offset × 8 is the first byte. Total Length includes the 20-byte header.', 'It starts at ' + off + ' × 8 = ' + fmt(a) + ' and carries ' + T + ' − 20 = ' + len + ' bytes, so it ends at byte ' + fmt(b) + '.', { kind: 'range', off: off, T: T });
+}
+function wsQ() {
+  var B = pick([1480, 2960, 4440, 5920, 512, 1024, 1376, 976, 552, 1104, 8 * rnd(10, 999)]);
+  return numQ('ws', 'off', 'In Wireshark\'s packet details, a fragment shows <b>Fragment Offset: ' + fmt(B) + '</b>. What number is in the header\'s 13-bit Offset field, the one the filter <code>ip.frag_offset</code> compares?', B / 8,
+    'Wireshark\'s details show bytes. The header counts 8-byte units.', fmt(B) + ' ÷ 8 = ' + (B / 8) + '. So the filter ip.frag_offset == ' + (B / 8) + ' finds it.', { kind: 'ws', B: B });
+}
+function pLastQ() {
+  var M = pick([1500, 1500, 1492, 1400, 9000]), m = maxData(M), N, data, n;
+  do { N = M === 9000 ? rnd(9000, 30000) : rnd(1500, 6000); data = N + 8; n = countFrags(data, M); } while (n < 2);
+  var last = data - (n - 1) * m;
+  return numQ('plast', 'size', 'Host A runs <code>ping -M dont -s ' + N + '</code> on a link with an <b>MTU of ' + M + '</b>. How many <b>data bytes</b> are in the last fragment?', last,
+    'The IP data is the payload plus the 8-byte ICMP header. Each full fragment carries ' + M + ' − 20 → ' + m + ' bytes.', 'IP data = ' + N + ' + 8 = ' + fmt(data) + '. ' + explainSplit(data, M) + ' The last carries ' + fmt(data) + ' − ' + fmt((n - 1) * m) + ' = ' + last + '.', { kind: 'plast', N: N, M: M });
+}
+function udpCountQ() {
+  var M = pick([1500, 1492, 1400, 576]), U = rnd(1500, 12000), data = U + 8, n = countFrags(data, M);
+  return numQ('udpcount', 'size', 'A program sends a <b>UDP payload of ' + fmt(U) + ' bytes</b> on a link with an <b>MTU of ' + M + '</b>. How many fragments does IP make?', n,
+    'The IP data is the UDP payload plus the 8-byte UDP header.', 'IP data = ' + fmt(U) + ' + 8 = ' + fmt(data) + '. ' + explainSplit(data, M), { kind: 'udpcount', U: U, M: M });
+}
+/* Hard */
+function pathList(mtus) { return mtus.join(', '); }
+function refragSetup() {
+  var mtus, D, res, once;
+  do {
+    var m2 = pick([1400, 1006, 1000, 900, 820, 700]), m3 = pick([576, 620, 532, 1000, 700, 300].filter(function (x) { return x < 1500; }));
+    mtus = [1500, m2, m3]; D = pick([rnd(1200, 1480), rnd(1500, 4400)]);
+    res = sendPath(D, mtus, false); once = splitFrag({ off: 0, len: D, mf: false }, Math.min.apply(null, mtus));
+  } while (res.frags.length < 3 || res.frags.length > 9 || res.frags.map(offField).join() === once.map(offField).join());
+  return { mtus: mtus, D: D, res: res, once: once };
+}
+function refragQ() {
+  var s = refragSetup(), n = s.res.frags.length;
+  return numQ('refrag', 'path', 'Host A sends a datagram with <b>' + fmt(s.D) + ' data bytes</b> over three links with MTUs <b>' + pathList(s.mtus) + '</b> (DF clear). How many fragments <b>reach Host B</b>?', n,
+    'Fragment for each link in turn. A router splits each fragment that is too big on its own.', s.res.hops.map(function (h, i) { return 'Link ' + (i + 1) + ': ' + h.frags.map(function (f) { return f.len; }).join(' + '); }).join('. ') + '. So ' + n + ' fragments arrive.', { kind: 'refrag', D: s.D, mtus: s.mtus });
+}
+function refragOffQ() {
+  var s = refragSetup(), right = s.res.frags.map(offField).join(', ');
+  var wrongs = [s.once.map(offField).join(', '), s.res.frags.map(function (f) { return f.off; }).join(', '), s.res.frags.map(function (f, i) { return i * maxData(s.mtus[2]) / 8; }).join(', ')];
+  return choiceQ('refragOffs', 'path', 'A datagram with <b>' + fmt(s.D) + ' data bytes</b> crosses links with MTUs <b>' + pathList(s.mtus) + '</b>. Which <b>Offset fields</b> arrive at Host B?', right, wrongs,
+    'Routers split fragments one by one, and every Offset counts from the start of the original data.', s.res.hops.map(function (h, i) { return 'Link ' + (i + 1) + ': ' + h.frags.map(function (f) { return f.len; }).join(' + '); }).join('. ') + '. Starting bytes ÷ 8: ' + right + '.', { kind: 'refragOffs', D: s.D, mtus: s.mtus });
+}
+function missingQ() {
+  var c = needFrag(4, 7, [532, 576, 620, 1006, 1500, 1000]), frs = splitFrag({ off: 0, len: c.D, mf: false }, c.M), miss = rnd(0, frs.length - 2), have = shuffle(frs.filter(function (x, i) { return i !== miss; }));
+  return numQ('missing', 'off', 'Host B holds these fragments of one datagram: ' + have.map(function (f) { return '<span class="addr">[Offset ' + offField(f) + ', M ' + (f.mf ? 1 : 0) + ', Total Length ' + totalLen(f) + ']</span>'; }).join(' ') + '. One is missing. What is its <b>Offset field</b>?', offField(frs[miss]),
+    'Each full fragment here carries ' + c.m + ' bytes, so the Offsets go up by ' + (c.m / 8) + '.', 'In order the Offsets are ' + frs.map(offField).join(', ') + ', so ' + offField(frs[miss]) + ' is missing. Without it, Host B throws the whole datagram away when its timer runs out.', { kind: 'missing', got: have.map(function (f) { return [offField(f), f.mf ? 1 : 0, totalLen(f)]; }) });
+}
+function dfQ() {
+  var mtus = [1500, pick([1500, 1492, 1400, 1280, 1000]), pick([1500, 1400, 1280, 1006, 576])], N = pick([1472, 1473, 1400, 1372, 1252, 1200, 980, 2000, 1464]);
+  var run = pingRun('do', N, mtus, 1), right = run.lines[1].t.replace(/ time=[\d.]+ ms/, ' …');
+  var w = ['ping: local error: message too long, mtu=1500', 'From 192.168.1.1 icmp_seq=1 Frag needed and DF set (mtu = ' + mtus[1] + ')', 'From 192.168.2.2 icmp_seq=1 Frag needed and DF set (mtu = ' + mtus[2] + ')', (N + 8) + ' bytes from 192.168.3.20: icmp_seq=1 ttl=62 …'];
+  return choiceQ('df', 'path', 'Links: Host A → <b>' + mtus[0] + '</b> → R1 → <b>' + mtus[1] + '</b> → R2 → <b>' + mtus[2] + '</b> → Host B (192.168.3.20). R1 is 192.168.1.1 and R2 is 192.168.2.2. What is the first line Linux prints after the header for <code>ping -c 1 -M do -s ' + N + ' 192.168.3.20</code>?', right, w.filter(function (x) { return x !== right; }),
+    'The datagram is ' + N + ' + 28 = ' + (N + 28) + ' bytes. Find the first link that is too small.', 'The datagram is ' + (N + 28) + ' bytes. ' + (run.attempts[0].res.ok ? 'It fits every link, so the reply comes back.' : run.attempts[0].local ? 'It is bigger than Host A\'s own link, so ping refuses to send it.' : 'Link ' + (run.attempts[0].res.dropAt + 1) + ' is too small, so ' + nodeName(run.attempts[0].res.dropAt, 3) + ' drops it and reports that link\'s MTU.'), { kind: 'df', N: N, mtus: mtus });
+}
+function largestQ() {
+  var mtus = [1500, pick([1500, 1492, 1450, 1400, 1280, 1000]), pick([1500, 1492, 1400, 1280, 576])], pm = Math.min.apply(null, mtus);
+  return numQ('largest', 'path', 'A path has links with MTUs <b>' + pathList(mtus) + '</b>. What is the <b>largest payload</b> for <code>ping -M do -s</code> that reaches the far end?', pm - 28,
+    'Find the path MTU, then take away the IP and ICMP headers.', 'The path MTU is ' + pm + '. ' + pm + ' − 20 (IP) − 8 (ICMP) = ' + (pm - 28) + '. One byte more and a router (or Host A) says the message is too long.', { kind: 'largest', mtus: mtus });
+}
+function wireQ() {
+  var s = refragSetup(), n = s.res.frags.length, wire = s.D + n * HDR;
+  return numQ('wire', 'path', 'A datagram with <b>' + fmt(s.D) + ' data bytes</b> crosses links with MTUs <b>' + pathList(s.mtus) + '</b>. How many bytes of IP datagrams (headers included) cross the <b>last link</b>?', wire,
+    'Count the fragments on the last link: each has its own 20-byte header.', n + ' fragments on the last link: ' + fmt(s.D) + ' data bytes + ' + n + ' × 20 = ' + fmt(wire) + '.', { kind: 'wire', D: s.D, mtus: s.mtus });
+}
+function learnQ() {
+  var m2 = pick([1492, 1400, 1280, 1000, 576]), mtus = [1500, m2], N = pick([m2 - 28, m2 - 27, 1472, 1200, 1400, 1000, 600].filter(function (x) { return x > 0 && x <= 1472; }));
+  var run = pingRun('want', N, mtus, 3), got = run.received;
+  var A = 'All 3 get replies', B = 'Ping 1: Frag needed (mtu = ' + m2 + '); pings 2 and 3 get replies', Cc = 'All 3: Frag needed (mtu = ' + m2 + ')', D = 'All 3: local error: message too long';
+  var right = got === 3 ? A : got === 2 ? B : Cc;
+  return choiceQ('learn', 'path', 'Host A → <b>1500</b> → R1 → <b>' + m2 + '</b> → Host B. Host A runs <code>ping -c 3 -s ' + N + '</code> on Linux (DF set by default). What happens?', right, [A, B, Cc, D].filter(function (x) { return x !== right; }),
+    'The datagram is ' + (N + 28) + ' bytes. Linux ping learns from a "Frag needed" message.', (N + 28 <= m2 ? (N + 28) + ' ≤ ' + m2 + ', so every ping fits the whole path.' : (N + 28) + ' > ' + m2 + ': R1 drops ping 1 and reports MTU ' + m2 + '. Linux remembers it and fragments pings 2 and 3 itself, so they arrive.'), { kind: 'learn', N: N, mtus: mtus });
+}
+var GEN = {
+  E: [fitsQ, perQ, function () { return countQ('E'); }, offQ, pingTotQ],
+  M: [lastTotQ, kOffQ, rangeQ, wsQ, pLastQ, udpCountQ, function () { return countQ('M'); }],
+  H: [refragQ, refragOffQ, missingQ, dfQ, largestQ, wireQ, learnQ]
+};
+function makeRound(level, n) {
+  var out = [], bag = [];
+  while (out.length < n) { if (!bag.length) bag = shuffle(GEN[level].slice()); out.push(bag.pop()()); }
+  return out;
+}
+
+/* ===================================================== CHALLENGE: play */
+var BADGES = [
+  { id: 'first', b: '🎯', t: 'First round', d: 'Finish a challenge round' },
+  { id: 'perfect', b: '💯', t: 'Perfect 10', d: 'Answer all ten questions right' },
+  { id: 'streak', b: '🔥', t: 'On fire', d: 'Five right answers in a row' },
+  { id: 'offset', b: '📏', t: 'Offset oracle', d: 'Every Offset question right in a round (at least three)' },
+  { id: 'path', b: '🧭', t: 'Path finder', d: 'Three path or DF questions right in a Hard round' },
+  { id: 'sprint', b: '⚡', t: 'Speed runner', d: 'Eight right answers in a sprint' },
+  { id: 'learned', b: '📘', t: 'Scholar', d: 'Finish all six lessons' }
+];
+function earn(id) { if (progress.badges[id]) return false; progress.badges[id] = Date.now(); store.set('progress', progress); return true; }
+function renderShelf() {
+  $('#badgeShelf').innerHTML = BADGES.map(function (b) { return '<span class="badge' + (progress.badges[b.id] ? '' : ' locked') + '" title="' + esc(b.d) + '"><span class="b" aria-hidden="true">' + b.b + '</span>' + b.t + '</span>'; }).join('');
+  var best = progress.best; $('#bestLine').textContent = 'Best scores: Easy ' + (best.E || 0) + ', Medium ' + (best.M || 0) + ', Hard ' + (best.H || 0) + (best.S ? ', Sprint ' + best.S : '');
+}
+var game = null;
+function startRound() {
+  var level = ($('.level[aria-pressed=true]') || $('.level')).getAttribute('data-level'), sprint = $('#sprint').checked;
+  game = { level: level, sprint: sprint, qs: makeRound(level, sprint ? 40 : 10), i: 0, score: 0, streak: 0, bestStreak: 0, right: 0, answered: 0, log: [], tags: {}, ends: sprint ? Date.now() + 120000 : 0, timer: null };
+  $('#ch-setup').hidden = true; $('#ch-end').hidden = true; $('#ch-play').hidden = false;
+  $('#q_timerbar').hidden = !sprint;
+  if (sprint) game.timer = setInterval(tick, 250);
+  showQ();
+}
+function tick() {
+  if (!game) return; var left = game.ends - Date.now();
+  $('#q_timer').style.width = Math.max(0, left / 1200) + '%';
+  if (left <= 0) { clearInterval(game.timer); endRound(); }
+}
+function chips() {
+  $('#q_n').textContent = game.sprint ? 'Answered ' + game.answered : 'Question ' + Math.min(game.i + 1, game.qs.length) + ' of ' + game.qs.length;
+  $('#q_score').textContent = '★ ' + game.score;
+  $('#q_streak').textContent = '🔥 streak ' + game.streak;
+}
+function showQ() {
+  if (!game) return; chips();
+  var q = game.qs[game.i], body = $('#q_body'); q.hinted = false;
+  var answerUI = q.input === 'choice'
+    ? '<div class="choices">' + q.choices.map(function (c, i) { return '<button class="choice" data-i="' + i + '">' + (/^(ping|From|\d+ bytes)/.test(c) ? '<code>' + esc(c) + '</code>' : esc(c)) + '</button>'; }).join('') + '</div>'
+    : '<div class="row"><input type="number" id="q_in" min="0" aria-label="Your answer"><button class="btn" id="q_ok">Check</button></div>';
+  body.innerHTML = '<p class="qtext">' + q.text + '</p>' + answerUI +
+    '<div class="row"><button class="btn alt small" id="q_hint">Hint (−3)</button></div><div class="feedback" id="q_fb" aria-live="polite"></div><div class="row" id="q_nextrow" hidden><button class="btn amber" id="q_next">Next →</button></div>';
+  $('#q_hint').onclick = function () { if (q.hinted || q.done) return; q.hinted = true; var fb = $('#q_fb'); fb.className = 'feedback'; fb.style.background = 'var(--amber-soft)'; fb.innerHTML = '💡 ' + q.hint; };
+  if (q.input === 'choice') $$('.choice', body).forEach(function (b) { b.onclick = function () { answer(+b.getAttribute('data-i'), b); }; });
+  else { $('#q_ok').onclick = function () { answer(+$('#q_in').value); }; $('#q_in').onkeydown = function (e) { if (e.key === 'Enter') answer(+$('#q_in').value); }; $('#q_in').focus(); }
+  $('#q_next').onclick = nextQ;
+}
+function answer(v, btn) {
+  var q = game.qs[game.i]; if (q.done) return; q.done = true;
+  var ok = v === q.answer, fb = $('#q_fb'); fb.style.background = '';
+  game.answered++;
+  if (ok) {
+    game.right++; game.streak++; game.bestStreak = Math.max(game.bestStreak, game.streak);
+    var pts = 10 + Math.min(game.streak - 1, 5) * 2 - (q.hinted ? 3 : 0); game.score += pts;
+    game.tags[q.tag] = (game.tags[q.tag] || 0) + 1;
+    fb.className = 'feedback ok pop'; fb.innerHTML = '<b>Correct! +' + pts + '</b>' + (game.streak >= 3 ? ' 🔥 ' + game.streak + ' in a row' : '') + '<br>' + q.explain;
+  } else {
+    game.streak = 0; game.tags[q.tag + '_miss'] = 1;
+    var right = q.input === 'choice' ? q.choices[q.answer] : q.answer;
+    fb.className = 'feedback bad'; fb.innerHTML = '<b>Not quite.</b> The answer is <b>' + esc(right) + '</b>.<br>' + q.explain;
+  }
+  game.log.push({ q: q.text, ok: ok, right: q.input === 'choice' ? q.choices[q.answer] : String(q.answer) });
+  if (q.input === 'choice') $$('#q_body .choice').forEach(function (b, i) { b.disabled = true; if (i === q.answer) b.classList.add('right'); else if (b === btn) b.classList.add('wrong'); });
+  else { $('#q_in').disabled = true; $('#q_ok').disabled = true; }
+  $('#q_hint').disabled = true; $('#q_nextrow').hidden = false; $('#q_next').focus(); chips();
+}
+function nextQ() { game.i++; if (game.i >= game.qs.length || (game.sprint && Date.now() > game.ends)) endRound(); else showQ(); }
+function code(level, score, right, total) {   // completion code with a checksum (deters casual editing; not secure)
+  var s = 'FV|' + level + '|' + score + '|' + right + '|' + total, h = 2166136261;
+  for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+  return level + score + '-' + right + 'of' + total + '-' + (h % 1679616).toString(36).toUpperCase().padStart(4, '0');
+}
+function checkCode(c) {
+  var m = /^([EMHS])(\d+)-(\d+)of(\d+)-([0-9A-Z]{4})$/.exec(String(c).trim().toUpperCase().replace('OF', 'of'));
+  if (!m) return null; return code(m[1], +m[2], +m[3], +m[4]) === m[0] ? { level: m[1], score: +m[2], right: +m[3], total: +m[4] } : false;
+}
+function endRound() {
+  if (!game) return; clearInterval(game.timer);
+  var g = game, total = g.sprint ? g.answered : g.qs.length, pct = total ? g.right / total : 0, stars = pct >= 0.9 ? 3 : pct >= 0.7 ? 2 : pct >= 0.5 ? 1 : 0;
+  var lvl = g.sprint ? 'S' : g.level, fresh = [];
+  if (g.answered && earn('first')) fresh.push('first');
+  if (!g.sprint && g.right === 10 && earn('perfect')) fresh.push('perfect');
+  if (g.bestStreak >= 5 && earn('streak')) fresh.push('streak');
+  if ((g.tags.off || 0) >= 3 && !g.tags.off_miss && earn('offset')) fresh.push('offset');
+  if (g.level === 'H' && (g.tags.path || 0) >= 3 && earn('path')) fresh.push('path');
+  if (g.sprint && g.right >= 8 && earn('sprint')) fresh.push('sprint');
+  var newBest = g.score > (progress.best[lvl] || 0); if (newBest) progress.best[lvl] = g.score;
+  store.set('progress', progress); addXP(g.score);
+  var cd = code(lvl, g.score, g.right, total), lname = { E: 'Easy', M: 'Medium', H: 'Hard', S: 'Sprint' }[lvl];
+  $('#ch-play').hidden = true; var end = $('#ch-end'); end.hidden = false;
+  end.innerHTML = '<h2>' + (stars === 3 ? 'Outstanding!' : stars === 2 ? 'Great work!' : stars === 1 ? 'Good start!' : 'Keep practicing!') + '</h2>' +
+    '<div class="stars" aria-label="' + stars + ' of 3 stars">' + '★★★'.slice(0, stars) + '<span style="color:#D3E3EC">' + '★★★'.slice(0, 3 - stars) + '</span></div>' +
+    '<p style="font-size:19px"><b>' + g.score + ' points</b> · ' + g.right + ' of ' + total + ' right · best streak ' + g.bestStreak + (newBest ? ' · <span class="oneway">new best for ' + lname + '!</span>' : '') + '</p>' +
+    (fresh.length ? '<h3>New badges</h3><div class="badges">' + fresh.map(function (id) { var b = BADGES.filter(function (x) { return x.id === id; })[0]; return '<span class="badge pop"><span class="b">' + b.b + '</span>' + b.t + '</span>'; }).join('') + '</div>' : '') +
+    '<h3>Completion code</h3><p>If you are asked for it, copy this code.</p><span class="code" id="ccode">' + cd + '</span> <button class="btn alt small" id="ccopy">Copy</button>' +
+    '<div class="row" style="margin-top:16px"><button class="btn amber" id="again">Play again</button>' + (g.level !== 'H' ? '<button class="btn" id="harder">Try ' + (g.level === 'E' ? 'Medium' : 'Hard') + '</button>' : '') + '<button class="btn alt" id="toLearn">Review the lessons</button></div>' +
+    '<details><summary>Review your answers</summary><ol class="list">' + g.log.map(function (l) { return '<li>' + (l.ok ? '<span class="yes">✓</span> ' : '<span class="no">✗</span> ') + l.q + ' <i>Answer: ' + esc(l.right) + '</i></li>'; }).join('') + '</ol></details>';
+  $('#ccopy').onclick = function () { copyText(cd, $('#ccopy')); };
+  $('#again').onclick = function () { startRound(); };
+  if ($('#harder')) $('#harder').onclick = function () { setLevel(g.level === 'E' ? 'M' : 'H'); startRound(); };
+  $('#toLearn').onclick = function () { go('learn'); };
+  if (stars === 3) burst();
+  game = null; renderShelf(); writeLink();
+}
+function burst() {
+  if (reduceMotion) return;
+  var b = document.createElement('div'); b.className = 'burst'; b.setAttribute('aria-hidden', 'true');
+  for (var i = 0; i < 40; i++) { var s = document.createElement('span'); s.textContent = pick(['★', '✦', '●', '▲']); s.style.left = rnd(0, 100) + '%'; s.style.color = pick(['#00A2D7', '#F5A524', '#13A88A', '#7B61FF']); s.style.animationDelay = (Math.random() * 0.6) + 's'; b.appendChild(s); }
+  document.body.appendChild(b); setTimeout(function () { if (b.parentNode) b.parentNode.removeChild(b); }, 2800);
+}
+function setLevel(l) { $$('.level').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-level') === l)); }); }
+
+/* ===================================================== hero figure on the start screen */
+function drawHero() {
+  var f = new Fig($('#heroFig'), 0, 7.2, 0, 4, 1.65);
+  f.slab(0.2, 2.9, 1.3, 0.7, { text: 'Host A', fill: '#fff', fs: 9.5, bold: true });
+  f.slab(2.95, 2.9, 1.3, 0.7, { text: 'Router', fill: '#fff', fs: 9.5, bold: true });
+  f.slab(5.7, 2.9, 1.3, 0.7, { text: 'Host B', fill: '#fff', fs: 9.5, bold: true });
+  f.line(1.5, 3.25, 2.95, 3.25, { color: '#fff', lw: 2 }); f.line(4.25, 3.25, 5.7, 3.25, { color: '#fff', lw: 2 });
+  f.text(2.22, 3.48, 'MTU 1500', { fs: 8, color: '#CFE6F0', bold: true }); f.text(4.97, 3.48, 'MTU 532', { fs: 8, color: '#FCE9C6', bold: true });
+  f.rect(0.35, 1.6, 0.18, 0.5, { fill: C.navy, stroke: '#fff', lw: 1 }); f.rect(0.53, 1.6, 2.05, 0.5, { fill: C.panel, stroke: '#fff', lw: 1 });
+  f.text(1.46, 1.85, '1400 data bytes', { fs: 8.5, bold: true });
+  f.arrow(2.7, 1.85, 3.5, 1.85, { color: '#fff', lw: 1.6 }); f.text(3.1, 2.15, '✂', { fs: 14, color: '#F5A524' });
+  [[512, '#CFE6F0'], [512, '#E7E1FF'], [376, '#FCE9C6']].forEach(function (p, i) {
+    var y = 2.25 - i * 0.62, w = p[0] / 512 * 1.9;
+    f.rect(3.7, y - 0.25, 0.18, 0.42, { fill: C.navy, stroke: '#fff', lw: 1 }); f.rect(3.88, y - 0.25, w, 0.42, { fill: p[1], stroke: '#fff', lw: 1 });
+    f.text(3.88 + w / 2, y - 0.04, String(p[0]), { fs: 8, bold: true });
+    f.text(6.05, y - 0.04, 'Offset ' + (i * 64), { fs: 8, color: '#fff', ha: 'left' });
+  });
+}
+
+/* ===================================================== navigation and links */
+var VIEWS = ['home', 'learn', 'calc', 'challenge'], current = 'home';
+function go(mode) {
+  current = VIEWS.indexOf(mode) >= 0 ? mode : 'home';
+  lessonState.token++;
+  VIEWS.forEach(function (v) { $('#view-' + v).hidden = v !== current; });
+  $$('.modes button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === current)); });
+  if (current === 'learn') openLesson(lessonState.i);
+  if (current === 'challenge') { if (game) { clearInterval(game.timer); game = null; } $('#ch-setup').hidden = false; $('#ch-play').hidden = true; $('#ch-end').hidden = true; renderShelf(); }
+  if (current === 'calc') calc();
+  window.scrollTo(0, 0); writeLink();
+}
+function writeLink() {
+  try {
+    var q = new URLSearchParams(); q.set('mode', current);
+    if (current === 'learn') q.set('lesson', lessonState.i + 1);
+    if (current === 'calc') { q.set('size', calcState.size); q.set('kind', calcState.kind); q.set('mtus', calcState.mtus.join('-')); if (calcState.df) q.set('df', '1'); }
+    if (current === 'challenge') q.set('level', ($('.level[aria-pressed=true]') || $('.level')).getAttribute('data-level'));
+    if (window.history && history.replaceState) history.replaceState(null, '', location.pathname + '?' + q.toString());
+  } catch (e) { /* some embeds block history changes */ }
+}
+function readLink() {
+  var q; try { q = new URLSearchParams(location.search); } catch (e) { return null; }
+  if (q.get('lesson')) lessonState.i = Math.max(0, Math.min(LESSONS.length - 1, (+q.get('lesson') || 1) - 1));
+  if (/^[EMH]$/.test(q.get('level') || '')) setLevel(q.get('level'));
+  var sz = +q.get('size'); if (q.get('size') && Number.isInteger(sz) && sz >= 0 && sz <= MAX_DATA) calcState.size = sz;
+  if (KINDS[q.get('kind')]) calcState.kind = q.get('kind');
+  if (q.get('df') === '1') calcState.df = 1;
+  if (q.get('mtus')) { var ms = q.get('mtus').split(/[-,]/).map(Number).filter(function (m) { return Number.isInteger(m) && m >= MIN_MTU && m <= 65535; }).slice(0, 4); if (ms.length) calcState.mtus = ms; }
+  return q.get('mode');
+}
+
+/* ===================================================== start */
+function init() {
+  var mode = readLink();   // read the link before anything rewrites it
+  drawHero(); showXP(false); calcInit(); renderShelf();
+  $$('.modes button').forEach(function (b) { b.onclick = function () { go(b.getAttribute('data-mode')); }; });
+  $$('[data-go]').forEach(function (b) { b.onclick = function () { go(b.getAttribute('data-go')); }; });
+  $('#home').onclick = function () { go('home'); };
+  $$('.level').forEach(function (b) { b.onclick = function () { setLevel(b.getAttribute('data-level')); writeLink(); }; });
+  $('#ch-start').onclick = startRound;
+  $('#q_quit').onclick = function () { endRound(); };
+  $('#resetProgress').onclick = function () { progress = { xp: 0, lessons: {}, badges: {}, best: {} }; store.set('progress', progress); showXP(false); renderShelf(); if (current === 'learn') renderStepper(); };
+  $('#verifyBtn').onclick = function () { var r = checkCode($('#verifyIn').value); $('#verifyOut').innerHTML = r ? '<span class="yes">Valid:</span> ' + { E: 'Easy', M: 'Medium', H: 'Hard', S: 'Sprint' }[r.level] + ', ' + r.score + ' points, ' + r.right + ' of ' + r.total + ' right.' : '<span class="no">Not a valid code.</span>'; };
+  go(mode || 'home');
+}
+init();
+window.FragViz = { maxData: maxData, splitFrag: splitFrag, sendPath: sendPath, countFrags: countFrags, pingRun: pingRun, GEN: GEN, makeRound: makeRound, code: code, checkCode: checkCode };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subnet Visualizer</title>
+<meta name="description" content="Learn subnets by doing: masks, network and broadcast addresses, overlapping subnets, and the commands to join and leave a subnet.">
+<style>
+/* ===================================================== theme (shared by all the apps) */
+:root {
+  --brand: #00A2D7; --brand-dark: #0081AD; --navy: #0B3D5C; --ink: #1B2A35; --muted: #5B6B78;
+  --panel: #CFE6F0; --panel-soft: #EAF5FA; --bg: #F4F8FB; --line: #D3E3EC; --white: #FFFFFF;
+  --amber: #F5A524; --amber-soft: #FDF0D5; --ok: #13A88A; --ok-soft: #E1F5EF; --bad: #E5484D; --bad-soft: #FDE8E9;
+  --gray: #E4E4E4; --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Roboto, Arial, sans-serif;
+  --mono: Consolas, "SF Mono", Menlo, "DejaVu Sans Mono", "Courier New", monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: var(--font); font-size: 16px; line-height: 1.5; color: var(--ink); background: var(--bg); }
+h1, h2, h3 { color: var(--navy); line-height: 1.25; }
+h2 { font-size: 22px; margin: 0 0 8px; }
+h3 { font-size: 17px; margin: 18px 0 6px; }
+p { margin: 6px 0; }
+a { color: var(--brand-dark); }
+code, .mono { font-family: var(--mono); font-size: 0.92em; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* header bar */
+.topbar { background: var(--navy); color: #fff; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 0 var(--brand); }
+.topbar .in { max-width: 1180px; margin: 0 auto; padding: 8px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 19px; background: none; border: 0; color: #fff; cursor: pointer; padding: 4px 2px; }
+.brand svg { width: 30px; height: 30px; }
+.modes { display: flex; gap: 4px; background: rgba(255,255,255,.12); border-radius: 999px; padding: 4px; }
+.modes button { border: 0; background: transparent; color: #fff; padding: 6px 14px; border-radius: 999px; cursor: pointer; font-weight: 600; }
+.modes button[aria-pressed=true] { background: #fff; color: var(--navy); }
+.spacer { flex: 1; }
+.pill { background: var(--amber); color: #3a2600; font-weight: 700; border-radius: 999px; padding: 4px 12px; white-space: nowrap; }
+
+main { max-width: 1180px; margin: 0 auto; padding: 18px 16px 40px; }
+
+/* cards: slab look, heavy top and right edge, softened */
+.card { background: var(--white); border: 1px solid var(--line); border-top: 4px solid var(--brand); border-right: 4px solid var(--brand); border-radius: var(--radius); padding: 16px 18px; }
+.card + .card { margin-top: 14px; }
+#view-calc .card { margin-top: 14px; } #view-calc .card:first-child { margin-top: 0; }
+.soft { background: var(--panel-soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; }
+
+/* buttons */
+.btn { border: 2px solid var(--brand); background: var(--brand); color: #fff; border-radius: 8px; padding: 7px 16px; cursor: pointer; font-weight: 600; }
+.btn:hover:not(:disabled) { background: var(--brand-dark); border-color: var(--brand-dark); }
+.btn.alt { background: #fff; color: var(--brand-dark); }
+.btn.alt:hover:not(:disabled) { background: var(--panel-soft); }
+.btn.amber { background: var(--amber); border-color: var(--amber); color: #3a2600; }
+.btn.amber:hover:not(:disabled) { background: #e3931a; border-color: #e3931a; }
+.btn.small { padding: 4px 10px; font-size: 14px; }
+.btn:disabled { opacity: .45; cursor: default; }
+.row { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 10px 0; }
+.row label { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; max-width: 100%; }
+.row label.addrgrp { flex-wrap: nowrap; white-space: nowrap; gap: 4px; }   /* address / prefix always on one line */
+input[type=text] { max-width: 100%; }
+#o_res .addr { white-space: normal; overflow-wrap: anywhere; }
+input[type=text], input[type=number], select { border: 1px solid #9DB3C1; border-radius: 6px; padding: 5px 8px; background: #fff; }
+input[type=number] { width: 5.2em; }
+input[type=range] { accent-color: var(--brand); width: 200px; }
+.addr { font-family: var(--mono); white-space: nowrap; }
+
+/* start screen */
+.hero { background: linear-gradient(135deg, var(--navy), #0E6A92 60%, var(--brand)); color: #fff; border-radius: 14px; padding: 28px 26px; display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; align-items: center; }
+.hero h1 { color: #fff; font-size: 32px; margin: 0 0 8px; }
+.hero p { font-size: 17px; max-width: 560px; }
+.hero svg { width: 100%; height: auto; max-height: 220px; }
+.modecards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 18px; }
+.modecard { display: flex; flex-direction: column; gap: 6px; }
+.modecard .icon { font-size: 30px; line-height: 1; }
+.modecard h2 { margin: 4px 0; }
+.modecard p { flex: 1; color: var(--muted); }
+.skills { columns: 2; margin: 8px 0 0; padding-left: 20px; }
+@media (max-width: 880px) { .hero { grid-template-columns: 1fr; } .modecards { grid-template-columns: 1fr; } .skills { columns: 1; } }
+
+/* learn: stepper */
+.stepper { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+.stepper button { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 5px 12px 5px 5px; cursor: pointer; font-size: 14px; }
+.stepper .num { display: inline-flex; width: 26px; height: 26px; border-radius: 50%; align-items: center; justify-content: center; background: var(--panel); color: var(--navy); font-weight: 700; }
+.stepper button[aria-current=step] { border-color: var(--brand); box-shadow: 0 0 0 2px var(--brand) inset; }
+.stepper button.done .num { background: var(--ok); color: #fff; }
+.progress { height: 8px; background: var(--panel); border-radius: 999px; overflow: hidden; margin: 0 0 12px; }
+.progress > div { height: 100%; background: linear-gradient(90deg, var(--brand), var(--ok)); width: 0; transition: width .4s; }
+.lesson { display: grid; grid-template-columns: minmax(300px, 0.85fr) minmax(0, 1.15fr); grid-template-areas: "text fig" "try fig"; grid-template-rows: auto 1fr; gap: 16px; align-items: start; }
+#ltext { grid-area: text; } #lfig { grid-area: fig; } #ltry { grid-area: try; }
+#ltry .tryit { margin-top: 0; }
+.lesson > * { min-width: 0; }
+@media (max-width: 980px) { .lesson { grid-template-columns: 1fr; grid-template-areas: "text" "fig" "try"; grid-template-rows: auto; } }   /* phones: controls, then the figure, then Try it */
+.tryit { border-left: 5px solid var(--amber); background: var(--amber-soft); border-radius: 8px; padding: 10px 14px; margin-top: 14px; }
+.tryit h3 { margin-top: 0; }
+.feedback { border-radius: 8px; padding: 8px 12px; margin-top: 8px; }
+.feedback.ok { background: var(--ok-soft); border: 1px solid var(--ok); }
+.feedback.bad { background: var(--bad-soft); border: 1px solid var(--bad); }
+.feedback:empty { display: none; }
+.navrow { display: flex; justify-content: space-between; gap: 10px; margin-top: 16px; }
+
+/* figures */
+.fig { overflow-x: auto; }
+.fig svg { display: block; width: 100%; height: auto; min-width: 520px; }
+#view-learn .fig svg#topo { min-width: 0; }   /* the topology always fits its card */
+.figtitle { font-weight: 600; color: var(--navy); margin: 4px 0; }
+.legend { list-style: none; padding: 0; margin: 6px 0; display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 14px; color: var(--muted); }
+.legend i { display: inline-block; width: 22px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; }
+
+/* host editors */
+.hosts { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.host { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.host b { color: var(--navy); }
+.host .hd { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; }
+.host .hd b { min-width: 4.2em; }
+.host .r.r2 { margin-left: calc(4.2em + 10px); }
+.host { padding: 6px 10px; }
+.host .r { display: flex; align-items: center; gap: 4px; margin: 4px 0; flex-wrap: nowrap; white-space: nowrap; }
+.host .r input[type=number], .addrgrp input[type=number] { width: 4.3em; }
+.host label.chk { font-size: 14px; color: var(--muted); }
+input[aria-invalid=true] { border-color: var(--bad); box-shadow: 0 0 0 2px var(--bad-soft); }
+.stale .fig, .stale .soft, .stale .legend, .stale .p_out, .stale .calcgrid, .stale #o_res { opacity: .3; }
+.stalenote { background: var(--amber-soft); border: 1px solid var(--amber); border-radius: 8px; padding: 6px 10px; margin: 6px 0; font-weight: 600; }
+
+.list { padding-left: 20px; margin: 6px 0; }
+.list li { margin: 3px 0; }
+.yes { color: var(--ok); font-weight: 700; }
+.no { color: var(--bad); font-weight: 700; }
+.oneway { color: #B86E00; font-weight: 700; }
+
+/* ping log */
+.log { padding-left: 22px; margin: 6px 0; }
+.log li { margin: 4px 0; }
+.log li.now { font-weight: 600; }
+.log li.result { list-style: none; margin-left: -22px; padding: 6px 10px; border-radius: 8px; background: var(--panel-soft); font-weight: 700; }
+details { margin-top: 8px; }
+details.fold { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 8px; }
+details.card > summary { font-size: 20px; font-weight: 700; color: var(--navy); }
+details.card[open] > summary { margin-bottom: 8px; }
+.map h3:first-child { margin-top: 0; }
+.mapitem { display: flex; gap: 10px; align-items: flex-start; width: 100%; text-align: left; border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 8px 10px; margin: 6px 0; cursor: pointer; }
+.mapitem:hover { border-color: var(--brand); }
+.mapitem .num { flex: none; display: inline-flex; width: 26px; height: 26px; border-radius: 50%; align-items: center; justify-content: center; background: var(--panel); color: var(--navy); font-weight: 700; }
+.mapitem.done .num { background: var(--ok); color: #fff; }
+.mapitem .sub { font-size: 14px; color: var(--muted); }
+summary { cursor: pointer; color: var(--brand-dark); font-weight: 600; }
+
+/* commands */
+.cmdtabs { display: flex; gap: 4px; margin: 8px 0; }
+.cmdtabs button { border: 1px solid var(--line); background: #fff; padding: 5px 14px; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: 600; }
+.cmdtabs button[aria-pressed=true] { background: var(--navy); color: #fff; border-color: var(--navy); }
+.cmd { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; align-items: center; background: #0F2533; color: #E8F4FA; border-radius: 8px; padding: 8px 10px; margin: 6px 0 2px; }
+.cmd code { white-space: pre-wrap; word-break: break-all; font-size: 14px; }
+.cmd button { background: transparent; border: 1px solid #5E8BA3; color: #E8F4FA; border-radius: 6px; padding: 2px 8px; cursor: pointer; font-size: 13px; }
+.cmdnote { font-size: 14px; color: var(--muted); margin: 0 0 8px; }
+
+/* calculator */
+.calcgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin: 10px 0; }
+.stat { background: var(--panel-soft); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.stat .k { font-size: 13px; color: var(--muted); }
+.stat .v { font-family: var(--mono); font-size: 17px; font-weight: 700; color: var(--navy); word-break: break-all; }
+.blocks { padding-left: 28px; font-family: var(--mono); font-size: 14px; }
+.blocks li { margin: 2px 0; }
+
+/* challenge */
+.levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 12px 0; }
+@media (max-width: 760px) { .levels { grid-template-columns: 1fr; } }
+.level { text-align: left; cursor: pointer; border: 2px solid var(--line); background: #fff; border-radius: 12px; padding: 12px 14px; }
+.level[aria-pressed=true] { border-color: var(--amber); box-shadow: 0 0 0 3px var(--amber-soft); }
+.level b { display: block; font-size: 18px; color: var(--navy); }
+.qhead { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { background: var(--panel-soft); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-weight: 600; font-size: 14px; }
+.chip.fire { background: var(--amber-soft); border-color: var(--amber); }
+.qtext { font-size: 19px; margin: 12px 0; }
+.choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
+.choice { text-align: left; border: 2px solid var(--line); background: #fff; border-radius: 10px; padding: 10px 12px; cursor: pointer; }
+.choice:hover:not(:disabled) { border-color: var(--brand); }
+.choice.right { border-color: var(--ok); background: var(--ok-soft); }
+.choice.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.timer { height: 8px; background: var(--panel); border-radius: 999px; overflow: hidden; }
+.timer > div { height: 100%; background: var(--amber); width: 100%; }
+.stars { font-size: 44px; letter-spacing: 6px; color: var(--amber); }
+.badges { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0; }
+.badge { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 4px 12px 4px 6px; }
+.badge .b { font-size: 22px; }
+.badge.locked { opacity: .45; filter: grayscale(1); }
+.code { font-family: var(--mono); font-size: 22px; font-weight: 700; letter-spacing: 2px; background: var(--panel-soft); border: 2px dashed var(--brand); border-radius: 8px; padding: 6px 14px; display: inline-block; }
+.pop { animation: pop .45s ease-out; }
+@keyframes pop { 0% { transform: scale(.9); } 60% { transform: scale(1.04); } 100% { transform: scale(1); } }
+.burst { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 20; }
+.burst span { position: absolute; top: -20px; font-size: 22px; animation: fall 1.8s ease-in forwards; }
+@keyframes fall { to { transform: translateY(105vh) rotate(360deg); opacity: .2; } }
+@media (prefers-reduced-motion: reduce) { .pop, .burst span { animation: none !important; } .progress > div { transition: none; } }
+
+footer { max-width: 1180px; margin: 0 auto; padding: 0 16px 30px; font-size: 14px; color: var(--muted); }
+footer .card { border-top-width: 1px; border-right-width: 1px; }
+@media print { .topbar, .navrow, .btn, footer, .stepper, .tryit button { display: none !important; } body { background: #fff; } .card { border: 1px solid #999; } }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="in">
+    <button class="brand" id="home" aria-label="Subnet Visualizer home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="7" fill="#00A2D7"/><rect x="7" y="8" width="18" height="6" rx="2" fill="#fff"/><rect x="7" y="18" width="8" height="6" rx="2" fill="#CFE6F0"/><rect x="17" y="18" width="8" height="6" rx="2" fill="#F5A524"/></svg>
+      Subnet Visualizer
+    </button>
+    <nav class="modes" aria-label="Mode">
+      <button data-mode="learn" aria-pressed="false">Learn</button>
+      <button data-mode="calc" aria-pressed="false">Calculator</button>
+      <button data-mode="challenge" aria-pressed="false">Challenge</button>
+    </nav>
+    <span class="spacer"></span>
+    <span class="pill" id="xp" title="Points from lessons and challenges">★ 0 points</span>
+  </div>
+</header>
+
+<main id="main">
+<!-- ===================================================== start screen -->
+<section id="view-home">
+  <div class="hero">
+    <div>
+      <h1>Subnet Visualizer</h1>
+      <p>Hosts on the same switch do not always talk to each other. The mask decides. Learn how to read an address and its mask, find a subnet's range, spot overlapping subnets, and join or leave a subnet with real commands.</p>
+    </div>
+    <svg id="heroFig" viewBox="0 0 360 200" role="img" aria-label="Three hosts on a switch in two subnets"></svg>
+  </div>
+  <div class="modecards">
+    <div class="card modecard">
+      <div class="icon" aria-hidden="true">📘</div>
+      <h2>Learn</h2>
+      <p>A lesson map, then six short lessons with live figures. Each one ends with a quick task.</p>
+      <button class="btn" data-go="learn">Start learning</button>
+    </div>
+    <div class="card modecard">
+      <div class="icon" aria-hidden="true">🧮</div>
+      <h2>Calculator</h2>
+      <p>Type any address and prefix to get the network, broadcast, host range, overlap check, and commands.</p>
+      <button class="btn alt" data-go="calc">Open the calculator</button>
+    </div>
+    <div class="card modecard">
+      <div class="icon" aria-hidden="true">🏆</div>
+      <h2>Challenge</h2>
+      <p>Ten fresh questions, three levels, streaks, badges, and a completion code.</p>
+      <button class="btn amber" data-go="challenge">Take the challenge</button>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3 style="margin-top:0">What you will be able to do</h3>
+    <ul class="skills">
+      <li>Read a prefix length and its subnet mask</li>
+      <li>Find the network address, broadcast address, and host range</li>
+      <li>Tell whether two addresses are in the same subnet</li>
+      <li>Predict a ping when two hosts use different masks</li>
+      <li>Put one host in two subnets</li>
+      <li>Join and leave a subnet on Linux and Windows</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===================================================== learn -->
+<section id="view-learn" hidden>
+  <div class="progress" aria-hidden="true"><div id="lprog"></div></div>
+  <nav class="stepper" id="stepper" aria-label="Lessons"></nav>
+  <div class="lesson">
+    <div class="card" id="ltext"></div>
+    <div id="lfig"></div>
+    <div id="ltry"></div>
+  </div>
+</section>
+
+<!-- ===================================================== calculator -->
+<section id="view-calc" hidden>
+  <div class="card">
+    <h2>Subnet calculator</h2>
+    <p>Type an address with its prefix length (192.168.10.130/25) or with a mask (192.168.10.130 255.255.255.128).</p>
+    <div class="row">
+      <label>Address <input type="text" id="c_ip" value="192.168.10.130/25" size="28" spellcheck="false" autocomplete="off" aria-describedby="c_err"></label>
+      <label>Prefix length <input type="range" id="c_p" min="0" max="32" value="25"> <output id="c_pout" class="mono">/25</output></label>
+    </div>
+    <p id="c_err" class="no" aria-live="polite"></p>
+    <div class="calcgrid" id="c_stats"></div>
+    <div class="fig"><svg id="c_bits" role="img" aria-label="The address, mask, network address, and broadcast address in binary"></svg></div>
+  </div>
+  <details class="card">
+    <summary>Do two subnets overlap?</summary>
+    <div class="row">
+      <label>Subnet 1 <input type="text" id="o_a" value="192.168.10.0/24" size="20" spellcheck="false"></label>
+      <label>Subnet 2 <input type="text" id="o_b" value="192.168.10.128/25" size="20" spellcheck="false"></label>
+    </div>
+    <p id="o_res" aria-live="polite"></p>
+    <div class="fig"><svg id="o_fig" role="img" aria-label="The two subnets as ranges of addresses"></svg></div>
+  </details>
+  <details class="card">
+    <summary>Split a network into blocks</summary>
+    <div class="row">
+      <label>Network <input type="text" id="s_net" value="192.168.10.0/24" size="20" spellcheck="false"></label>
+      <label>Block size <select id="s_p"></select></label>
+    </div>
+    <p id="s_res"></p>
+    <ol class="blocks" id="s_list"></ol>
+  </details>
+  <details class="card">
+    <summary>Commands for this address</summary>
+    <div id="c_cmds"></div>
+  </details>
+</section>
+
+<!-- ===================================================== challenge -->
+<section id="view-challenge" hidden>
+  <div class="card" id="ch-setup">
+    <h2>Challenge</h2>
+    <p>Answer ten questions. A correct answer earns 10 points, and a streak adds a bonus. A hint costs 3 points. Every answer comes with an explanation.</p>
+    <div class="levels" id="levels">
+      <button class="level" data-level="E" aria-pressed="true"><b>Easy</b>/25 and /26: masks, network and broadcast addresses, host counts.</button>
+      <button class="level" data-level="M" aria-pressed="false"><b>Medium</b>/26 to /28: host ranges, valid addresses, and commands.</button>
+      <button class="level" data-level="H" aria-pressed="false"><b>Hard</b>Mixed masks: predict the ping, spot overlaps, /27 to /30.</button>
+    </div>
+    <div class="row">
+      <label><input type="checkbox" id="sprint"> Sprint: as many as you can in 2 minutes</label>
+      <button class="btn amber" id="ch-start">Start</button>
+    </div>
+    <h3>Your badges</h3>
+    <div class="badges" id="badgeShelf"></div>
+    <p id="bestLine" class="mono"></p>
+  </div>
+  <div class="card" id="ch-play" hidden>
+    <div class="qhead">
+      <div class="chips"><span class="chip" id="q_n"></span><span class="chip" id="q_score"></span><span class="chip fire" id="q_streak"></span></div>
+      <button class="btn alt small" id="q_quit">End round</button>
+    </div>
+    <div class="timer" id="q_timerbar" hidden><div id="q_timer"></div></div>
+    <div id="q_body"></div>
+  </div>
+  <div class="card" id="ch-end" hidden></div>
+</section>
+</main>
+
+<footer>
+  <div class="card">
+    <p><strong>About this app.</strong> Subnet Visualizer works offline in any current browser. In the network it models, hosts have no router and no default route, every ping starts with an empty ARP (Address Resolution Protocol) cache, and the switch passes every broadcast to every port. Progress and badges are kept in this browser only.</p>
+    <details>
+      <summary>Network settings</summary>
+      <div class="row"><label>First three numbers of the network <input type="text" id="netbase" value="192.168.10" size="14" spellcheck="false"></label><span>Lessons and challenges use addresses in this /24.</span></div>
+      <div class="row"><button class="btn alt small" id="resetProgress">Reset my progress</button></div>
+    </details>
+    <details>
+      <summary>For instructors: check a completion code</summary>
+      <div class="row"><label>Code <input type="text" id="verifyIn" size="22" spellcheck="false"></label><button class="btn small" id="verifyBtn">Check</button><span id="verifyOut" aria-live="polite"></span></div>
+    </details>
+  </div>
+</footer>
+
+<script>
+(function () {
+'use strict';
+
+/* ===================================================== small helpers */
+var $ = function (s, r) { return (r || document).querySelector(s); };
+var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+var reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+/* storage that never throws (some embeds block it) */
+var store = {
+  get: function (k, d) { try { var v = window.localStorage.getItem('subnetviz.' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set: function (k, v) { try { window.localStorage.setItem('subnetviz.' + k, JSON.stringify(v)); } catch (e) { /* ignore */ } }
+};
+
+/* ===================================================== IP math (works for any prefix 0 to 32) */
+var IP = {
+  toInt: function (s) {
+    var m = /^\s*(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\s*$/.exec(s || '');
+    if (!m) return null;
+    var b = [+m[1], +m[2], +m[3], +m[4]];
+    for (var i = 0; i < 4; i++) if (b[i] > 255) return null;
+    return b[0] * 16777216 + b[1] * 65536 + b[2] * 256 + b[3];
+  },
+  str: function (n) { return [Math.floor(n / 16777216) % 256, Math.floor(n / 65536) % 256, Math.floor(n / 256) % 256, n % 256].join('.'); },
+  size: function (p) { return Math.pow(2, 32 - p); },
+  mask: function (p) { return 4294967296 - Math.pow(2, 32 - p); },
+  net: function (n, p) { var s = Math.pow(2, 32 - p); return Math.floor(n / s) * s; },
+  bcast: function (n, p) { return IP.net(n, p) + Math.pow(2, 32 - p) - 1; },
+  bits: function (n) { var s = n.toString(2); while (s.length < 32) s = '0' + s; return s; },
+  maskToPrefix: function (m) { var b = IP.bits(m); return /^1*0*$/.test(b) ? b.indexOf('0') === -1 ? 32 : b.indexOf('0') : null; },
+  hosts: function (p) { return p === 32 ? 1 : p === 31 ? 2 : Math.pow(2, 32 - p) - 2; },
+  parse: function (s) {           // "a.b.c.d/p", "a.b.c.d m.m.m.m", or "a.b.c.d"
+    s = String(s || '').trim();
+    var m = /^(\S+)\s*\/\s*(\d{1,2})$/.exec(s), ip, p;
+    if (m) { ip = IP.toInt(m[1]); p = +m[2]; if (ip === null || p > 32) return null; return { ip: ip, p: p }; }
+    m = /^(\S+)\s+(\S+)$/.exec(s);
+    if (m) { ip = IP.toInt(m[1]); var mk = IP.toInt(m[2]); if (ip === null || mk === null) return null; p = IP.maskToPrefix(mk); if (p === null) return null; return { ip: ip, p: p, maskGiven: true }; }
+    ip = IP.toInt(s); if (ip === null) return null; return { ip: ip, p: null };
+  }
+};
+/* last-byte model used by lessons and challenges: every address is BASE.x with a prefix from /24 to /30 */
+function sub(x, p) { var s = Math.pow(2, 32 - p), n = Math.floor(x / s) * s; return { net: n, bc: n + s - 1, size: s }; }
+function maskLast(p) { return 256 - Math.pow(2, 32 - p); }
+function maskStr(p) { return IP.str(IP.mask(p)); }
+function BASE() { var v = ($('#netbase').value || '').trim().replace(/\.+$/, ''); return /^\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(v) && v.split('.').every(function (b) { return +b <= 255; }) ? v : '192.168.10'; }
+function A(x) { return BASE() + '.' + x; }
+
+/* ===================================================== theme colors for figures */
+var C = { brand: '#00A2D7', navy: '#0B3D5C', ink: '#1B2A35', panel: '#CFE6F0', soft: '#EAF5FA', gray: '#E4E4E4', amber: '#F5A524', ok: '#13A88A', bad: '#E5484D', oneway: '#D98A00', white: '#FFFFFF', muted: '#5B6B78' };
+/* one color pair per subnet; always shown with a text label too */
+var SUBNET_COLORS = [
+  { line: '#00A2D7', fill: '#CFE6F0' }, { line: '#7B61FF', fill: '#E7E1FF' },
+  { line: '#E08B00', fill: '#FCE9C6' }, { line: '#13A88A', fill: '#D3F1E8' }, { line: '#D6457A', fill: '#F9DCE7' }
+];
+
+/* ===================================================== figure library (inches, y up, sizes in points) */
+var NS = 'http://www.w3.org/2000/svg', figN = 0;
+function el(tag, at, parent) { var e = document.createElementNS(NS, tag); if (at) for (var k in at) if (at[k] !== null && at[k] !== undefined) e.setAttribute(k, at[k]); if (parent) parent.appendChild(e); return e; }
+function r4(v) { return Math.round(v * 10000) / 10000; }
+function Fig(svg, x0, x1, y0, y1, k) {
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  svg.setAttribute('viewBox', '0 0 ' + r4(x1 - x0) + ' ' + r4(y1 - y0));
+  this.svg = svg; this.x0 = x0; this.y1 = y1; this.k = k || 1.2; this.id = 'f' + (++figN);
+  var defs = el('defs', null, svg);
+  var m = el('marker', { id: this.id + 'a', viewBox: '0 0 10 10', refX: 10, refY: 5, markerWidth: 0.13, markerHeight: 0.13, markerUnits: 'userSpaceOnUse', orient: 'auto' }, defs);
+  el('path', { d: 'M0 0L10 5L0 10z', fill: C.ink }, m);
+  this.root = el('g', { 'font-family': 'Segoe UI, system-ui, -apple-system, Helvetica Neue, Roboto, Arial, sans-serif' }, svg);
+}
+Fig.prototype.X = function (x) { return r4(x - this.x0); };
+Fig.prototype.Y = function (y) { return r4(this.y1 - y); };
+Fig.prototype.pt = function (v) { return r4(v / 72); };
+Fig.prototype.g = function (p) { return el('g', null, p || this.root); };
+Fig.prototype.rect = function (x, y, w, h, o) {
+  o = o || {};
+  return el('rect', { x: this.X(x), y: this.Y(y + h), width: r4(w), height: r4(h), rx: o.rx ? r4(o.rx) : null, fill: o.fill || C.white,
+    stroke: o.stroke || C.brand, 'stroke-width': this.pt(o.lw || 1.1), 'stroke-dasharray': o.dash ? o.dash.map(this.pt, this).join(' ') : null }, o.parent || this.root);
+};
+Fig.prototype.slab = function (x, y, w, h, o) {   // slab box: thin outline, heavy top and right edges
+  o = o || {};
+  var g = this.g(o.parent);
+  g.box = this.rect(x, y, w, h, { fill: o.fill || C.white, stroke: o.stroke || C.brand, lw: 1.1, parent: g });
+  el('path', { d: 'M' + this.X(x) + ' ' + this.Y(y + h) + 'H' + this.X(x + w) + 'V' + this.Y(y), fill: 'none', stroke: o.stroke || C.brand,
+    'stroke-width': this.pt(o.thick || 3.4), 'stroke-linecap': 'square' }, g);
+  if (o.text) this.text(x + w / 2, y + h / 2, o.text, { fs: o.fs || 10, bold: o.bold, parent: g });
+  return g;
+};
+Fig.prototype.line = function (x1, y1, x2, y2, o) {
+  o = o || {};
+  return el('line', { x1: this.X(x1), y1: this.Y(y1), x2: this.X(x2), y2: this.Y(y2), stroke: o.color || C.ink, 'stroke-width': this.pt(o.lw || 1.3),
+    'stroke-dasharray': o.dash ? o.dash.map(this.pt, this).join(' ') : null }, o.parent || this.root);
+};
+Fig.prototype.poly = function (pts, o) {
+  o = o || {}; var self = this;
+  return el('polyline', { points: pts.map(function (p) { return self.X(p[0]) + ',' + self.Y(p[1]); }).join(' '), fill: 'none', stroke: o.color || C.ink,
+    'stroke-width': this.pt(o.lw || 1.5), 'stroke-dasharray': o.dash ? o.dash.map(this.pt, this).join(' ') : null, 'stroke-linejoin': 'round' }, o.parent || this.root);
+};
+Fig.prototype.arrow = function (x1, y1, x2, y2, o) { var l = this.line(x1, y1, x2, y2, o); l.setAttribute('marker-end', 'url(#' + this.id + 'a)'); return l; };
+Fig.prototype.text = function (x, y, s, o) {   // centered on y; no dominant-baseline, so every browser places it the same
+  o = o || {};
+  var size = (o.fs || 9.5) * this.k / 72, lh = size * 1.3, lines = String(s).split('\n'), n = lines.length;
+  var t = el('text', { 'font-size': r4(size), fill: o.color || C.ink, 'fill-opacity': o.opacity, 'text-anchor': o.ha === 'left' ? 'start' : o.ha === 'right' ? 'end' : 'middle',
+    'font-style': o.italic ? 'italic' : null, 'font-weight': o.bold ? 'bold' : null }, o.parent || this.root);
+  var yc = this.Y(y), self = this;
+  lines.forEach(function (ln, i) { var ts = el('tspan', { x: self.X(x), y: r4(yc + (i - (n - 1) / 2) * lh + size * 0.35) }, t); ts.textContent = ln; });
+  return t;
+};
+Fig.prototype.tw = function (s, fs) { return String(s).length * (fs * this.k / 72) * 0.55; };
+Fig.prototype.label = function (x, y, s, o) {   // text on a white patch, for labels that sit on lines
+  o = o || {}; var w = this.tw(s, o.fs || 8.5) + 0.12, hh = (o.fs || 8.5) * this.k / 72 * 1.5;
+  this.rect(x - w / 2, y - hh / 2, w, hh, { fill: '#fff', stroke: '#fff', lw: 0.1, rx: 0.05, parent: o.parent });
+  return this.text(x, y, s, o);
+};
+
+/* ===================================================== hosts, subnets, and the ping model */
+var NAMES = { A: 'Host A', B: 'Host B', C: 'Host C', S: 'Switch' };
+var KEYS = ['A', 'B', 'C', 'S'];
+function mkAddr(key, idx, x, p) { var s = sub(x, p); return { key: key, idx: idx, x: x, p: p, net: s.net, bc: s.bc }; }
+function inside(x, a) { return x >= a.net && x <= a.bc; }
+function rng(a) { return '.' + a.net + ' to .' + a.bc; }
+function ownerOf(H, x) { for (var i = 0; i < KEYS.length; i++) { var h = H[KEYS[i]]; if (!h.on) continue; for (var j = 0; j < h.addrs.length; j++) if (h.addrs[j].x === x) return { key: KEYS[i], a: h.addrs[j] }; } return null; }
+function subnetKey(a) { return a.net + '/' + a.p; }
+
+/* Each step: text for the log, the flowchart box to outline, and an optional animation. */
+function simulate(H, from, x) {
+  var S = H[from], nm = NAMES[from], steps = [];
+  if (!S.on || !S.addrs.length) return { outcome: 'no address', steps: steps };
+  if (S.addrs.some(function (a) { return a.x === x; })) { steps.push({ flow: 'start', text: A(x) + ' is ' + nm + "'s own address, so the reply never leaves " + nm + '.' }); return { outcome: 'replies from itself', ok: true, steps: steps }; }
+  steps.push({ flow: 'start', cap: nm + ' pings ' + A(x), text: nm + ' has a packet to send: an echo request to ' + A(x) + '.' });
+  var match = S.addrs.filter(function (a) { return inside(x, a); }).sort(function (p, q) { return q.p - p.p; });
+  if (!match.length) {
+    steps.push({ flow: 'q1', cap: 'Not in its routing table', text: nm + ' checks its routing table. Its subnet' + (S.addrs.length > 1 ? 's cover ' : ' covers ') + S.addrs.map(rng).join(' and ') + ', and .' + x + ' is outside. No.' });
+    steps.push({ flow: 'q3', cap: 'No default route', text: 'Is there a default route? No: this network has no router.' });
+    steps.push({ flow: 'netunr', cap: 'Nothing is sent', anim: { type: 'block', at: from }, text: 'ping prints "Network is unreachable" at once. Nothing is sent, so a capture shows nothing.' });
+    return { outcome: 'Network is unreachable', steps: steps };
+  }
+  var src = match[0];
+  steps.push({ flow: 'q1', cap: 'In its routing table', text: nm + ' checks its routing table: .' + x + ' is inside ' + A(src.net) + '/' + src.p + ' (' + rng(src) + '). Yes, so it sends directly, from ' + A(src.x) + '.' });
+  steps.push({ flow: 'arp', cap: 'ARP request: a broadcast', anim: { type: 'bcast', from: from, label: 'ARP request' },
+    text: nm + ' broadcasts an ARP (Address Resolution Protocol) request: "Who has ' + A(x) + '? Tell ' + A(src.x) + '." The switch passes it out of every port, so every host receives it, whatever its subnet.' });
+  var own = ownerOf(H, x);
+  if (!own) {
+    steps.push({ flow: 'q2', cap: 'Nobody answers', text: 'No host owns ' + A(x) + ', so nobody answers. Linux asks three times.' });
+    steps.push({ flow: 'dhu', cap: 'Destination Host Unreachable', text: 'ping prints "Destination Host Unreachable" after about three seconds.' });
+    return { outcome: 'Destination Host Unreachable', steps: steps };
+  }
+  var O = H[own.key], on = NAMES[own.key], om = O.addrs.filter(function (a) { return inside(src.x, a); });
+  if (!om.length) {
+    steps.push({ flow: 'q2', cap: on + ' does not answer', text: on + ' owns ' + A(x) + ', but the sender ' + A(src.x) + ' is outside its own subnet' + (O.addrs.length > 1 ? 's' : '') + ' (' + O.addrs.map(rng).join(' and ') + '). With no default route, ' + on + ' does not answer.' });
+    steps.push({ flow: 'dhu', cap: 'Destination Host Unreachable', text: 'ping prints "Destination Host Unreachable" after about three seconds. A capture shows ARP requests and no reply.' });
+    return { outcome: 'Destination Host Unreachable', steps: steps };
+  }
+  steps.push({ flow: 'q2', cap: 'ARP reply: unicast', anim: { type: 'uni', from: own.key, to: from, label: 'ARP reply', reply: true },
+    text: on + ' owns ' + A(x) + ' and finds the sender ' + A(src.x) + ' inside its subnet (' + rng(om[0]) + '). It answers with an ARP reply that only ' + nm + ' receives: "' + A(x) + ' is at my MAC (Media Access Control) address."' });
+  steps.push({ flow: 'send', cap: 'Echo request', anim: { type: 'uni', from: from, to: own.key, label: 'echo request' }, text: nm + ' sends the echo request to that MAC address.' });
+  steps.push({ flow: 'send', cap: 'Echo reply', anim: { type: 'uni', from: own.key, to: from, label: 'echo reply', reply: true }, text: on + ' sends the echo reply. ping -c 3 repeats this: 3 replies.' });
+  return { outcome: '3 replies', ok: true, steps: steps };
+}
+function sees(H, k, x) { return H[k].addrs.some(function (a) { return inside(x, a); }); }
+function pairStatus(H, p, q) {   // 'works', 'oneway' (one side sees the other), or 'none'
+  var P = H[p], Q = H[q];
+  var pq = Q.addrs.some(function (a) { return simulate(H, p, a.x).ok; }), qp = P.addrs.some(function (a) { return q === 'S' ? true : simulate(H, q, a.x).ok; });
+  if (pq && qp) return 'works';
+  var sp = Q.addrs.some(function (a) { return sees(H, p, a.x); }), sq = P.addrs.some(function (a) { return sees(H, q, a.x); });
+  return sp || sq ? 'oneway' : 'none';
+}
+function colorMap(H) {   // the same subnet gets the same color in every figure
+  var map = {}, n = 0;
+  KEYS.forEach(function (k) { if (!H[k].on) return; H[k].addrs.forEach(function (a) { var s = subnetKey(a); if (!(s in map)) map[s] = SUBNET_COLORS[n++ % SUBNET_COLORS.length]; }); });
+  return map;
+}
+function cloneHosts(H) { var o = {}; KEYS.forEach(function (k) { o[k] = { on: H[k].on, addrs: H[k].addrs.map(function (a) { return mkAddr(a.key, a.idx, a.x, a.p); }) }; }); return o; }
+function hostsFrom(spec) {   // spec: { A: [[160,24]], B: [[90,25]], C: null, S: [[1,24]] }
+  var H = {};
+  KEYS.forEach(function (k) { var v = spec[k]; H[k] = { on: !!v, addrs: (v || []).map(function (xp, i) { return mkAddr(k, i, xp[0], xp[1]); }) }; });
+  return H;
+}
+
+/* ===================================================== figure: the topology (adapts to the hosts) */
+var TOPO = {
+  host: { A: [0.3, 1.25], B: [3.98, 1.25], C: [7.66, 1.25] }, HW: 3.0, HH: 1.25,
+  port: [4.16, 4.82, 5.48, 6.14, 6.80], FAB: 4.12, MGMT: [7.15, 4.12], SW: [3.7, 3.62, 3.75, 1.3]
+};
+function hostTop(k) { var h = TOPO.host[k]; return [h[0] + TOPO.HW / 2, h[1] + TOPO.HH]; }
+var PORT_OF = { A: 0, B: 2, C: 4 };
+function upPath(k) {   // from a host to the switch fabric
+  if (k === 'S') return [TOPO.MGMT];
+  var t = hostTop(k), px = TOPO.port[PORT_OF[k]];
+  return Math.abs(t[0] - px) < 0.01 ? [t, [px, TOPO.FAB]] : [t, [t[0], 3.05], [px, 3.05], [px, TOPO.FAB]];
+}
+function downPath(k) { return upPath(k).slice().reverse(); }
+
+function drawTopo(svg, H, opt) {
+  opt = opt || {};
+  var wide = H.C.on, box = svg.parentNode && svg.parentNode.clientWidth ? svg.parentNode.clientWidth : 600;
+  var f = new Fig(svg, 0, wide ? 11 : 7.6, wide ? 0 : 0.55, 5.35, wide ? 1.7 : (box < 460 ? 2.2 : 1.55)), cm = colorMap(H), boxes = {};   // without Host C, crop to Hosts A and B; bigger text on narrow screens
+  var u = Math.max(1, f.k / 1.7); TOPO.HH = 1.25 * u;   // host boxes and line spacing grow with the text
+  var sw = TOPO.SW, s = H.S.addrs[0];
+  boxes.S = f.slab(sw[0], sw[1], sw[2], sw[3], { fill: C.soft });
+  f.text(sw[0] + sw[2] / 2, sw[1] + 0.9, 'Switch' + (s ? '\n' + A(s.x) + '/' + s.p : ''), { fs: 9.5, bold: true, color: C.navy });
+  TOPO.port.forEach(function (px, i) { f.rect(px - 0.2, sw[1] + 0.08, 0.4, 0.3, { fill: '#fff', stroke: C.navy, lw: 0.8, rx: 0.03 }); f.text(px, sw[1] + 0.23, String(i + 1), { fs: 7.5, color: C.navy }); });
+  ['A', 'B', 'C'].forEach(function (k) {
+    if (!H[k].on) return;
+    var hp = TOPO.host[k], hs = H[k];
+    f.poly(upPath(k).slice(0, -1).concat([[TOPO.port[PORT_OF[k]], sw[1] + 0.08]]), { lw: 1.8, color: C.navy });
+    boxes[k] = f.slab(hp[0], hp[1], TOPO.HW, TOPO.HH, { fill: '#fff' });
+    f.text(hp[0] + 0.15, hp[1] + TOPO.HH - 0.2 * u, NAMES[k], { fs: 10, bold: true, ha: 'left', color: C.navy });
+    hs.addrs.forEach(function (a, i) {
+      var y = hp[1] + TOPO.HH - (0.5 + i * 0.3) * u, col = cm[subnetKey(a)];
+      f.rect(hp[0] + 0.15, y - 0.08, 0.16, 0.16, { fill: col.fill, stroke: col.line, lw: 1.2, rx: 0.03 });
+      f.text(hp[0] + 0.4, y, A(a.x) + '/' + a.p, { fs: 8.5, ha: 'left' });
+    });
+    if (H.S.on && H.S.addrs.length) {
+      var ok = simulate(H, k, H.S.addrs[0].x).ok;
+      f.text(hp[0] + 0.15, hp[1] + 0.16 * u, ok ? '✓ reaches the switch' : '✗ cannot reach switch', { fs: 7.4, ha: 'left', color: ok ? C.ok : C.bad, bold: true });
+    }
+    f.text(TOPO.port[PORT_OF[k]] + 0.08, 3.25, 'port ' + (PORT_OF[k] + 1), { fs: 7.5, ha: 'left', color: C.muted });
+  });
+  /* relationship lines under the hosts: green works, amber one side sees the other, red neither */
+  var pairs = [['A', 'B', 0.85], ['B', 'C', 0.85], ['A', 'C', 0.35]];
+  pairs.forEach(function (pr) {
+    var p = pr[0], q = pr[1], y = pr[2];
+    if (!H[p].on || !H[q].on) return;
+    var st = pairStatus(H, p, q), x1 = TOPO.host[p][0] + TOPO.HW / 2 + (q === 'C' && p === 'A' ? -0.5 : 0), x2 = TOPO.host[q][0] + TOPO.HW / 2 + (p === 'A' && q === 'C' ? 0.5 : 0);
+    if (p === 'A' && q === 'B') { x1 += 0.3; x2 -= 0.3; } if (p === 'B' && q === 'C') { x1 += 0.3; x2 -= 0.3; }
+    var col = st === 'works' ? C.ok : st === 'oneway' ? C.oneway : C.bad;
+    f.poly([[x1, TOPO.host[p][1]], [x1, y], [x2, y], [x2, TOPO.host[q][1]]], { color: col, lw: st === 'works' ? 2.2 : 1.6, dash: st === 'works' ? null : [4, 3] });
+    var txt = st === 'works' ? 'ping works' : st === 'oneway' ? oneWayText(H, p, q) : 'different subnets';
+    f.label((x1 + x2) / 2, y, txt, { fs: 7.2, color: col, bold: true });
+  });
+  var tags = f.g(), layer = f.g();
+  return { f: f, boxes: boxes, tags: tags, layer: layer };
+}
+function oneWayText(H, p, q) {
+  var sp = H[q].addrs.some(function (a) { return sees(H, p, a.x); });
+  return 'only ' + (sp ? p + ' sees ' + q : q + ' sees ' + p) + ': no ping';
+}
+
+/* ===================================================== figure: subnets on the address line */
+function drawLine(svg, H, opt) {
+  opt = opt || {};
+  var items = [], cm = colorMap(H);
+  ['A', 'B', 'C', 'S'].forEach(function (k) { if (H[k].on) H[k].addrs.forEach(function (a) { items.push(a); }); });
+  var L0 = 2.25, L1 = 10.6, ax = function (v) { return L0 + v * (L1 - L0) / 256; }, BH = 0.42, GAP = 0.58;
+  var probe = new Fig(document.createElementNS(NS, 'svg'), 0, 1, 0, 1, 1.7);
+  var marks = items.map(function (a) { return { a: a, x: ax(a.x + 0.5), label: NAMES[a.key].replace('Host ', '') + ' .' + a.x }; })
+    .concat((opt.extra || []).map(function (e) { return { a: { x: e.x }, x: ax(e.x + 0.5), label: e.label }; }));
+  marks.sort(function (p, q) { return p.x - q.x; });
+  var levels = [];
+  marks.forEach(function (m) { var w = probe.tw(m.label, 8.5) + 0.1; m.x0 = m.x - w / 2; m.x1 = m.x + w / 2; var lv = 0; while (levels[lv] !== undefined && levels[lv] > m.x0) lv++; levels[lv] = m.x1; m.lv = lv; });
+  var barsTop = 0.75 + items.length * GAP, top = barsTop + 0.45 + levels.length * 0.3 + 0.05;
+  var f = new Fig(svg, 0, 11, 0, top, 1.7);
+  [0, 64, 128, 192, 256].forEach(function (t) { f.line(ax(t), 0.55, ax(t), barsTop + 0.05, { color: '#C9DCE6', lw: 0.8 }); f.text(ax(t), 0.35, t === 256 ? '.255' : '.' + t, { fs: 8, color: C.muted }); });
+  f.text(L0 - 0.12, 0.35, 'last number', { fs: 8, ha: 'right', italic: true, color: C.muted });
+  items.forEach(function (a, i) {
+    var y = barsTop - (i + 1) * GAP, col = cm[subnetKey(a)];
+    f.text(L0 - 0.12, y + BH / 2, NAMES[a.key] + (a.idx ? ' (2nd)' : '') + '  /' + a.p, { fs: 8.5, ha: 'right', bold: true, color: C.navy });
+    f.rect(ax(0), y, ax(256) - ax(0), BH, { fill: '#fff', stroke: '#B9CCD7', lw: 0.8, dash: [3, 2], rx: 0.04 });
+    f.rect(ax(a.net), y, ax(a.bc + 1) - ax(a.net), BH, { fill: col.fill, stroke: col.line, lw: 1.4, rx: 0.04 });
+    var txt = A(a.net) + '/' + a.p + '  (.' + a.net + ' to .' + a.bc + ')', tw = f.tw(txt, 8.3), bw = ax(a.bc + 1) - ax(a.net), cx;
+    if (tw + 0.15 < bw) {
+      var mid = (ax(a.net) + ax(a.bc + 1)) / 2, lo = ax(a.net) + tw / 2 + 0.08, hi = ax(a.bc + 1) - tw / 2 - 0.08, best = mid, bd = 1e9;
+      var clear = function (c) { return marks.every(function (m) { return Math.abs(m.x - c) > tw / 2 + 0.05; }); };
+      if (!clear(mid)) for (var c = lo; c <= hi + 1e-9; c += 0.05) if (clear(c) && Math.abs(c - mid) < bd) { bd = Math.abs(c - mid); best = c; }
+      f.text(best, y + BH / 2, txt, { fs: 8.3 });
+    } else if (ax(256) - ax(a.bc + 1) > tw + 0.2) f.text(ax(a.bc + 1) + 0.1, y + BH / 2, txt, { fs: 8.3, ha: 'left' });
+    else f.text(ax(a.net) - 0.1, y + BH / 2, txt, { fs: 8.3, ha: 'right' });
+  });
+  marks.forEach(function (m) {
+    var yt = barsTop + 0.12;
+    f.line(m.x, 0.55, m.x, yt, { lw: 1.1, dash: [2, 2] });
+    el('path', { d: 'M' + f.X(m.x) + ' ' + f.Y(yt) + 'l-0.05 -0.1h0.1z', fill: C.ink }, f.root);
+    f.text(m.x, yt + 0.22 + m.lv * 0.3, m.label, { fs: 8.5, bold: true, color: C.navy });
+  });
+}
+
+/* ===================================================== figure: bits (any prefix) */
+function drawBits(svg, rows, p) {
+  /* Like Figure 1: whole network bytes are one shaded block with their value; bytes the split touches are drawn bit by bit. */
+  var CW = 0.4, GAPB = 0.14, BW = 1.0, X0 = 2.3, RH = 0.5, mode = [], bx = [], x = X0;
+  for (var b = 0; b < 4; b++) { mode[b] = (b + 1) * 8 <= p ? 'block' : 'bits'; bx[b] = x; x += (mode[b] === 'block' ? BW : 8 * CW) + GAPB; }
+  var endX = x - GAPB, top = rows.length * RH + 0.9;
+  var f = new Fig(svg, 0, endX + 3.6, 0, top, 1.8);
+  var cx = function (i) { return bx[Math.floor(i / 8)] + (i % 8) * CW; };
+  var byteOf = function (n, b) { return Math.floor(n / Math.pow(2, 24 - 8 * b)) % 256; };
+  for (b = 0; b < 4; b++) f.text(bx[b] + (mode[b] === 'block' ? BW / 2 : 4 * CW), top - 0.2, mode[b] === 'block' ? 'byte ' + (b + 1) : 'byte ' + (b + 1) + ', bit by bit', { fs: 7.5, color: C.muted, italic: mode[b] !== 'block' });
+  rows.forEach(function (r, ri) {
+    var y = top - 0.5 - (ri + 1) * RH + 0.08, bits = IP.bits(r.n);
+    f.text(X0 - 0.12, y + 0.19, r.label, { fs: 8.5, ha: 'right', bold: !!r.bold, color: C.navy });
+    for (var b = 0; b < 4; b++) {
+      if (mode[b] === 'block') {
+        f.rect(bx[b], y, BW, 0.38, { fill: C.panel, stroke: C.brand, lw: 0.9 });
+        f.text(bx[b] + BW / 2, y + 0.19, String(byteOf(r.n, b)), { fs: 8.5, bold: true });
+        if (r.compare !== undefined && byteOf(r.n, b) !== byteOf(r.compare, b)) f.rect(bx[b] + 0.03, y + 0.03, BW - 0.06, 0.32, { fill: 'none', stroke: C.bad, lw: 2 });
+        continue;
+      }
+      for (var i = b * 8; i < b * 8 + 8; i++) {
+        var net = i < p, ch = bits[i], faded = false, fresh = false;
+        if (r.reveal !== undefined && !net) { var order = r.reveal.offset + (i - p); if (order >= r.reveal.n) { ch = IP.bits(r.reveal.from)[i]; faded = true; } else if (order === r.reveal.n - 1) fresh = true; }
+        f.rect(cx(i), y, CW, 0.38, { fill: net ? C.panel : '#fff', stroke: net ? C.brand : '#9DB3C1', lw: 0.8 });
+        f.text(cx(i) + CW / 2, y + 0.19, ch, { fs: 8.5, bold: net || fresh, opacity: faded ? 0.3 : null, color: fresh ? C.bad : C.ink });
+        if (r.compare !== undefined && net && bits[i] !== IP.bits(r.compare)[i]) f.rect(cx(i) + 0.03, y + 0.03, CW - 0.06, 0.32, { fill: 'none', stroke: C.bad, lw: 2 });
+      }
+    }
+    f.text(endX + 0.15, y + 0.19, r.right || IP.str(r.n), { fs: 8.5, ha: 'left', bold: !!r.bold });
+  });
+  if (p > 0 && p < 32) {
+    var xs = p % 8 === 0 ? bx[p / 8] - GAPB / 2 : cx(p);
+    f.line(xs, 0.36, xs, top - 0.36, { lw: 2.4, color: C.amber }); f.text(xs, 0.2, '/' + p + ' split', { fs: 8, bold: true, color: '#9A6500' });
+  }
+  return f;
+}
+function bitRows(n, p, o) {
+  o = o || {};
+  var net = IP.net(n, p), bc = IP.bcast(n, p), rows = [
+    { label: 'Mask /' + p, n: IP.mask(p), bold: true },
+    { label: 'Address', n: n },
+    { label: 'Network address', n: net, right: IP.str(net) + '  (host bits 0)' },
+    { label: 'Broadcast address', n: bc, right: IP.str(bc) + '  (host bits 1)' }
+  ];
+  if (o.reveal !== undefined) { var h = 32 - p; rows[2].reveal = { n: o.reveal, offset: 0, from: n }; rows[3].reveal = { n: o.reveal, offset: h, from: n }; }
+  if (o.other !== undefined && o.other !== null) rows.push({ label: 'Other address', n: o.other, compare: n });
+  return rows;
+}
+
+/* ===================================================== figure: how a host decides (flowchart) */
+var FLOW = { start: [0.6, 6.3, 3.6, 0.65], q1: [0.6, 4.75, 3.6, 0.95], arp: [0.6, 3.05, 3.6, 0.95], q2: [0.6, 1.35, 3.6, 0.95], send: [0.6, 0, 3.6, 0.65],
+  q3: [5.6, 4.75, 3.6, 0.95], router: [5.6, 6.3, 3.6, 0.65], netunr: [5.6, 3.05, 3.6, 0.95], dhu: [5.6, 1.35, 3.6, 0.95] };
+function drawFlow(svg) {
+  var f = new Fig(svg, -0.15, 9.4, -0.15, 7.1, 1.45);
+  function box(k, t, fill) { var b = FLOW[k]; f.slab(b[0], b[1], b[2], b[3], { text: t, fill: fill || '#fff', fs: 9.5 }); }
+  box('start', 'The host has\na packet to send');
+  box('q1', 'Is the destination in a subnet\nlisted in the routing table?');
+  box('arp', 'Send an ARP request\non that subnet');
+  box('q2', 'Did the owner reply?\n(Linux asks three times)');
+  box('send', 'Send the packet to that\nMAC address', C.panel);
+  box('q3', 'Is there a default route?');
+  box('router', 'Send it to the router\n(a later topic)', C.panel);
+  box('netunr', 'Network is unreachable\nNothing is sent; the error\nappears at once', C.panel);
+  box('dhu', 'Destination Host Unreachable\nThe error appears after\nabout three seconds', C.panel);
+  f.arrow(2.4, 6.3, 2.4, 5.7); f.arrow(2.4, 4.75, 2.4, 4.0); f.text(2.6, 4.37, 'Yes', { ha: 'left' });
+  f.arrow(2.4, 3.05, 2.4, 2.3); f.arrow(2.4, 1.35, 2.4, 0.65); f.text(2.6, 1.0, 'Yes', { ha: 'left' });
+  f.arrow(4.2, 5.22, 5.6, 5.22); f.text(4.9, 5.45, 'No'); f.arrow(4.2, 1.82, 5.6, 1.82); f.text(4.9, 2.05, 'No');
+  f.arrow(7.4, 5.7, 7.4, 6.3); f.text(7.6, 6.0, 'Yes', { ha: 'left' }); f.arrow(7.4, 4.75, 7.4, 4.0); f.text(7.6, 4.37, 'No', { ha: 'left' });
+  var hi = f.rect(0, 0, 0.1, 0.1, { fill: 'none', stroke: C.amber, lw: 3, rx: 0.08 }); hi.setAttribute('visibility', 'hidden');
+  return { f: f, hi: hi };
+}
+function flowMark(fl, k) {
+  if (!fl) return;
+  if (!k || !FLOW[k]) { fl.hi.setAttribute('visibility', 'hidden'); return; }
+  var b = FLOW[k], m = 0.1;
+  fl.hi.setAttribute('x', fl.f.X(b[0] - m)); fl.hi.setAttribute('y', fl.f.Y(b[1] + b[3] + m)); fl.hi.setAttribute('width', r4(b[2] + 2 * m)); fl.hi.setAttribute('height', r4(b[3] + 2 * m)); fl.hi.setAttribute('visibility', 'visible');
+}
+
+/* ===================================================== ping animation on the topology */
+function Pinger(root, getHosts) {
+  this.root = root; this.getHosts = getHosts; this.token = 0; this.steps = []; this.i = 0; this.busy = false; this.playing = false;
+}
+Pinger.prototype.mount = function () {
+  var self = this, r = this.root;
+  $('.p_controls', r).innerHTML = '<div class="row"><label>From <select class="p_from"></select></label><label>To <select class="p_to"></select></label>' +
+    '<label class="p_other addrgrp" hidden><span class="addr p_base"></span><input type="number" min="0" max="255" value="126" class="p_ox" aria-label="Last number of the address to ping"></label>' +
+    '<button class="btn small p_play">▶ Ping</button><button class="btn alt small p_step">Step</button><button class="btn alt small p_reset">Reset</button>' +
+    '<label>Speed <select class="p_speed"><option value="0.6">Slow</option><option value="1" selected>Normal</option><option value="1.8">Fast</option></select></label></div>';
+  $('.p_out', r).innerHTML = '<p class="p_cap" style="font-style:italic;min-height:1.5em;margin:2px 0" aria-live="polite"></p>' +
+    '<ol class="log p_log" aria-live="polite"></ol><details class="fold"><summary>How the sending host decides</summary><div class="fig"><svg class="p_flow" role="img" aria-label="How a host decides what to do with a packet; the current step is outlined"></svg></div></details>';
+  this.flow = drawFlow($('.p_flow', r));
+  $('.p_play', r).onclick = function () { self.play(); };
+  $('.p_step', r).onclick = function () { self.stepClick(); };
+  $('.p_reset', r).onclick = function () { self.reset(); };
+  $('.p_from', r).onchange = function () { self.fill(); self.reset(); };
+  $('.p_to', r).onchange = function () { $('.p_other', r).hidden = $('.p_to', r).value !== 'other'; self.reset(); };
+  $('.p_ox', r).oninput = function () { self.reset(); };
+};
+Pinger.prototype.fill = function () {
+  var H = this.getHosts(), r = this.root, fs = $('.p_from', r), keep = fs.value || 'A';
+  fs.innerHTML = ['A', 'B', 'C'].filter(function (k) { return H[k].on; }).map(function (k) { return '<option value="' + k + '">' + NAMES[k] + '</option>'; }).join('');
+  if ($$('option', fs).some(function (o) { return o.value === keep; })) fs.value = keep;
+  var ts = $('.p_to', r), keepT = ts.value, opts = [];
+  KEYS.forEach(function (k) { if (k !== fs.value && H[k].on) H[k].addrs.forEach(function (a) { opts.push([k + ':' + a.x, NAMES[k] + ' (' + A(a.x) + ')']); }); });
+  opts.push(['other', 'Another address']);
+  ts.innerHTML = opts.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('');
+  ts.value = opts.some(function (o) { return o[0] === keepT; }) ? keepT : opts[0][0];
+  $('.p_other', r).hidden = ts.value !== 'other';
+  $('.p_base', r).textContent = BASE() + '.';
+};
+Pinger.prototype.setStage = function (stage) { this.stage = stage; };
+Pinger.prototype.reset = function () {
+  this.token++; this.steps = []; this.i = 0; this.busy = false; this.playing = false; this.ready = false;
+  $('.p_log', this.root).innerHTML = ''; $('.p_cap', this.root).textContent = ''; flowMark(this.flow, null);
+  if (this.onReset) this.onReset();
+  this.buttons();
+};
+Pinger.prototype.target = function () {
+  var v = $('.p_to', this.root).value;
+  if (v === 'other') { var x = +$('.p_ox', this.root).value; return Number.isInteger(x) && x >= 0 && x <= 255 ? x : null; }
+  return +v.split(':')[1];
+};
+Pinger.prototype.prepare = function () {
+  this.reset(); var x = this.target();
+  if (x === null) { $('.p_cap', this.root).textContent = 'Type a last number from 0 to 255.'; return false; }
+  var res = simulate(this.getHosts(), $('.p_from', this.root).value, x);
+  this.steps = res.steps; this.outcome = res.outcome; this.ready = true; return true;
+};
+Pinger.prototype.log = function (t, result) {
+  var ol = $('.p_log', this.root); $$('li.now', ol).forEach(function (li) { li.className = ''; });
+  var li = document.createElement('li'); li.textContent = t; li.className = result ? 'result' : 'now'; ol.appendChild(li);
+};
+Pinger.prototype.stepOnce = function () {
+  var self = this;
+  if (this.busy || !this.ready || this.i >= this.steps.length) return Promise.resolve();
+  this.busy = true; this.buttons();
+  var tok = this.token, s = this.steps[this.i++];
+  this.log(s.text); flowMark(this.flow, s.flow); $('.p_cap', this.root).textContent = s.cap || '';
+  return (s.anim ? this.animate(s.anim, tok) : Promise.resolve()).then(function () {
+    if (tok !== self.token) return;
+    self.busy = false;
+    if (self.i >= self.steps.length) { self.log('Result: ' + self.outcome + '.', true); if (self.onDone) self.onDone(self.outcome); }
+    self.buttons();
+  });
+};
+Pinger.prototype.play = function () {
+  var self = this; if (!this.prepare()) return;
+  var tok = this.token; this.playing = true; this.buttons();
+  (function next() {
+    if (tok !== self.token) return;
+    if (self.i >= self.steps.length) { self.playing = false; self.buttons(); return; }
+    self.stepOnce().then(function () { return sleep(reduceMotion ? 200 : 550 / self.speed()); }).then(next);
+  })();
+};
+Pinger.prototype.stepClick = function () { if (!this.ready || this.i >= this.steps.length) { if (!this.prepare()) return; } this.stepOnce(); };
+Pinger.prototype.buttons = function () { var off = this.playing || this.busy || !!this.blocked; $('.p_play', this.root).disabled = off; $('.p_step', this.root).disabled = off; };
+Pinger.prototype.speed = function () { return +$('.p_speed', this.root).value; };
+Pinger.prototype.move = function (pts, label, reply, tok) {
+  var self = this, st = this.stage;
+  return new Promise(function (resolve) {
+    if (!st || tok !== self.token) { resolve(); return; }
+    var f = st.f, g = el('g', null, st.layer), w = label.length * 0.07 + 0.2, h = 0.27;
+    el('rect', { x: r4(-w / 2), y: r4(-h / 2), width: r4(w), height: h, rx: 0.06, fill: reply ? C.amber : '#fff', stroke: reply ? '#B86E00' : C.brand, 'stroke-width': f.pt(1.6) }, g);
+    var t = el('text', { 'font-size': r4(7.5 * f.k / 72), 'text-anchor': 'middle', y: r4(7.5 * f.k / 72 * 0.35), fill: C.ink, 'font-weight': 'bold' }, g); t.textContent = label;
+    var P = pts.map(function (p) { return [f.X(p[0]), f.Y(p[1])]; }), seg = [], total = 0;
+    for (var i = 1; i < P.length; i++) { var d = Math.sqrt(Math.pow(P[i][0] - P[i - 1][0], 2) + Math.pow(P[i][1] - P[i - 1][1], 2)); seg.push(d); total += d; }
+    function place(d) { var i = 0; while (i < seg.length - 1 && d > seg[i]) { d -= seg[i]; i++; } var u = seg[i] ? Math.min(1, d / seg[i]) : 1, a = P[i], b = P[i + 1] || P[i]; g.setAttribute('transform', 'translate(' + r4(a[0] + (b[0] - a[0]) * u) + ',' + r4(a[1] + (b[1] - a[1]) * u) + ')'); }
+    if (reduceMotion || total === 0) { place(total); setTimeout(function () { g.parentNode && g.parentNode.removeChild(g); resolve(); }, 300); return; }
+    var dur = total / (3.4 * self.speed()) * 1000, t0 = null;
+    function frame(now) {
+      if (t0 === null) t0 = now;
+      if (tok !== self.token) { g.parentNode && g.parentNode.removeChild(g); resolve(); return; }
+      var u = Math.min(1, (now - t0) / dur); place(u * total);
+      if (u < 1) requestAnimationFrame(frame); else setTimeout(function () { g.parentNode && g.parentNode.removeChild(g); resolve(); }, 120);
+    }
+    place(0); requestAnimationFrame(frame);
+  });
+};
+Pinger.prototype.flash = function (k, tok) {
+  var st = this.stage; if (!st || !st.boxes[k] || tok !== this.token) return;
+  var r = st.boxes[k].box, old = r.getAttribute('fill'); r.setAttribute('fill', C.amber);
+  setTimeout(function () { r.setAttribute('fill', old); }, reduceMotion ? 300 : 700);
+};
+Pinger.prototype.animate = function (a, tok) {
+  var self = this, H = this.getHosts();
+  if (a.type === 'uni') return this.move(upPath(a.from).concat(downPath(a.to)), a.label, !!a.reply, tok).then(function () { self.flash(a.to, tok); });
+  if (a.type === 'bcast') {
+    var start = upPath(a.from), hub = start[start.length - 1];
+    return this.move(start, a.label, false, tok).then(function () {
+      var legs = [], used = {};
+      KEYS.forEach(function (k) {
+        if (k === a.from || !H[k].on) return;
+        if (k !== 'S') used[PORT_OF[k]] = 1;
+        legs.push(self.move([hub].concat(downPath(k)), a.label, false, tok).then(function () { self.flash(k, tok); }));
+      });
+      TOPO.port.forEach(function (px, i) { if (!used[i] && i !== PORT_OF[a.from]) legs.push(self.move([hub, [px, TOPO.FAB], [px, TOPO.SW[1] + 0.2]], a.label, false, tok)); });
+      return Promise.all(legs);
+    });
+  }
+  if (a.type === 'block' && this.stage) {
+    var hp = TOPO.host[a.at], f = this.stage.f;
+    f.rect(hp[0] - 0.08, hp[1] - 0.08, TOPO.HW + 0.16, TOPO.HH + 0.16, { fill: 'none', stroke: C.bad, lw: 2.4, dash: [5, 3], rx: 0.08, parent: this.stage.tags });
+    f.label(hp[0] + TOPO.HW / 2, hp[1] + TOPO.HH + 0.2, '✗ nothing is sent', { fs: 8.5, bold: true, color: C.bad, parent: this.stage.tags });
+    return sleep(reduceMotion ? 200 : 700);
+  }
+  return Promise.resolve();
+};
+
+/* ===================================================== commands panel */
+var cmdState = { os: 'linux', ifL: 'eth0', ifW: 'Ethernet', moreOpen: false };
+function renderCommands(box, ipStr, p, peerStr) {
+  var mask = maskStr(p), L = cmdState.ifL, W = cmdState.ifW, peer = peerStr || ipStr;
+  var linux = [
+    ['Check that the address is free (no reply means free)', 'sudo arping -D -c 3 -I ' + L + ' ' + ipStr],
+    ['Join the subnet: add the address and its prefix length', 'sudo ip addr add ' + ipStr + '/' + p + ' dev ' + L],
+    ['See your addresses and your routing table', 'ip -4 addr show dev ' + L + '\nip route'],
+    ['Test a neighbor, then look at the ARP (Address Resolution Protocol) cache', 'ping -c 3 ' + peer + '\nip neigh show dev ' + L],
+    ['Leave the subnet: remove the address', 'sudo ip addr del ' + ipStr + '/' + p + ' dev ' + L]
+  ];
+  var linuxNote = 'Addresses added with ip addr last until the next restart. To keep one with NetworkManager: nmcli connection modify "Wired connection 1" +ipv4.addresses ' + ipStr + '/' + p + ', then nmcli connection up "Wired connection 1". Use -ipv4.addresses to remove it.';
+  var win = [
+    ['Join the subnet (Command Prompt as administrator)', 'netsh interface ipv4 add address "' + W + '" ' + ipStr + ' ' + mask],
+    ['The same in PowerShell (as administrator)', 'New-NetIPAddress -InterfaceAlias "' + W + '" -IPAddress ' + ipStr + ' -PrefixLength ' + p],
+    ['See your addresses, routes, and ARP (Address Resolution Protocol) cache', 'ipconfig /all\nroute print -4\narp -a'],
+    ['Test a neighbor (Windows sends four requests)', 'ping ' + peer],
+    ['Leave the subnet (Command Prompt as administrator)', 'netsh interface ipv4 delete address "' + W + '" ' + ipStr],
+    ['The same in PowerShell', 'Remove-NetIPAddress -InterfaceAlias "' + W + '" -IPAddress ' + ipStr + ' -Confirm:$false']
+  ];
+  var winNote = 'Windows keeps these settings after a restart. netsh add address adds a second address to an adapter that already has a static address. New-NetIPAddress turns off DHCP (Dynamic Host Configuration Protocol) on that adapter. Find the adapter name with ipconfig /all.';
+  var rows = cmdState.os === 'linux' ? linux : win, main, more;
+  if (cmdState.os === 'linux') { main = [rows[1], rows[4]]; more = [rows[0], rows[2], rows[3]]; } else { main = [rows[0], rows[4]]; more = [rows[1], rows[5], rows[2], rows[3]]; }
+  function row(r) { return '<p class="cmdnote" style="margin-top:8px">' + esc(r[0]) + '</p><div class="cmd"><code>' + esc(r[1]) + '</code><button type="button" data-copy="' + esc(r[1]) + '">Copy</button></div>'; }
+  box.innerHTML = '<div class="cmdtabs" role="group" aria-label="Operating system"><button data-os="linux" aria-pressed="' + (cmdState.os === 'linux') + '">Linux</button><button data-os="win" aria-pressed="' + (cmdState.os === 'win') + '">Windows</button></div>' +
+    '<div class="row"><label>Interface name <input type="text" class="ifname" size="14" value="' + esc(cmdState.os === 'linux' ? L : W) + '" spellcheck="false"></label></div>' +
+    main.map(row).join('') +
+    '<details class="fold cmdmore"><summary>More commands</summary>' + more.map(row).join('') + '<p class="cmdnote" style="margin-top:10px">' + esc(cmdState.os === 'linux' ? linuxNote : winNote) + '</p></details>';
+  var det = $('.cmdmore', box); det.open = !!cmdState.moreOpen; det.addEventListener('toggle', function () { cmdState.moreOpen = det.open; });
+  $$('[data-os]', box).forEach(function (b) { b.onclick = function () { cmdState.os = b.getAttribute('data-os'); renderCommands(box, ipStr, p, peerStr); }; });
+  $('.ifname', box).onchange = function () { var v = this.value.trim() || (cmdState.os === 'linux' ? 'eth0' : 'Ethernet'); if (cmdState.os === 'linux') cmdState.ifL = v; else cmdState.ifW = v; renderCommands(box, ipStr, p, peerStr); };
+  $$('[data-copy]', box).forEach(function (b) { b.onclick = function () { copyText(b.getAttribute('data-copy'), b); }; });
+}
+function copyText(t, btn) {
+  function done(ok) { var o = btn.textContent; btn.textContent = ok ? 'Copied' : 'Select it'; setTimeout(function () { btn.textContent = o; }, 1200); }
+  try { if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(t).then(function () { done(true); }, function () { fallback(); }); return; } } catch (e) { /* fall through */ }
+  fallback();
+  function fallback() { var ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); var ok = false; try { ok = document.execCommand('copy'); } catch (e) { ok = false; } document.body.removeChild(ta); done(ok); }
+}
+
+/* ===================================================== incomplete input: fade the figure and say why */
+function markStale(card, on, msg) {
+  if (!card) return;
+  card.classList.toggle('stale', !!on);
+  var n = $('.stalenote', card);
+  if (on) {
+    if (!n) { n = document.createElement('p'); n.className = 'stalenote'; n.setAttribute('role', 'status'); var t = $('.figtitle', card) || $('h2', card); if (t && t.parentNode === card) card.insertBefore(n, t.nextSibling); else card.insertBefore(n, card.firstChild); }
+    n.textContent = msg;
+  } else if (n) n.parentNode.removeChild(n);
+}
+function byteOK(inp) { var v = +inp.value; return inp.value !== '' && Number.isInteger(v) && v >= 0 && v <= 255; }
+function flag(inp, bad) { if (bad) inp.setAttribute('aria-invalid', 'true'); else inp.removeAttribute('aria-invalid'); }
+var STALE_MSG = 'Type a last number from 0 to 255. The figure updates when the address is complete.';
+
+/* ===================================================== points */
+var progress = store.get('progress', { xp: 0, lessons: {}, badges: {}, best: {} });
+function addXP(n) { progress.xp += n; store.set('progress', progress); showXP(true); }
+function showXP(pop) { var e = $('#xp'); e.textContent = '★ ' + progress.xp + ' points'; if (pop && !reduceMotion) { e.classList.remove('pop'); void e.offsetWidth; e.classList.add('pop'); } }
+
+/* ===================================================== host editor (lessons 4 and 5) */
+function hostEditor(box, H, onChange, opt) {
+  opt = opt || {};
+  function addrRow(k, i) {
+    var a = H[k].addrs[i];
+    return '<div class="r"><span class="addr">' + esc(BASE()) + '.</span><input type="number" min="0" max="255" value="' + a.x + '" data-k="' + k + '" data-i="' + i + '" data-f="x" aria-label="' + NAMES[k] + ' last number">' +
+      '<span>/</span><select data-k="' + k + '" data-i="' + i + '" data-f="p" aria-label="' + NAMES[k] + ' prefix length">' + [24, 25, 26, 27, 28, 29, 30].map(function (p) { return '<option' + (p === a.p ? ' selected' : '') + '>' + p + '</option>'; }).join('') + '</select></div>';
+  }
+  var html = '';
+  ['A', 'B', 'C', 'S'].forEach(function (k) {
+    if (k === 'C' && !opt.allowC) return;
+    var h = H[k];
+    html += '<div class="host"><div class="hd"><b>' + NAMES[k] + '</b>' + (k === 'C' ? ' <label class="chk"><input type="checkbox" data-k="C" data-f="on"' + (h.on ? ' checked' : '') + '> include</label>' : '') + (h.on ? addrRow(k, 0) : '') + '</div>';
+    if (h.on) {
+      h.addrs.forEach(function (a, i) { if (i) html += addrRow(k, i).replace('class="r"', 'class="r r2"'); });
+      if (k !== 'S') html += '<label class="chk"><input type="checkbox" data-k="' + k + '" data-f="second"' + (h.addrs.length > 1 ? ' checked' : '') + '> second address</label>';
+    }
+    html += '</div>';
+  });
+  box.innerHTML = '<div class="hosts">' + html + '</div>';
+  $$('[data-f]', box).forEach(function (inp) {
+    inp.addEventListener(inp.type === 'number' ? 'input' : 'change', function () {
+      var k = inp.getAttribute('data-k'), f = inp.getAttribute('data-f'), i = +inp.getAttribute('data-i');
+      if (f === 'x') { var v = +inp.value; if (!byteOK(inp)) { flag(inp, true); if (opt.onIncomplete) opt.onIncomplete(true); return; } flag(inp, false); var a = H[k].addrs[i]; H[k].addrs[i] = mkAddr(k, i, v, a.p); if (opt.onIncomplete && !$$('[aria-invalid=true]', box).length) opt.onIncomplete(false); }
+      else if (f === 'p') { var b = H[k].addrs[i]; H[k].addrs[i] = mkAddr(k, i, b.x, +inp.value); }
+      else if (f === 'on') { H.C.on = inp.checked; if (H.C.on && !H.C.addrs.length) H.C.addrs = [mkAddr('C', 0, 200, 24)]; hostEditor(box, H, onChange, opt); }
+      else if (f === 'second') { if (inp.checked) { var first = H[k].addrs[0]; H[k].addrs.push(mkAddr(k, 1, (first.x + 64) % 256 || 70, 26)); } else H[k].addrs = H[k].addrs.slice(0, 1); hostEditor(box, H, onChange, opt); }
+      onChange();
+    });
+    if (inp.type === 'number') inp.addEventListener('change', function () {   // leaving an incomplete box puts the last good address back
+      if (byteOK(inp)) return;
+      inp.value = H[inp.getAttribute('data-k')].addrs[+inp.getAttribute('data-i')].x; flag(inp, false);
+      if (opt.onIncomplete && !$$('[aria-invalid=true]', box).length) { opt.onIncomplete(false); onChange(); }
+    });
+  });
+}
+function warnings(H) {
+  var w = [], all = [];
+  KEYS.forEach(function (k) { if (H[k].on) H[k].addrs.forEach(function (a) { all.push(a); }); });
+  all.forEach(function (a) {
+    if (a.x === a.net) w.push(NAMES[a.key] + ': .' + a.x + ' is the network address of its /' + a.p + '. A host cannot use it.');
+    else if (a.x === a.bc) w.push(NAMES[a.key] + ': .' + a.x + ' is the broadcast address of its /' + a.p + '. A host cannot use it.');
+  });
+  for (var i = 0; i < all.length; i++) for (var j = i + 1; j < all.length; j++) if (all[i].x === all[j].x) w.push(NAMES[all[i].key] + ' and ' + NAMES[all[j].key] + ' both use .' + all[i].x + ': an address conflict. arping -D finds it.');
+  return w;
+}
+function neighborList(H) {
+  var out = [], pairs = [['A', 'B'], ['A', 'C'], ['B', 'C'], ['A', 'S'], ['B', 'S'], ['C', 'S']];
+  pairs.forEach(function (pq) {
+    var p = pq[0], q = pq[1]; if (!H[p].on || !H[q].on) return;
+    var li = [];
+    [[p, q], [q, p]].forEach(function (st) {
+      var s = st[0], t = st[1];
+      H[t].addrs.forEach(function (a) {
+        var yes = sees(H, s, a.x);
+        li.push(NAMES[s] + ' asks: is .' + a.x + ' inside ' + H[s].addrs.map(rng).join(' or ') + '? <span class="' + (yes ? 'yes' : 'no') + '">' + (yes ? 'Yes' : 'No') + '</span>');
+      });
+    });
+    var st = pairStatus(H, p, q);
+    out.push('<li><b>' + NAMES[p] + ' and ' + NAMES[q] + ':</b> ' + (st === 'works' ? '<span class="yes">ping works both ways</span>' : st === 'oneway' ? '<span class="oneway">only one side sees the other, so ping fails</span>' : '<span class="no">different subnets, so ping fails</span>') + '<ul class="list">' + li.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul></li>');
+  });
+  return '<ul class="list">' + out.join('') + '</ul>';
+}
+function routeText(H, k) {
+  return H[k].addrs.slice().sort(function (a, b) { return a.net - b.net || a.p - b.p; }).map(function (a) { return A(a.net) + '/' + a.p + ' dev eth0 proto kernel scope link src ' + A(a.x); }).join('\n');
+}
+
+/* ===================================================== LEARN */
+var lessonState = { i: store.get('lesson', -1), H: null, l1p: 26, l2: { x: 75, p: 27, reveal: Infinity }, l3: { x: 130, p: 25, y: 200 }, task: null };
+var LESSONS = [
+  { t: 'Bits and the mask', setup: l1 },
+  { t: 'Network, broadcast, hosts', setup: l2 },
+  { t: 'Same subnet or not?', setup: l3 },
+  { t: 'Overlapping subnets', setup: l4 },
+  { t: 'One host, two subnets', setup: l5 },
+  { t: 'Join and leave a subnet', setup: l6 }
+];
+var PARTS = [
+  { t: 'Part 1: Read an address', l: [[0, 'Move a slider and see how the prefix length sets the mask.'], [1, 'Find the network address, the broadcast address, and the hosts of a subnet.'], [2, 'Compare network bits to tell whether two addresses share a subnet.']] },
+  { t: 'Part 2: Hosts on one switch', l: [[3, 'Change a host\'s address until the ping works both ways.'], [4, 'Give one host a second address to reach a small subnet.']] },
+  { t: 'Part 3: Do it on a real computer', l: [[5, 'Pick the Linux or Windows command that joins or leaves a subnet.']] }
+];
+function renderStepper() {
+  var st = $('#stepper');
+  st.innerHTML = '<button data-l="-1"' + (lessonState.i === -1 ? ' aria-current="step"' : '') + '><span class="num" aria-hidden="true">☰</span>Lesson map</button>' +
+    LESSONS.map(function (L, i) { return '<button data-l="' + i + '" class="' + (progress.lessons[i] ? 'done' : '') + '"' + (i === lessonState.i ? ' aria-current="step"' : '') + '><span class="num">' + (progress.lessons[i] ? '✓' : i + 1) + '</span>' + L.t + '</button>'; }).join('');
+  $$('[data-l]', st).forEach(function (b) { b.onclick = function () { openLesson(+b.getAttribute('data-l')); }; });
+  var done = Object.keys(progress.lessons).length; $('#lprog').style.width = (done / LESSONS.length * 100) + '%';
+}
+function openLesson(i) {
+  lessonState.i = Math.max(-1, Math.min(LESSONS.length - 1, i)); store.set('lesson', lessonState.i);
+  renderStepper(); $('#lfig').innerHTML = ''; $('#ltry').innerHTML = '';
+  if (lessonState.i < 0) showMap(); else LESSONS[lessonState.i].setup();
+  var last = lessonState.i === LESSONS.length - 1;
+  $('#ltry').insertAdjacentHTML('beforeend', '<div class="navrow"><button class="btn alt" id="lprev"' + (lessonState.i < 0 ? ' disabled' : '') + '>← ' + (lessonState.i === 0 ? 'Lesson map' : 'Back') + '</button>' +
+    (last ? '<button class="btn amber" id="lnext">Take the challenge →</button>' : '<button class="btn" id="lnext">' + (lessonState.i < 0 ? 'Start Lesson 1 →' : 'Next lesson →') + '</button>') + '</div>');
+  $('#lprev').onclick = function () { openLesson(lessonState.i - 1); };
+  $('#lnext').onclick = function () { if (!last) openLesson(lessonState.i + 1); else go('challenge'); };
+  writeLink();
+}
+function showMap() {
+  $('#ltext').innerHTML = '<h2>Lesson map</h2><p>Six short lessons in three parts. Each one ends with a quick task worth 20 points.</p><p>Take them in order, or jump to any lesson from the bar above.</p>';
+  $('#lfig').innerHTML = '<div class="card map">' + PARTS.map(function (P) {
+    return '<h3>' + P.t + '</h3>' + P.l.map(function (x) {
+      var i = x[0];
+      return '<button class="mapitem' + (progress.lessons[i] ? ' done' : '') + '" data-open="' + i + '"><span class="num">' + (progress.lessons[i] ? '✓' : i + 1) + '</span><span><b>' + LESSONS[i].t + '</b><br><span class="sub">' + x[1] + '</span></span></button>';
+    }).join('');
+  }).join('') + '</div>';
+  $$('[data-open]').forEach(function (b) { b.onclick = function () { openLesson(+b.getAttribute('data-open')); }; });
+}
+function lessonDone(fb, msg) {
+  fb.className = 'feedback ok'; fb.innerHTML = '✓ ' + msg + (progress.lessons[lessonState.i] ? '' : ' <b>+20 points</b>');
+  if (!progress.lessons[lessonState.i]) { progress.lessons[lessonState.i] = true; addXP(20); renderStepper(); if (Object.keys(progress.lessons).length === LESSONS.length) earn('learned'); }
+}
+function wrong(fb, msg) { fb.className = 'feedback bad'; fb.innerHTML = msg; }
+/* Every lesson: short intro, its controls, then "Show more" and "Terms in this lesson" (closed). The Try it task sits in #ltry. */
+function lessonHead(n, title, o) {
+  $('#ltext').innerHTML = '<p class="mono" style="color:var(--muted);margin:0">Lesson ' + n + ' of 6</p><h2>' + title + '</h2>' + o.intro + (o.controls || '') +
+    (o.more ? '<details class="fold"><summary>Show more</summary>' + o.more + '</details>' : '') +
+    '<details class="fold"><summary>Terms in this lesson</summary><ul class="list">' + o.terms.map(function (t) { return '<li><b>' + t[0] + ':</b> ' + t[1] + '</li>'; }).join('') + '</ul></details>';
+  $('#ltry').innerHTML = '<div class="tryit"><h3>Try it</h3>' + o.tryit + '</div>';
+}
+function prefixSelect(id, sel) { return '<span>/</span><select id="' + id + '" aria-label="Prefix length">' + [24, 25, 26, 27, 28, 29, 30].map(function (p) { return '<option' + (p === sel ? ' selected' : '') + '>' + p + '</option>'; }).join('') + '</select>'; }
+
+/* Lesson 1: bits and the mask */
+function l1() {
+  var targets = [25, 26, 27, 28, 29, 30, 16, 20, 22], tp = lessonState.task && lessonState.task.l === 1 ? lessonState.task.p : pick(targets);
+  lessonState.task = { l: 1, p: tp };
+  lessonHead(1, 'Bits and the mask', {
+    intro: '<p>An IP (Internet Protocol) version 4 address has 32 bits, written as four numbers from 0 to 255.</p>' +
+      '<p>The <b>prefix length</b> after the slash counts the <b>network bits</b> from the left; the rest are <b>host bits</b>. The <b>subnet mask</b> writes the same split as four numbers: 1 for each network bit, 0 for each host bit.</p>',
+    controls: '<div class="row"><label>Prefix length <input type="range" id="l1p" min="8" max="30" value="' + lessonState.l1p + '"> <output id="l1o" class="mono"></output></label></div>',
+    more: '<p>Linux shows the prefix length (/26). Windows shows the mask (255.255.255.192). Both describe the same split.</p><p>Each 255 in a mask is eight network bits in a row.</p>',
+    terms: [['IP (Internet Protocol) address', 'a 32-bit number that names a host on a network'], ['Bit and byte', 'a bit is a 0 or a 1; a byte is 8 bits, one of the four numbers'],
+      ['Prefix length', 'the number after the slash: how many bits, from the left, name the network'], ['Network bits and host bits', 'the left part names the network; the right part names one host in it'],
+      ['Subnet mask', 'the same split as four numbers: 1 for network bits, 0 for host bits']],
+    tryit: '<p>Move the slider until the mask is <b class="mono">' + maskStr(tp) + '</b>.</p><div class="feedback" id="l1fb" aria-live="polite"></div>'
+  });
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">The address ' + esc(A(130)) + ' and its mask</p><div class="fig"><svg id="l1svg" role="img" aria-label="Network bits shaded, host bits white"></svg></div>' +
+    '<ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>network bit</li><li><i style="background:#fff;border:1px solid #9DB3C1"></i>host bit</li><li><i style="background:#F5A524"></i>the split</li></ul><div id="l1facts" class="soft"></div></div>';
+  function upd() {
+    var p = +$('#l1p').value; lessonState.l1p = p; $('#l1o').textContent = '/' + p;
+    var n = IP.toInt(A(130));
+    drawBits($('#l1svg'), [{ label: 'Mask /' + p, n: IP.mask(p), bold: true, right: maskStr(p) }, { label: 'Address', n: n }], p);
+    $('#l1facts').innerHTML = '<b>/' + p + '</b> = mask <span class="addr">' + maskStr(p) + '</span>: ' + p + ' network bits and ' + (32 - p) + ' host bits.';
+    var fb = $('#l1fb');
+    if (p === tp) lessonDone(fb, 'Right: /' + tp + ' is ' + maskStr(tp) + '. Each 255 is eight network bits.'); else { fb.className = 'feedback'; fb.innerHTML = ''; }
+  }
+  $('#l1p').oninput = upd; upd();
+}
+
+/* Lesson 2: network, broadcast, and host range */
+function l2() {
+  var s = lessonState.l2, t = lessonState.task && lessonState.task.l === 2 ? lessonState.task : null;
+  if (!t) { var p = pick([26, 27, 28]), x = rnd(1, 254), q = pick(['broadcast', 'network']); t = { l: 2, p: p, x: x, q: q }; lessonState.task = t; }
+  s.reveal = Infinity;
+  lessonHead(2, 'Network address, broadcast address, and hosts', {
+    intro: '<p>Keep the network bits of an address, then fill in the host bits:</p><ul class="list"><li>All host bits <b>0</b>: the <b>network address</b>, the name of the subnet.</li><li>All host bits <b>1</b>: the <b>broadcast address</b>, which reaches every host in the subnet.</li><li>Everything in between: the <b>host addresses</b>.</li></ul>',
+    controls: '<div class="row"><label class="addrgrp">Address <span class="addr">' + esc(BASE()) + '.</span><input type="number" id="l2x" min="0" max="255" value="' + s.x + '" aria-label="Last number of the address">' + prefixSelect('l2p', s.p) + '</label></div>',
+    more: '<p>With h host bits there are 2<sup>h</sup> − 2 host addresses, because the network and broadcast addresses are not hosts.</p><p>Shortcut: a /27 block holds 2<sup>5</sup> = 32 addresses, so the blocks start at .0, .32, .64, and so on.</p>',
+    terms: [['Network address', 'the first address of a subnet (host bits all 0); it names the subnet'], ['Broadcast address', 'the last address of a subnet (host bits all 1); a packet sent there reaches every host'],
+      ['Host address', 'any address between the two; one per host'], ['Block', 'the run of addresses that share the same network bits; its size is a power of 2']],
+    tryit: '<p>What is the <b>' + t.q + ' address</b> of <span class="addr">' + esc(A(t.x)) + '/' + t.p + '</span>? Type its last number.</p>' +
+      '<div class="row"><label class="addrgrp"><span class="addr">' + esc(BASE()) + '.</span><input type="number" id="l2a" min="0" max="255" aria-label="Last number of your answer"></label><button class="btn small" id="l2c">Check</button><button class="btn alt small" id="l2h">Hint</button></div><div class="feedback" id="l2fb" aria-live="polite"></div>'
+  });
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">In binary</p><div class="row"><button class="btn small" id="l2go">▶ Show the steps</button><button class="btn alt small" id="l2reset">Reset</button></div>' +
+    '<div class="fig"><svg id="l2svg" role="img" aria-label="Mask, address, network address, and broadcast address in binary"></svg></div><div id="l2facts" class="soft"></div>' +
+    '<details class="fold"><summary>Where the subnet sits in the last number</summary><div class="fig"><svg id="l2line" role="img" aria-label="The subnet as a range of addresses"></svg></div></details></div>';
+  var timer = null;
+  function upd() {
+    var x = +$('#l2x').value, p = +$('#l2p').value, card = $('#l2svg').closest('.card'); flag($('#l2x'), !byteOK($('#l2x')));
+    if (!byteOK($('#l2x'))) { clearInterval(timer); markStale(card, true, STALE_MSG); return; } markStale(card, false);
+    s.x = x; s.p = p;
+    var n = IP.toInt(A(x)), sb = sub(x, p);
+    drawBits($('#l2svg'), bitRows(n, p, { reveal: s.reveal === Infinity ? undefined : s.reveal }), p);
+    $('#l2facts').innerHTML = 'Network <b class="addr">' + A(sb.net) + '</b>, broadcast <b class="addr">' + A(sb.bc) + '</b>, hosts <span class="addr">.' + (sb.net + 1) + ' to .' + (sb.bc - 1) + '</span>: 2<sup>' + (32 - p) + '</sup> − 2 = <b>' + IP.hosts(p) + '</b> hosts.';
+    drawLine($('#l2line'), hostsFrom({ A: [[x, p]] }));
+  }
+  function stop() { clearInterval(timer); s.reveal = Infinity; }
+  $('#l2x').oninput = function () { stop(); upd(); }; $('#l2p').onchange = function () { stop(); upd(); };
+  $('#l2x').onchange = function () { if (!byteOK(this)) { this.value = s.x; upd(); } };
+  $('#l2go').onclick = function () {   // starts from the address itself, then sets the host bits one at a time
+    clearInterval(timer); var h = 32 - +$('#l2p').value; s.reveal = 0; upd();
+    timer = setInterval(function () {
+      if (!$('#l2x')) { clearInterval(timer); s.reveal = Infinity; return; }   // the student moved on
+      s.reveal++; if (s.reveal > 2 * h) { clearInterval(timer); s.reveal = Infinity; } upd();
+    }, reduceMotion ? 50 : 320);
+  };
+  $('#l2reset').onclick = function () { stop(); upd(); };
+  var sb = sub(t.x, t.p), ans = t.q === 'broadcast' ? sb.bc : sb.net;
+  $('#l2c').onclick = function () {
+    var v = +$('#l2a').value, fb = $('#l2fb');
+    if (v === ans) lessonDone(fb, 'Correct. ' + A(t.x) + '/' + t.p + ' is in the block .' + sb.net + ' to .' + sb.bc + ', so its ' + t.q + ' address is ' + A(ans) + '.');
+    else wrong(fb, 'Not yet. A /' + t.p + ' block has ' + sb.size + ' addresses. Which multiple of ' + sb.size + ' is just below .' + t.x + '? Type .' + t.x + ' and /' + t.p + ' into the address above and look at the figure.');
+  };
+  $('#l2h').onclick = function () { wrong($('#l2fb'), 'Hint: the blocks start at ' + [0, 1, 2, 3].map(function (i) { return '.' + i * sb.size; }).join(', ') + ', … The ' + t.q + ' address is the ' + (t.q === 'broadcast' ? 'last' : 'first') + ' address of the block.'); };
+  upd();
+}
+
+/* Lesson 3: same subnet or not */
+function l3() {
+  var s = lessonState.l3, t = lessonState.task && lessonState.task.l === 3 ? lessonState.task : null;
+  if (!t) { var p = pick([25, 26, 27]), x = rnd(1, 254), same = Math.random() < 0.5, sb = sub(x, p), y; do { y = same ? rnd(sb.net + 1, sb.bc - 1) : rnd(1, 254); } while (y === x || (!same && inside(y, sb))); t = { l: 3, x: x, y: y, p: p }; lessonState.task = t; }
+  lessonHead(3, 'Same subnet or not?', {
+    intro: '<p>Two addresses are in the same subnet when their <b>network bits are equal</b>. A host sends directly only to addresses in its own subnet.</p><p>In the figure, network bits that differ are outlined in red.</p>',
+    controls: '<div class="row"><label class="addrgrp">Address <span class="addr">' + esc(BASE()) + '.</span><input type="number" id="l3x" min="0" max="255" value="' + s.x + '" aria-label="Last number of the address">' + prefixSelect('l3p', s.p) + '</label>' +
+      '<label class="addrgrp">Other <span class="addr">' + esc(BASE()) + '.</span><input type="number" id="l3y" min="0" max="255" value="' + s.y + '" aria-label="Last number of the other address"></label></div><p id="l3res" class="soft" aria-live="polite"></p>',
+    more: '<p>Only the network bits matter. The host bits may differ; that is what makes the two addresses different hosts.</p>',
+    terms: [['Subnet', 'a group of addresses that share the same network bits'], ['Same subnet', 'equal network bits under the same prefix length'], ['Neighbor', 'a host in your own subnet, which you reach directly']],
+    tryit: '<p>Are <span class="addr">' + esc(A(t.x)) + '</span> and <span class="addr">' + esc(A(t.y)) + '</span> in the same /' + t.p + ' subnet?</p><div class="row"><button class="btn small" id="l3yes">Yes</button><button class="btn small" id="l3no">No</button></div><div class="feedback" id="l3fb" aria-live="polite"></div>'
+  });
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">Compare the network bits</p><div class="fig"><svg id="l3svg" role="img" aria-label="The two addresses in binary"></svg></div>' +
+    '<details class="fold"><summary>On the address line</summary><div class="fig"><svg id="l3line" role="img" aria-label="The subnet and the other address"></svg></div></details></div>';
+  function upd() {
+    var x = +$('#l3x').value, p = +$('#l3p').value, y = +$('#l3y').value, card = $('#l3svg').closest('.card'), okx = byteOK($('#l3x')), oky = byteOK($('#l3y'));
+    flag($('#l3x'), !okx); flag($('#l3y'), !oky); $('#l3res').style.opacity = okx && oky ? '' : '.3';
+    if (!okx || !oky) { markStale(card, true, STALE_MSG); return; } markStale(card, false);
+    s.x = x; s.p = p; s.y = y;
+    var n = IP.toInt(A(x)), m = IP.toInt(A(y)), sb = sub(x, p), same = inside(y, sb);
+    drawBits($('#l3svg'), [{ label: 'Mask /' + p, n: IP.mask(p), bold: true }, { label: 'Address', n: n }, { label: 'Other', n: m, compare: n }], p);
+    drawLine($('#l3line'), hostsFrom({ A: [[x, p]] }), { extra: [{ x: y, label: 'other .' + y }] });
+    $('#l3res').innerHTML = same ? '<span class="yes">Same subnet.</span> .' + y + ' is inside .' + sb.net + ' to .' + sb.bc + '.' : '<span class="no">Different subnets.</span> .' + y + ' is outside .' + sb.net + ' to .' + sb.bc + '; it is in ' + A(sub(y, p).net) + '/' + p + '.';
+  }
+  ['#l3x', '#l3y'].forEach(function (id) { $(id).oninput = upd; $(id).onchange = function () { if (!byteOK(this)) { this.value = id === '#l3x' ? s.x : s.y; upd(); } }; }); $('#l3p').onchange = upd;
+  function answer(yes) {
+    var sb = sub(t.x, t.p), same = inside(t.y, sb), fb = $('#l3fb');
+    if (yes === same) lessonDone(fb, (same ? 'Yes' : 'No') + ': the /' + t.p + ' block of .' + t.x + ' is .' + sb.net + ' to .' + sb.bc + ', and .' + t.y + ' is ' + (same ? 'inside' : 'outside') + ' it.');
+    else wrong(fb, 'Look again: the /' + t.p + ' block of .' + t.x + ' is .' + sb.net + ' to .' + sb.bc + '. Is .' + t.y + ' in that range? Try the numbers in the boxes above.');
+  }
+  $('#l3yes').onclick = function () { answer(true); }; $('#l3no').onclick = function () { answer(false); };
+  upd();
+}
+
+/* Lessons 4 and 5 share one figure card: ping controls, the topology, the ping log; extras folded closed */
+var HOST_TERMS = [['Switch', 'joins the hosts\' cables; it never reads IP (Internet Protocol) addresses and passes every broadcast to every port'],
+  ['Ping', 'sends an echo request and waits for an echo reply'],
+  ['ARP (Address Resolution Protocol)', 'a broadcast that asks "who has this address?"; the owner replies with its MAC address'],
+  ['MAC (Media Access Control) address', 'the hardware address of a network card, used to deliver a frame on the switch'],
+  ['Routing table', 'a host\'s list of subnets it reaches directly (see it with ip route)'],
+  ['Router and default route', 'a router joins different networks; a default route sends everything else to it. This network has neither.']];
+function explorePanel(H, goal) {
+  $('#lfig').innerHTML =
+    '<div class="card" id="pcard"><p class="figtitle">How the hosts are connected</p><div class="p_controls"></div>' +
+    '<div class="fig"><svg id="topo" role="img" aria-label="Hosts cabled to the switch; lines under the hosts show who can ping whom"></svg></div>' +
+    '<ul class="legend"><li><i style="background:#13A88A"></i>ping works</li><li><i style="background:#D98A00"></i>only one side sees the other</li><li><i style="background:#E5484D"></i>different subnets</li><li><i style="background:#fff;border:2px solid #00A2D7"></i>request</li><li><i style="background:#F5A524"></i>reply</li></ul>' +
+    '<div class="p_out"></div>' +
+    '<details class="fold"><summary>Where each subnet sits</summary><div class="fig"><svg id="aline" role="img" aria-label="Each host\'s subnet as a range of addresses"></svg></div><p class="cmdnote">The same color means the same subnet. A dashed line marks each address. A host is a neighbor when its line crosses the other host\'s bar.</p></details>' +
+    '<details class="fold"><summary>The neighbor test and routing tables</summary><div id="nlist"></div><h3>Routing tables (ip route)</h3><div id="routes"></div></details></div>';
+  var pinger = new Pinger($('#pcard'), function () { return H; });
+  pinger.mount();
+  function redraw() {
+    var stage = drawTopo($('#topo'), H); pinger.setStage(stage);
+    drawLine($('#aline'), H);
+    $('#nlist').innerHTML = neighborList(H);
+    $('#routes').innerHTML = ['A', 'B', 'C'].filter(function (k) { return H[k].on; }).map(function (k) { return '<p class="cmdnote" style="margin:6px 0 0">' + NAMES[k] + '</p><div class="cmd"><code>' + esc(routeText(H, k)) + '</code><span></span></div>'; }).join('');
+    var w = warnings(H); $('#hwarn').innerHTML = w.map(esc).join('<br>'); $('#hwarn').hidden = !w.length;
+    goal();
+  }
+  pinger.onReset = function () { var stage = drawTopo($('#topo'), H); pinger.setStage(stage); };
+  hostEditor($('#heditor'), H, function () { pinger.fill(); pinger.reset(); redraw(); }, { allowC: false, onIncomplete: function (on) {
+    pinger.blocked = on; pinger.reset();
+    markStale($('#pcard'), on, STALE_MSG);
+    if (on) $$('#ltry .feedback').forEach(function (fb) { fb.className = 'feedback'; fb.innerHTML = ''; });
+  } });
+  pinger.fill(); redraw();
+  window.onresize = function () { if ($('#topo')) { var st = drawTopo($('#topo'), H); pinger.setStage(st); } };
+}
+
+/* Lesson 4: overlapping subnets (the core idea) */
+var L4 = { A: 40, B: 200, S: 254 };
+function l4() {
+  var H = lessonState.H = hostsFrom({ A: [[L4.A, 24]], B: [[L4.B, 25]], C: null, S: [[L4.S, 24]] });
+  lessonHead(4, 'Overlapping subnets', {
+    intro: '<p>Each host decides <b>on its own</b>, from its address and mask, which addresses are its neighbors. A ping works only when <b>each host finds the other inside its own subnet</b>.</p>' +
+      '<p>When two hosts use <b>different masks</b>, their subnets can <b>overlap</b>: a /25 is one half of a /24. Then one host sees the other, but not the other way around.</p>',
+    controls: '<div id="heditor"></div><p id="hwarn" class="feedback bad" hidden></p>',
+    more: '<p>The switch never reads IP (Internet Protocol) addresses. It passes every broadcast, such as an ARP (Address Resolution Protocol) request, to every port, so every host hears it.</p>' +
+      '<p>A host answers only when the sender is inside its own subnet. There is no router here, so a host with no matching subnet gives up at once.</p>',
+    terms: HOST_TERMS.concat([['Overlap', 'two subnets that share addresses, such as a /24 and one of its /25 halves']]),
+    tryit: '<p>Right now only Host A sees Host B. <b>Keep Host B on /25 and change only its address</b> so that the ping works both ways. Then press Ping to watch it.</p><div class="feedback" id="l4fb" aria-live="polite"></div><button class="btn alt small" id="l4reset">Start over</button>'
+  });
+  $('#l4reset').onclick = function () { openLesson(3); };
+  explorePanel(H, function () {
+    var fb = $('#l4fb'), B = H.B.addrs[0], a = H.A.addrs[0];
+    if (H.B.addrs.length === 1 && B.p === 25 && H.A.addrs.length === 1 && a.x === L4.A && a.p === 24 && H.S.addrs[0].x === L4.S && H.S.addrs[0].p === 24 && !warnings(H).length && pairStatus(H, 'A', 'B') === 'works') {
+      var sb = sub(B.x, 25), sw = simulate(H, 'B', L4.S).ok;
+      lessonDone(fb, 'Yes! Host B at .' + B.x + '/25 covers .' + sb.net + ' to .' + sb.bc + ', and that includes Host A at .' + L4.A + '. Host A uses /24, so it sees .' + B.x + ' too.' +
+        (sw ? '' : ' Notice that Host B now cannot reach the switch at .' + L4.S + '.'));
+    } else { fb.className = 'feedback'; fb.innerHTML = ''; }
+  });
+}
+
+/* Lesson 5: one host in two subnets */
+var L5 = { A: 40, B: 150, S: 254 };
+function l5() {
+  var H = lessonState.H = hostsFrom({ A: [[L5.A, 24]], B: [[L5.B, 26]], C: null, S: [[L5.S, 24]] });
+  var bs = sub(L5.B, 26);
+  lessonHead(5, 'One host, two subnets', {
+    intro: '<p>One interface can carry <b>several addresses</b>, each with its own mask. The host then has one line in its routing table for each subnet.</p>' +
+      '<p>When a destination fits more than one subnet, the host uses the <b>most specific</b> one (the longest prefix) and sends from its address there.</p>',
+    controls: '<div id="heditor"></div><p id="hwarn" class="feedback bad" hidden></p>',
+    more: '<p>This is how a host joins a second, smaller subnet without leaving its first one. Open "The neighbor test and routing tables" under the figure to see both lines.</p>',
+    terms: [['Interface', 'a network connection of a host, such as eth0 on Linux or Ethernet on Windows'], ['Routing table', 'a host\'s list of subnets it reaches directly (see it with ip route)'],
+      ['Longest prefix match', 'when several subnets fit, the one with the longest prefix wins'], ['Source address', 'the sender\'s own address written in the packet; the host picks the one in the matching subnet']].concat(HOST_TERMS.slice(1, 4)),
+    tryit: '<p>Host B is on the small subnet .' + bs.net + '/26 (.' + bs.net + ' to .' + bs.bc + '), which leaves out the switch at .' + L5.S + '. Tick <b>second address</b> for Host A and set it so that <b>Host A and Host B can ping each other</b>, while <b>Host B still cannot reach the switch</b>.</p><div class="feedback" id="l5fb" aria-live="polite"></div><button class="btn alt small" id="l5reset">Start over</button>'
+  });
+  $('#l5reset').onclick = function () { openLesson(4); };
+  explorePanel(H, function () {
+    var fb = $('#l5fb'), s = H.S.addrs[0];
+    if (H.A.addrs.length === 2 && pairStatus(H, 'A', 'B') === 'works' && !simulate(H, 'B', s.x).ok && simulate(H, 'A', s.x).ok && !warnings(H).length)
+      lessonDone(fb, 'Well done. Host A keeps .' + H.A.addrs[0].x + '/' + H.A.addrs[0].p + ' for the switch and uses .' + H.A.addrs[1].x + '/' + H.A.addrs[1].p + ' to reach Host B. Open the routing tables under the figure: Host A has two lines, one per subnet.');
+    else { fb.className = 'feedback'; fb.innerHTML = ''; }
+  });
+}
+
+/* Lesson 6: commands */
+function l6() {
+  var q = lessonState.task && lessonState.task.l === 6 ? lessonState.task.q : genCmdQuestion();
+  lessonState.task = { l: 6, q: q };
+  lessonHead(6, 'Join and leave a subnet', {
+    intro: '<p>To <b>join</b> a subnet, give the interface an address and prefix length in that subnet. To <b>leave</b> it, remove that address.</p>' +
+      '<p>Linux uses <code>ip addr add</code> and <code>ip addr del</code>. Windows uses <code>netsh interface ipv4 add address</code> and <code>delete address</code>, run as administrator.</p>',
+    controls: '<div class="row"><label class="addrgrp">Address <span class="addr">' + esc(BASE()) + '.</span><input type="number" id="l6x" min="1" max="254" value="130" aria-label="Last number of the address">' + prefixSelect('l6p', 25) + '</label></div>',
+    more: '<p>Check first that nobody else uses the address, with <code>arping -D</code> on Linux. Linux forgets the change at the next restart; Windows keeps it.</p><p>PowerShell has the same pair: <code>New-NetIPAddress</code> and <code>Remove-NetIPAddress</code>.</p>',
+    terms: [['Interface name', 'eth0 or enp0s3 on Linux, "Ethernet" on Windows; ip addr or ipconfig /all lists them'], ['sudo', 'runs one Linux command as the administrator (root)'],
+      ['Administrator', 'on Windows, open Command Prompt or PowerShell with "Run as administrator"'], ['arping -D', 'duplicate address detection: asks "who has this address?"; no reply means it is free'],
+      ['DHCP (Dynamic Host Configuration Protocol)', 'hands out addresses automatically; New-NetIPAddress turns it off on that adapter']],
+    tryit: '<p>' + q.text + '</p><div class="choices" id="l6c">' + q.choices.map(function (c, i) { return '<button class="choice" data-i="' + i + '"><code>' + esc(c) + '</code></button>'; }).join('') + '</div><div class="feedback" id="l6fb" aria-live="polite"></div>'
+  });
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">Commands for this address</p><div id="l6cmds"></div></div>';
+  var l6last = 130;
+  function upd() { var x = +$('#l6x').value, p = +$('#l6p').value, card = $('#l6cmds').closest('.card'); flag($('#l6x'), !byteOK($('#l6x'))); if (!byteOK($('#l6x'))) { markStale(card, true, 'Type a last number from 0 to 255. The commands update when the address is complete.'); return; } markStale(card, false); l6last = x; var sb = sub(x, p); renderCommands($('#l6cmds'), A(x), p, A(x === sb.net + 1 ? sb.net + 2 : sb.net + 1)); }
+  $('#l6x').oninput = upd; $('#l6p').onchange = upd; $('#l6x').onchange = function () { if (!byteOK(this)) { this.value = l6last; upd(); } }; upd();
+  $$('#l6c .choice').forEach(function (b) {
+    b.onclick = function () {
+      var i = +b.getAttribute('data-i'), fb = $('#l6fb');
+      $$('#l6c .choice').forEach(function (c) { c.classList.remove('right', 'wrong'); });
+      if (i === q.answer) { b.classList.add('right'); lessonDone(fb, q.explain); } else { b.classList.add('wrong'); wrong(fb, 'Not this one. ' + q.hint); }
+    };
+  });
+}
+
+/* ===================================================== CALCULATOR */
+function calcInit() {
+  var sp = $('#s_p'); sp.innerHTML = '';
+  for (var p = 1; p <= 32; p++) sp.insertAdjacentHTML('beforeend', '<option value="' + p + '"' + (p === 26 ? ' selected' : '') + '>/' + p + ' (' + IP.size(p) + ' addresses)</option>');
+  $('#c_ip').oninput = function () { var r = IP.parse($('#c_ip').value); if (r && r.p !== null) $('#c_p').value = r.p; calc(); };
+  $('#c_p').oninput = function () { var r = IP.parse($('#c_ip').value); if (r) $('#c_ip').value = IP.str(r.ip) + '/' + $('#c_p').value; calc(); };
+  ['#o_a', '#o_b'].forEach(function (id) { $(id).oninput = overlap; });
+  $('#s_net').oninput = split; sp.onchange = split;
+  calc(); overlap(); split();
+}
+function calc() {
+  var r = IP.parse($('#c_ip').value), err = $('#c_err');
+  var card = $('#c_stats').closest('.card'); flag($('#c_ip'), !r);
+  if (!r) { err.textContent = 'Type an address such as 192.168.10.130/25 or 192.168.10.130 255.255.255.128.'; card.classList.add('stale'); return; }
+  card.classList.remove('stale');
+  var p = r.p === null ? +$('#c_p').value : r.p; err.textContent = '';
+  $('#c_pout').textContent = '/' + p;
+  var n = r.ip, net = IP.net(n, p), bc = IP.bcast(n, p);
+  var first = p >= 31 ? net : net + 1, last = p >= 31 ? bc : bc - 1;
+  var note = n === net && p < 31 ? 'This is the network address itself: no host can use it.' : n === bc && p < 31 ? 'This is the broadcast address: no host can use it.' : p === 31 ? 'A /31 is a point-to-point link: both addresses are hosts.' : p === 32 ? 'A /32 is a single address.' : '';
+  var stats = [['Subnet', IP.str(net) + '/' + p], ['Subnet mask', maskStr(p)], ['Network address', IP.str(net)], ['Broadcast address', p === 32 ? 'none' : IP.str(bc)],
+    ['First host', IP.str(first)], ['Last host', IP.str(last)], ['Number of hosts', IP.hosts(p).toLocaleString('en-US')], ['Block size', IP.size(p).toLocaleString('en-US') + ' addresses']];
+  $('#c_stats').innerHTML = stats.map(function (s) { return '<div class="stat"><div class="k">' + s[0] + '</div><div class="v">' + s[1] + '</div></div>'; }).join('') + (note ? '<div class="stat" style="grid-column:1/-1;background:var(--amber-soft)"><div class="k">Note</div><div>' + note + '</div></div>' : '');
+  drawBits($('#c_bits'), bitRows(n, p), p);
+  renderCommands($('#c_cmds'), IP.str(n), p, IP.str(n === first && first !== last ? last : first));
+  writeLink();
+}
+function overlap() {
+  var a = IP.parse($('#o_a').value), b = IP.parse($('#o_b').value), out = $('#o_res');
+  var ocard = $('#o_fig').closest('.card'); flag($('#o_a'), !a || a.p === null); flag($('#o_b'), !b || b.p === null);
+  if (!a || !b || a.p === null || b.p === null) { out.innerHTML = 'Type both subnets with a prefix length, such as 192.168.10.0/24.'; $('#o_fig').style.opacity = '.3'; return; }
+  $('#o_fig').style.opacity = '';
+  var an = IP.net(a.ip, a.p), ab = IP.bcast(a.ip, a.p), bn = IP.net(b.ip, b.p), bb = IP.bcast(b.ip, b.p), msg;
+  if (an === bn && ab === bb) msg = '<span class="yes">The same subnet.</span>';
+  else if (an <= bn && bb <= ab) msg = '<span class="oneway">They overlap: subnet 2 is inside subnet 1.</span> Every address of subnet 2 is also in subnet 1, so hosts that use these two masks may disagree about who is a neighbor.';
+  else if (bn <= an && ab <= bb) msg = '<span class="oneway">They overlap: subnet 1 is inside subnet 2.</span> Every address of subnet 1 is also in subnet 2, so hosts that use these two masks may disagree about who is a neighbor.';
+  else msg = '<span class="no">No overlap.</span> No address is in both subnets.';
+  out.innerHTML = msg + '<br><span class="addr">' + IP.str(an) + '/' + a.p + ': ' + IP.str(an) + ' to ' + IP.str(ab) + '</span><br><span class="addr">' + IP.str(bn) + '/' + b.p + ': ' + IP.str(bn) + ' to ' + IP.str(bb) + '</span>';
+  var lo = Math.min(an, bn), hi = Math.max(ab, bb), span = hi - lo + 1;
+  var f = new Fig($('#o_fig'), 0, 11, 0, 1.9, 1.15), L0 = 1.6, L1 = 10.6, X = function (v) { return L0 + (v - lo) / span * (L1 - L0); };
+  [[an, ab, 'Subnet 1', 1.15, SUBNET_COLORS[0]], [bn, bb, 'Subnet 2', 0.6, SUBNET_COLORS[1]]].forEach(function (s) {
+    f.text(L0 - 0.1, s[3] + 0.2, s[2], { fs: 8.5, ha: 'right', bold: true, color: C.navy });
+    f.rect(X(s[0]), s[3], Math.max(0.05, X(s[1] + 1) - X(s[0])), 0.4, { fill: s[4].fill, stroke: s[4].line, lw: 1.4, rx: 0.04 });
+  });
+  f.text(X(lo), 0.3, IP.str(lo), { fs: 7.5, ha: 'left', color: C.muted }); f.text(L1, 0.3, IP.str(hi), { fs: 7.5, ha: 'right', color: C.muted });
+}
+function split() {
+  var r = IP.parse($('#s_net').value), np = +$('#s_p').value, out = $('#s_res'), list = $('#s_list');
+  if (!r || r.p === null) { out.textContent = 'Type a network with its prefix length, such as 192.168.10.0/24.'; list.innerHTML = ''; return; }
+  if (np < r.p) { out.textContent = 'Pick a block size smaller than the network (a prefix of /' + r.p + ' or longer).'; list.innerHTML = ''; return; }
+  var net = IP.net(r.ip, r.p), count = Math.pow(2, np - r.p), size = IP.size(np), show = Math.min(count, 64), items = [];
+  for (var i = 0; i < show; i++) { var b = net + i * size; items.push('<li>' + IP.str(b) + '/' + np + (np <= 30 ? ': hosts ' + IP.str(b + 1) + ' to ' + IP.str(b + size - 2) : '') + ', broadcast ' + IP.str(b + size - 1) + '</li>'); }
+  out.innerHTML = IP.str(net) + '/' + r.p + ' splits into <b>' + count.toLocaleString('en-US') + '</b> blocks of ' + size.toLocaleString('en-US') + ' addresses' + (count > show ? '. The first ' + show + ' are listed.' : '.');
+  list.innerHTML = items.join('');
+}
+
+/* ===================================================== CHALLENGE: question generators */
+function blockQ(level, kind) {   // network, broadcast, first or last host
+  var p = level === 'E' ? pick([25, 26]) : level === 'M' ? pick([26, 27, 28]) : pick([27, 28, 29, 30]);
+  var x, sb; do { x = rnd(1, 254); sb = sub(x, p); } while (x === sb.net || x === sb.bc);
+  var ans = kind === 'network' ? sb.net : kind === 'broadcast' ? sb.bc : kind === 'first host' ? sb.net + 1 : sb.bc - 1;
+  return { type: 'block', tag: 'mask', text: 'What is the <b>' + kind + '</b> address of <span class="addr">' + esc(A(x)) + '/' + p + '</span>?', input: 'byte', answer: ans,
+    hint: 'A /' + p + ' block holds ' + sb.size + ' addresses. Find the multiple of ' + sb.size + ' at or below .' + x + '.',
+    explain: '/' + p + ' blocks hold ' + sb.size + ' addresses, so .' + x + ' is in the block .' + sb.net + ' to .' + sb.bc + '. The ' + kind + ' address is ' + A(ans) + '.', fig: { hosts: { A: [[x, p]] } } };
+}
+function hostsQ(level) {
+  var p = level === 'E' ? pick([24, 25, 26, 27]) : level === 'M' ? pick([26, 27, 28, 29]) : pick([28, 29, 30, 22, 20]);
+  return { type: 'hosts', tag: 'mask', text: 'How many <b>host addresses</b> can a /' + p + ' subnet hold?', input: 'number', answer: IP.hosts(p),
+    hint: 'Count the host bits h = 32 − ' + p + ', then compute 2^h − 2.', explain: 'A /' + p + ' has ' + (32 - p) + ' host bits: 2^' + (32 - p) + ' − 2 = ' + IP.hosts(p) + ' hosts. The network and broadcast addresses are not hosts.' };
+}
+function maskQ(level) {
+  var p = level === 'E' ? pick([24, 25, 26, 27]) : pick([26, 27, 28, 29, 30, 20, 22]);
+  if (Math.random() < 0.5) {
+    var opts = shuffle(uniq([p, p + 1 > 30 ? p - 2 : p + 1, p - 1, p === 24 ? 16 : p + 2 > 30 ? p - 3 : p + 2]).slice(0, 4).map(maskStr));
+    return { type: 'mask', tag: 'mask', text: 'Which subnet mask is the same as <b>/' + p + '</b>?', input: 'choice', choices: opts, answer: opts.indexOf(maskStr(p)),
+      hint: 'Write ' + p + ' ones followed by ' + (32 - p) + ' zeros, eight bits per number.', explain: '/' + p + ' means ' + p + ' network bits, written as ' + maskStr(p) + '.' };
+  }
+  return { type: 'mask', tag: 'mask', text: 'The mask <span class="addr">' + maskStr(p) + '</span> is which prefix length? Type the number after the slash.', input: 'number', answer: p,
+    hint: 'Count the 1 bits: 255 is eight of them, ' + maskLast(p > 24 ? p : 24) + ' in the last number is ' + Math.max(0, p - 24) + '.', explain: maskStr(p) + ' has ' + p + ' bits set to 1, so it is /' + p + '.' };
+}
+function uniq(a) { return a.filter(function (v, i) { return a.indexOf(v) === i && v >= 8 && v <= 30; }); }
+function sameQ(level) {
+  var p = level === 'E' ? pick([25, 26]) : pick([26, 27, 28]), x = rnd(1, 254), sb = sub(x, p), same = Math.random() < 0.5, y;
+  do { y = same ? rnd(sb.net + 1, sb.bc - 1) : rnd(Math.max(1, sb.net - sb.size), Math.min(254, sb.bc + sb.size)); } while (y === x || (!same && inside(y, sb)) || y === sub(y, p).net || y === sub(y, p).bc);
+  return { type: 'same', tag: 'same', text: 'Are <span class="addr">' + esc(A(x)) + '</span> and <span class="addr">' + esc(A(y)) + '</span> in the same <b>/' + p + '</b> subnet?', input: 'choice', choices: ['Yes', 'No'], answer: same ? 0 : 1,
+    hint: 'Find the /' + p + ' block of .' + x + ' (blocks of ' + sb.size + ').', explain: 'The /' + p + ' block of .' + x + ' is .' + sb.net + ' to .' + sb.bc + '. .' + y + ' is ' + (same ? 'inside' : 'outside') + ' it.', fig: { hosts: { A: [[x, p]] }, extra: [{ x: y, label: 'other .' + y }] } };
+}
+function validQ(level) {
+  var p = level === 'M' ? pick([26, 27, 28]) : pick([28, 29, 30]), x = rnd(1, 254), sb = sub(x, p);
+  var good = rnd(sb.net + 1, sb.bc - 1), outside = (sb.bc + 1 + rnd(1, 20)) % 256;
+  if (inside(outside, sb) || outside === good) outside = (sb.net + 256 - rnd(1, 20)) % 256;
+  var opts = shuffle([A(sb.net), A(sb.bc), A(good), A(outside)]);
+  return { type: 'valid', tag: 'mask', text: 'A host must join <span class="addr">' + esc(A(sb.net)) + '/' + p + '</span>. Which address can it use?', input: 'choice', choices: opts, answer: opts.indexOf(A(good)),
+    hint: 'The first and last addresses of a block are not hosts, and the address must be inside .' + sb.net + ' to .' + sb.bc + '.', explain: 'The hosts are .' + (sb.net + 1) + ' to .' + (sb.bc - 1) + '. .' + sb.net + ' is the network address, .' + sb.bc + ' is the broadcast address, and .' + outside + ' is in another subnet.' };
+}
+function pingQ() {
+  var want = pick(['3 replies', 'Network is unreachable', 'Destination Host Unreachable']), H, res, tries = 0, a, b;
+  do {
+    var pa = pick([24, 25, 26, 27]), pb = pick([24, 25, 26, 27]);
+    a = rnd(1, 254); b = rnd(1, 254);
+    H = hostsFrom({ A: [[a, pa]], B: [[b, pb]], C: null, S: [[1, 24]] });
+    res = simulate(H, 'A', b); tries++;
+  } while ((res.outcome !== want || warnings(H).length || pa === pb) && tries < 400);
+  var ch = ['3 replies', 'Network is unreachable', 'Destination Host Unreachable'];
+  var why = res.outcome === '3 replies' ? 'Each host finds the other inside its own subnet.' : res.outcome === 'Network is unreachable' ? 'Host A does not find .' + b + ' in its own subnet (' + rng(H.A.addrs[0]) + ') and there is no default route, so nothing is sent.' : 'Host A sends ARP requests, but Host B finds .' + a + ' outside its subnet (' + rng(H.B.addrs[0]) + ') and does not answer.';
+  return { type: 'ping', tag: 'overlap', text: 'Host A is <span class="addr">' + esc(A(a)) + '/' + H.A.addrs[0].p + '</span> and Host B is <span class="addr">' + esc(A(b)) + '/' + H.B.addrs[0].p + '</span>, on the same switch with no router. <b>What does Host A\'s ping to Host B show?</b>', input: 'choice', choices: ch, answer: ch.indexOf(res.outcome),
+    hint: 'First ask: does Host A find .' + b + ' inside its own subnet? Then: does Host B find .' + a + ' inside its subnet?', explain: why, fig: { hosts: { A: [[a, H.A.addrs[0].p]], B: [[b, H.B.addrs[0].p]] } } };
+}
+function overlapQ() {
+  var p1 = pick([24, 25, 26]), p2 = pick([25, 26, 27, 28]), x1 = rnd(0, 255), x2 = rnd(0, 255);
+  var s1 = sub(x1, p1), s2 = sub(x2, p2);
+  var rel = s1.net === s2.net && p1 === p2 ? 0 : s1.net <= s2.net && s2.bc <= s1.bc ? 1 : s2.net <= s1.net && s1.bc <= s2.bc ? 2 : 3;
+  var ch = ['They are the same subnet', 'The second is inside the first', 'The first is inside the second', 'They do not overlap'];
+  return { type: 'overlap', tag: 'overlap', text: 'Compare <span class="addr">' + esc(A(s1.net)) + '/' + p1 + '</span> and <span class="addr">' + esc(A(s2.net)) + '/' + p2 + '</span>. Which is true?', input: 'choice', choices: ch, answer: rel,
+    hint: 'Write each as a range of last numbers: .' + s1.net + ' to ?, and .' + s2.net + ' to ?', explain: 'The first covers .' + s1.net + ' to .' + s1.bc + ' and the second covers .' + s2.net + ' to .' + s2.bc + '. ' + ch[rel] + '.', fig: { hosts: { A: [[s1.net + 1, p1]], B: [[s2.net + 1, p2]] } } };
+}
+function genCmdQuestion() {
+  var p = pick([25, 26, 27, 28]), x = rnd(1, 254), sb = sub(x, p); if (x === sb.net || x === sb.bc) x = sb.net + 1;
+  var ip = A(x), m = maskStr(p), forms = [
+    { text: 'Which command makes a Linux host <b>leave</b> the subnet of <span class="addr">' + esc(ip) + '/' + p + '</span> on eth0?', good: 'sudo ip addr del ' + ip + '/' + p + ' dev eth0',
+      bad: ['sudo ip addr add ' + ip + '/' + p + ' dev eth0', 'sudo ip neigh flush dev eth0', 'sudo ip route del default'], explain: 'ip addr del removes the address, and with it the subnet\'s line in the routing table. ip neigh flush only empties the ARP cache.' },
+    { text: 'Which command makes a Linux host <b>join</b> <span class="addr">' + esc(A(sb.net)) + '/' + p + '</span> as ' + esc(ip) + ' on eth0?', good: 'sudo ip addr add ' + ip + '/' + p + ' dev eth0',
+      bad: ['sudo ip addr add ' + ip + '/24 dev eth0', 'sudo ip route add ' + ip + ' dev eth0', 'ping -c 3 ' + ip], explain: 'ip addr add needs the address and its own prefix length, /' + p + '. With /24 the host would join a different, larger subnet.' },
+    { text: 'Which Windows command adds <span class="addr">' + esc(ip) + '/' + p + '</span> to the adapter "Ethernet"?', good: 'netsh interface ipv4 add address "Ethernet" ' + ip + ' ' + m,
+      bad: ['netsh interface ipv4 add address "Ethernet" ' + ip + ' 255.255.255.0', 'netsh interface ipv4 delete address "Ethernet" ' + ip, 'arp -a'], explain: 'Windows takes the mask in dotted form: /' + p + ' is ' + m + '. delete address removes it again.' },
+    { text: 'Which Windows command <b>removes</b> <span class="addr">' + esc(ip) + '</span> from the adapter "Ethernet"?', good: 'netsh interface ipv4 delete address "Ethernet" ' + ip,
+      bad: ['netsh interface ipv4 add address "Ethernet" ' + ip + ' ' + m, 'route print -4', 'ipconfig /release'], explain: 'netsh interface ipv4 delete address removes one address. ipconfig /release gives back an address that DHCP (Dynamic Host Configuration Protocol) handed out.' },
+    { text: 'Before adding <span class="addr">' + esc(ip) + '</span> on Linux, which command checks that <b>no other host uses it</b>?', good: 'sudo arping -D -c 3 -I eth0 ' + ip,
+      bad: ['ip route', 'sudo ip neigh flush dev eth0', 'ip -4 addr show dev eth0'], explain: 'arping -D (duplicate address detection) asks "Who has this address?" three times. No reply means it is free.' }
+  ];
+  var q = pick(forms), choices = shuffle([q.good].concat(q.bad));
+  return { type: 'cmd', tag: 'cmd', text: q.text, input: 'choice', code: true, choices: choices, answer: choices.indexOf(q.good), hint: 'Join means add, leave means del or delete. Check the prefix length or the mask.', explain: q.explain };
+}
+var GEN = {
+  E: [function () { return blockQ('E', 'network'); }, function () { return blockQ('E', 'broadcast'); }, function () { return hostsQ('E'); }, function () { return maskQ('E'); }, function () { return sameQ('E'); }],
+  M: [function () { return blockQ('M', pick(['network', 'broadcast'])); }, function () { return blockQ('M', pick(['first host', 'last host'])); }, function () { return hostsQ('M'); }, function () { return validQ('M'); }, function () { return sameQ('M'); }, genCmdQuestion, function () { return maskQ('M'); }],
+  H: [pingQ, pingQ, overlapQ, function () { return blockQ('H', pick(['network', 'broadcast', 'last host'])); }, function () { return validQ('H'); }, genCmdQuestion, function () { return hostsQ('H'); }]
+};
+function makeRound(level, n) {
+  var out = [], bag = [];
+  while (out.length < n) { if (!bag.length) bag = shuffle(GEN[level].slice()); out.push(bag.pop()()); }
+  return out;
+}
+
+/* ===================================================== CHALLENGE: play */
+var BADGES = [
+  { id: 'first', b: '🎯', t: 'First round', d: 'Finish a challenge round' },
+  { id: 'perfect', b: '💯', t: 'Perfect 10', d: 'Answer all ten questions right' },
+  { id: 'streak', b: '🔥', t: 'On fire', d: 'Five right answers in a row' },
+  { id: 'mask', b: '🎭', t: 'Mask master', d: 'Every mask and address question right in a round' },
+  { id: 'overlap', b: '🕵️', t: 'Overlap detective', d: 'Three ping or overlap questions right in a Hard round' },
+  { id: 'sprint', b: '⚡', t: 'Speed runner', d: 'Eight right answers in a sprint' },
+  { id: 'learned', b: '📘', t: 'Scholar', d: 'Finish all six lessons' }
+];
+function earn(id) { if (progress.badges[id]) return false; progress.badges[id] = Date.now(); store.set('progress', progress); return true; }
+function renderShelf() {
+  $('#badgeShelf').innerHTML = BADGES.map(function (b) { return '<span class="badge' + (progress.badges[b.id] ? '' : ' locked') + '" title="' + esc(b.d) + '"><span class="b" aria-hidden="true">' + b.b + '</span>' + b.t + '</span>'; }).join('');
+  var best = progress.best; $('#bestLine').textContent = 'Best scores: Easy ' + (best.E || 0) + ', Medium ' + (best.M || 0) + ', Hard ' + (best.H || 0) + (best.S ? ', Sprint ' + best.S : '');
+}
+var game = null;
+function startRound() {
+  var level = ($('.level[aria-pressed=true]') || $('.level')).getAttribute('data-level'), sprint = $('#sprint').checked;
+  game = { level: level, sprint: sprint, qs: makeRound(level, sprint ? 40 : 10), i: 0, score: 0, streak: 0, bestStreak: 0, right: 0, answered: 0, log: [], tags: {}, ends: sprint ? Date.now() + 120000 : 0, timer: null };
+  $('#ch-setup').hidden = true; $('#ch-end').hidden = true; $('#ch-play').hidden = false;
+  $('#q_timerbar').hidden = !sprint;
+  if (sprint) game.timer = setInterval(tick, 250);
+  showQ();
+}
+function tick() {
+  if (!game) return; var left = game.ends - Date.now();
+  $('#q_timer').style.width = Math.max(0, left / 1200) + '%';
+  if (left <= 0) { clearInterval(game.timer); endRound(); }
+}
+function chips() {
+  $('#q_n').textContent = game.sprint ? 'Answered ' + game.answered : 'Question ' + Math.min(game.i + 1, game.qs.length) + ' of ' + game.qs.length;
+  $('#q_score').textContent = '★ ' + game.score;
+  $('#q_streak').textContent = '🔥 streak ' + game.streak;
+}
+function showQ() {
+  if (!game) return; chips();
+  var q = game.qs[game.i], body = $('#q_body'); q.hinted = false;
+  var answerUI = q.input === 'choice'
+    ? '<div class="choices">' + q.choices.map(function (c, i) { return '<button class="choice" data-i="' + i + '">' + (q.code ? '<code>' + esc(c) + '</code>' : esc(c)) + '</button>'; }).join('') + '</div>'
+    : '<div class="row">' + (q.input === 'byte' ? '<span class="addr">' + esc(BASE()) + '.</span>' : '') + '<input type="number" id="q_in" min="0" aria-label="Your answer"><button class="btn" id="q_ok">Check</button></div>';
+  body.innerHTML = '<p class="qtext">' + q.text + '</p>' + (q.fig ? '<div class="fig"><svg id="q_fig" role="img" aria-label="The addresses on the address line"></svg></div>' : '') + answerUI +
+    '<div class="row"><button class="btn alt small" id="q_hint">Hint (−3)</button></div><div class="feedback" id="q_fb" aria-live="polite"></div><div class="row" id="q_nextrow" hidden><button class="btn amber" id="q_next">Next →</button></div>';
+  if (q.fig) drawLine($('#q_fig'), hostsFrom(q.fig.hosts), { extra: q.fig.extra });
+  $('#q_hint').onclick = function () { if (q.hinted || q.done) return; q.hinted = true; var fb = $('#q_fb'); fb.className = 'feedback'; fb.style.background = 'var(--amber-soft)'; fb.innerHTML = '💡 ' + q.hint; };
+  if (q.input === 'choice') $$('.choice', body).forEach(function (b) { b.onclick = function () { answer(+b.getAttribute('data-i'), b); }; });
+  else { $('#q_ok').onclick = function () { answer(+$('#q_in').value); }; $('#q_in').onkeydown = function (e) { if (e.key === 'Enter') answer(+$('#q_in').value); }; $('#q_in').focus(); }
+  $('#q_next').onclick = nextQ;
+}
+function answer(v, btn) {
+  var q = game.qs[game.i]; if (q.done) return; q.done = true;
+  var ok = v === q.answer, fb = $('#q_fb'); fb.style.background = '';
+  game.answered++;
+  if (ok) {
+    game.right++; game.streak++; game.bestStreak = Math.max(game.bestStreak, game.streak);
+    var pts = 10 + Math.min(game.streak - 1, 5) * 2 - (q.hinted ? 3 : 0); game.score += pts;
+    game.tags[q.tag] = (game.tags[q.tag] || 0) + 1;
+    fb.className = 'feedback ok pop'; fb.innerHTML = '<b>Correct! +' + pts + '</b>' + (game.streak >= 3 ? ' 🔥 ' + game.streak + ' in a row' : '') + '<br>' + q.explain;
+  } else {
+    game.streak = 0; game.tags[q.tag + '_miss'] = 1;
+    var right = q.input === 'choice' ? q.choices[q.answer] : (q.input === 'byte' ? A(q.answer) : q.answer);
+    fb.className = 'feedback bad'; fb.innerHTML = '<b>Not quite.</b> The answer is <b>' + esc(right) + '</b>.<br>' + q.explain;
+  }
+  game.log.push({ q: q.text, ok: ok, right: q.input === 'choice' ? q.choices[q.answer] : (q.input === 'byte' ? A(q.answer) : String(q.answer)) });
+  if (q.input === 'choice') $$('#q_body .choice').forEach(function (b, i) { b.disabled = true; if (i === q.answer) b.classList.add('right'); else if (b === btn) b.classList.add('wrong'); });
+  else { $('#q_in').disabled = true; $('#q_ok').disabled = true; }
+  $('#q_hint').disabled = true; $('#q_nextrow').hidden = false; $('#q_next').focus(); chips();
+}
+function nextQ() { game.i++; if (game.i >= game.qs.length || (game.sprint && Date.now() > game.ends)) endRound(); else showQ(); }
+function code(level, score, right, total) {
+  var s = 'SV|' + level + '|' + score + '|' + right + '|' + total, h = 2166136261;
+  for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+  return level + score + '-' + right + 'of' + total + '-' + (h % 1679616).toString(36).toUpperCase().padStart(4, '0');
+}
+function checkCode(c) {
+  var m = /^([EMHS])(\d+)-(\d+)of(\d+)-([0-9A-Z]{4})$/.exec(String(c).trim().toUpperCase().replace('OF', 'of'));
+  if (!m) return null; return code(m[1], +m[2], +m[3], +m[4]) === m[0] ? { level: m[1], score: +m[2], right: +m[3], total: +m[4] } : false;
+}
+function endRound() {
+  if (!game) return; clearInterval(game.timer);
+  var g = game, total = g.sprint ? g.answered : g.qs.length, pct = total ? g.right / total : 0, stars = pct >= 0.9 ? 3 : pct >= 0.7 ? 2 : pct >= 0.5 ? 1 : 0;
+  var lvl = g.sprint ? 'S' : g.level, fresh = [];
+  if (g.answered) { if (earn('first')) fresh.push('first'); }
+  if (!g.sprint && g.right === 10 && earn('perfect')) fresh.push('perfect');
+  if (g.bestStreak >= 5 && earn('streak')) fresh.push('streak');
+  if ((g.tags.mask || 0) >= 3 && !g.tags.mask_miss && earn('mask')) fresh.push('mask');
+  if (g.level === 'H' && (g.tags.overlap || 0) >= 3 && earn('overlap')) fresh.push('overlap');
+  if (g.sprint && g.right >= 8 && earn('sprint')) fresh.push('sprint');
+  var newBest = g.score > (progress.best[lvl] || 0); if (newBest) progress.best[lvl] = g.score;
+  store.set('progress', progress); addXP(g.score);
+  var cd = code(lvl, g.score, g.right, total), lname = { E: 'Easy', M: 'Medium', H: 'Hard', S: 'Sprint' }[lvl];
+  $('#ch-play').hidden = true; var end = $('#ch-end'); end.hidden = false;
+  end.innerHTML = '<h2>' + (stars === 3 ? 'Outstanding!' : stars === 2 ? 'Great work!' : stars === 1 ? 'Good start!' : 'Keep practicing!') + '</h2>' +
+    '<div class="stars" aria-label="' + stars + ' of 3 stars">' + '★★★'.slice(0, stars) + '<span style="color:#D3E3EC">' + '★★★'.slice(0, 3 - stars) + '</span></div>' +
+    '<p style="font-size:19px"><b>' + g.score + ' points</b> · ' + g.right + ' of ' + total + ' right · best streak ' + g.bestStreak + (newBest ? ' · <span class="oneway">new best for ' + lname + '!</span>' : '') + '</p>' +
+    (fresh.length ? '<h3>New badges</h3><div class="badges">' + fresh.map(function (id) { var b = BADGES.filter(function (x) { return x.id === id; })[0]; return '<span class="badge pop"><span class="b">' + b.b + '</span>' + b.t + '</span>'; }).join('') + '</div>' : '') +
+    '<h3>Completion code</h3><p>If your instructor asks for it, copy this code and hand it in.</p><span class="code" id="ccode">' + cd + '</span> <button class="btn alt small" id="ccopy">Copy</button>' +
+    '<div class="row" style="margin-top:16px"><button class="btn amber" id="again">Play again</button>' + (g.level !== 'H' ? '<button class="btn" id="harder">Try ' + (g.level === 'E' ? 'Medium' : 'Hard') + '</button>' : '') + '<button class="btn alt" id="toLearn">Review the lessons</button></div>' +
+    '<details><summary>Review your answers</summary><ol class="list">' + g.log.map(function (l) { return '<li>' + (l.ok ? '<span class="yes">✓</span> ' : '<span class="no">✗</span> ') + l.q + ' <i>Answer: ' + esc(l.right) + '</i></li>'; }).join('') + '</ol></details>';
+  $('#ccopy').onclick = function () { copyText(cd, $('#ccopy')); };
+  $('#again').onclick = function () { startRound(); };
+  if ($('#harder')) $('#harder').onclick = function () { setLevel(g.level === 'E' ? 'M' : 'H'); startRound(); };
+  $('#toLearn').onclick = function () { go('learn'); };
+  if (stars === 3) burst();
+  game = null; renderShelf(); writeLink();
+}
+function burst() {
+  if (reduceMotion) return;
+  var b = document.createElement('div'); b.className = 'burst'; b.setAttribute('aria-hidden', 'true');
+  for (var i = 0; i < 40; i++) { var s = document.createElement('span'); s.textContent = pick(['★', '✦', '●', '▲']); s.style.left = rnd(0, 100) + '%'; s.style.color = pick(['#00A2D7', '#F5A524', '#13A88A', '#7B61FF']); s.style.animationDelay = (Math.random() * 0.6) + 's'; b.appendChild(s); }
+  document.body.appendChild(b); setTimeout(function () { if (b.parentNode) b.parentNode.removeChild(b); }, 2800);
+}
+function setLevel(l) { $$('.level').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-level') === l)); }); }
+
+/* ===================================================== hero figure on the start screen */
+function drawHero() {
+  var svg = $('#heroFig'), f = new Fig(svg, 0, 7.2, 0, 4, 1.2);
+  f.rect(0.25, 0.2, 4.6, 1.5, { fill: 'rgba(207,230,240,.25)', stroke: '#CFE6F0', lw: 1.4, rx: 0.15 }); f.text(0.45, 1.5, 'subnet .0/24', { fs: 8.5, ha: 'left', color: '#CFE6F0', bold: true });
+  f.rect(3.0, 0.3, 3.95, 1.3, { fill: 'rgba(245,165,36,.25)', stroke: '#F5A524', lw: 1.4, rx: 0.15 }); f.text(6.8, 1.45, 'subnet .128/25', { fs: 8.5, ha: 'right', color: '#FCE9C6', bold: true });
+  f.slab(2.35, 2.75, 2.5, 0.75, { text: 'Switch', fill: '#fff', fs: 10, bold: true });
+  [[0.55, 'A'], [3.2, 'B'], [5.5, 'C']].forEach(function (h) { f.poly([[h[0] + 0.6, 1.25], [h[0] + 0.6, 2.2], [3.6, 2.2], [3.6, 2.75]], { color: '#fff', lw: 1.8 }); f.slab(h[0], 0.55, 1.2, 0.7, { text: 'Host ' + h[1], fill: '#fff', fs: 9.5 }); });
+}
+
+/* ===================================================== navigation and links */
+var VIEWS = ['home', 'learn', 'calc', 'challenge'], current = 'home';
+function go(mode) {
+  current = VIEWS.indexOf(mode) >= 0 ? mode : 'home';
+  VIEWS.forEach(function (v) { $('#view-' + v).hidden = v !== current; });
+  $$('.modes button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === current)); });
+  if (current === 'learn') openLesson(lessonState.i);
+  if (current === 'challenge') { if (game) { clearInterval(game.timer); game = null; } $('#ch-setup').hidden = false; $('#ch-play').hidden = true; $('#ch-end').hidden = true; renderShelf(); }
+  if (current === 'calc') calc();
+  window.scrollTo(0, 0); writeLink();
+}
+function writeLink() {
+  try {
+    var q = new URLSearchParams(); q.set('mode', current);
+    if (current === 'learn') q.set('lesson', lessonState.i + 1);
+    if (current === 'calc') q.set('ip', $('#c_ip').value.trim());
+    if (current === 'challenge') q.set('level', ($('.level[aria-pressed=true]') || $('.level')).getAttribute('data-level'));
+    if (BASE() !== '192.168.10') q.set('net', BASE());
+    if (window.history && history.replaceState) history.replaceState(null, '', location.pathname + '?' + q.toString());
+  } catch (e) { /* some embeds block history changes */ }
+}
+function readLink() {
+  var q; try { q = new URLSearchParams(location.search); } catch (e) { return; }
+  if (q.get('net') && /^\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(q.get('net'))) $('#netbase').value = q.get('net');
+  if (q.get('ip')) $('#c_ip').value = q.get('ip').slice(0, 40);
+  if (q.get('lesson') !== null && q.get('lesson') !== '') { var lv = +q.get('lesson'); if (Number.isInteger(lv)) lessonState.i = Math.max(-1, Math.min(5, lv - 1)); }
+  if (/^[EMH]$/.test(q.get('level') || '')) setLevel(q.get('level'));
+  return q.get('mode');
+}
+
+/* ===================================================== start */
+function init() {
+  var mode = readLink();   // read the link before anything rewrites it
+  drawHero(); showXP(false); calcInit(); renderShelf();
+  $$('.modes button').forEach(function (b) { b.onclick = function () { go(b.getAttribute('data-mode')); }; });
+  $$('[data-go]').forEach(function (b) { b.onclick = function () { go(b.getAttribute('data-go')); }; });
+  $('#home').onclick = function () { go('home'); };
+  $$('.level').forEach(function (b) { b.onclick = function () { setLevel(b.getAttribute('data-level')); writeLink(); }; });
+  $('#ch-start').onclick = startRound;
+  $('#q_quit').onclick = function () { endRound(); };
+  $('#netbase').onchange = function () { lessonState.task = null; if (current === 'learn') openLesson(lessonState.i); writeLink(); };
+  $('#resetProgress').onclick = function () { progress = { xp: 0, lessons: {}, badges: {}, best: {} }; store.set('progress', progress); showXP(false); renderShelf(); if (current === 'learn') renderStepper(); };
+  $('#verifyBtn').onclick = function () { var r = checkCode($('#verifyIn').value); $('#verifyOut').innerHTML = r ? '<span class="yes">Valid:</span> ' + { E: 'Easy', M: 'Medium', H: 'Hard', S: 'Sprint' }[r.level] + ', ' + r.score + ' points, ' + r.right + ' of ' + r.total + ' right.' : '<span class="no">Not a valid code.</span>'; };
+  go(mode || 'home');
+}
+init();
+window.SubnetVisualizer = { IP: IP, sub: sub, simulate: simulate, hostsFrom: hostsFrom, pairStatus: pairStatus, GEN: GEN, makeRound: makeRound, code: code, checkCode: checkCode };
+})();
+</script>
+</body>
+</html>

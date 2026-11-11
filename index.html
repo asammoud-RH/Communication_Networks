@@ -90,12 +90,14 @@ function card({ name, htmlPath, folderUrl, desc }) {
     <h2></h2><p></p>
     <div class="links">
       <a class="btn primary" target="_blank" rel="noopener">Open</a>
-      <a class="btn secondary" target="_blank" rel="noopener">Source</a>
     </div>`;
   el.querySelector("h2").textContent = name;
   el.querySelector("p").textContent = desc || "";
   el.querySelector(".primary").href = htmlPath;
+  /*
+  <a class="btn secondary" target="_blank" rel="noopener">Source</a>
   el.querySelector(".secondary").href = folderUrl;
+  */
   return el;
 }
 

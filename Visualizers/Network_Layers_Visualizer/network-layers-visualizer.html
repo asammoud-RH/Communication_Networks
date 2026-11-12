@@ -236,6 +236,11 @@ footer { max-width: 1180px; margin: 0 auto; padding: 0 16px 30px; font-size: 14p
 footer .card { border-top-width: 1px; border-right-width: 1px; }
 @media print { .playbar, .speed, .topbar, .navrow, .btn, footer, .stepper, .tryit button { display: none !important; } body { background: #fff; } .card { border: 1px solid #999; } }
 </style>
+<style id="mm-menu-2026-11-12">/* Menu button: back to this app's start screen */
+.modes .mm { display: inline-flex; align-items: center; gap: 5px; }
+.modes .mm svg { width: 15px; height: 15px; flex: none; }
+@media (max-width: 600px) { .modes .mm .mm-txt { display: none; } }
+</style>
 </head>
 <body>
 <header class="topbar">
@@ -245,6 +250,7 @@ footer .card { border-top-width: 1px; border-right-width: 1px; }
       Network Layers Visualizer
     </button>
     <nav class="modes" aria-label="Mode">
+      <button class="mm" data-mode="home" aria-pressed="false" aria-label="Menu" title="Back to the menu"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 7.5 8 2.5l6 5M3.8 6.3V13.5h3V10h2.4v3.5h3V6.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg><span class="mm-txt">Menu</span></button>
       <button data-mode="learn" aria-pressed="false">Learn</button>
       <button data-mode="calc" aria-pressed="false">Calculator</button>
       <button data-mode="challenge" aria-pressed="false">Challenge</button>

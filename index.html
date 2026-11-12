@@ -5,158 +5,634 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Communication Networks – Visualizers</title>
 <style>
-  :root {
-    --bg: #f6f7f9; --card: #fff; --text: #1f2328; --muted: #59636e;
-    --accent: #800000; --border: #d1d9e0;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg: #0d1117; --card: #161b22; --text: #e6edf3; --muted: #9198a1;
-            --accent: #ff7b72; --border: #30363d; }
-  }
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-         background: var(--bg); color: var(--text); line-height: 1.5; }
-  header { padding: 2.5rem 1.5rem 1rem; max-width: 1000px; margin: auto; }
-  h1 { margin: 0 0 .25rem; font-size: 1.9rem; }
-  header p { margin: 0; color: var(--muted); }
-  main { max-width: 1000px; margin: auto; padding: 1rem 1.5rem 3rem;
-         display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
-  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
-          padding: 1.25rem; display: flex; flex-direction: column; gap: .5rem; }
-  .card h2 { margin: 0; font-size: 1.15rem; }
-  .card p { margin: 0; color: var(--muted); font-size: .92rem; flex: 1; }
-  .links { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .5rem; }
-  .btn { display: inline-block; padding: .45rem .9rem; border-radius: 6px; text-decoration: none;
-         font-size: .9rem; font-weight: 600; border: 1px solid var(--accent); }
-  .btn.primary { background: var(--accent); color: #fff; }
-  .btn.secondary { color: var(--accent); }
-  .status { grid-column: 1 / -1; color: var(--muted); }
-  footer { text-align: center; color: var(--muted); font-size: .85rem; padding-bottom: 2rem; }
+:root {
+  --brand: #00A2D7; --brand-dark: #0081AD; --navy: #0B3D5C; --ink: #1B2A35; --muted: #5B6B78;
+  --panel: #CFE6F0; --panel-soft: #EAF5FA; --bg: #F4F8FB; --line: #D3E3EC; --white: #FFFFFF;
+  --amber: #F5A524; --amber-soft: #FDF0D5; --ok: #13A88A;
+  --radius: 10px;
+  --font: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Roboto, Arial, sans-serif;
+  --mono: Consolas, "SF Mono", Menlo, "DejaVu Sans Mono", "Courier New", monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: var(--font); font-size: 16px; line-height: 1.5; color: var(--ink); background: var(--bg); }
+h1, h2, h3 { color: var(--navy); line-height: 1.25; }
+a { color: var(--brand-dark); }
+code { font-family: var(--mono); font-size: 0.92em; }
+:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 18px 16px; }
+
+/* hero with the animated path */
+.hero { background: linear-gradient(135deg, var(--navy), #0E6A92 60%, var(--brand)); color: #fff; border-radius: 14px; padding: 24px 26px 14px; }
+.hero .top { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: flex-start; justify-content: space-between; }
+.hero h1 { color: #fff; font-size: 30px; margin: 0 0 6px; }
+.hero p { margin: 0; font-size: 17px; max-width: 640px; }
+.pill { background: var(--amber); color: #3a2600; font-weight: 700; border-radius: 999px; padding: 4px 12px; white-space: nowrap; }
+.path { margin-top: 10px; }
+.path svg { width: 100%; height: auto; display: block; }
+.path .cap { font-size: 14px; opacity: .9; margin: 2px 0 0; }
+.bx { fill: rgba(255,255,255,.13); stroke: rgba(255,255,255,.55); stroke-width: 1; transition: fill .2s; }
+.bx.lit { fill: var(--amber-soft); stroke: var(--amber); }
+.bt { fill: #fff; font-size: 13px; font-family: var(--font); pointer-events: none; }
+.bt.lit { fill: var(--navy); font-weight: 700; }
+.dev { fill: #fff; font-size: 15px; font-weight: 700; font-family: var(--font); }
+.wire { stroke: rgba(255,255,255,.85); stroke-width: 4; stroke-linecap: round; }
+.hop { stroke: rgba(255,255,255,.55); stroke-width: 1.5; stroke-dasharray: 5 5; fill: none; }
+.pin { cursor: pointer; }
+.pin rect { fill: var(--amber); stroke: #fff; stroke-width: 1.5; }
+.pin text { fill: #3a2600; font-size: 13px; font-weight: 700; font-family: var(--font); }
+.pin:hover rect, .pin:focus rect, .pin.lit rect { fill: #fff; stroke: var(--amber); stroke-width: 3; }
+.pin:focus { outline: none; }
+
+/* the stack */
+.intro { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: baseline; margin: 22px 0 10px; }
+.intro h2 { margin: 0; font-size: 24px; }
+.intro p { margin: 0; color: var(--muted); }
+.stack { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 8px; }
+.stack.spine { grid-template-columns: 180px minmax(0, 1fr) 250px; }
+.lbl { background: var(--navy); color: #fff; border-radius: var(--radius); padding: 10px 12px; display: flex; flex-direction: column; justify-content: center; min-height: 92px; transition: background .2s; }
+.lbl b { font-size: 17px; }
+.lbl .n { font-family: var(--mono); font-size: 13px; color: var(--panel); }
+.lbl small { color: #D9EAF2; font-size: 13px; line-height: 1.35; }
+.lbl.lit { background: var(--brand-dark); }
+.shelf { background: var(--panel-soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; transition: background .2s; }
+.shelf.lit { background: var(--amber-soft); }
+.spinecol { background: var(--panel-soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+.spinecol .head { font-weight: 700; color: var(--navy); font-size: 15px; display: flex; align-items: center; gap: 8px; }
+.spinecol .head:before { content: ""; width: 10px; align-self: stretch; border: 3px solid var(--navy); border-left: 0; border-radius: 0 4px 4px 0; }
+.empty { flex: 1 1 100%; border: 2px dashed #A9C6D6; border-radius: 8px; color: var(--muted); font-size: 14px; display: flex; align-items: center; padding: 10px 14px; min-height: 70px; }
+
+/* app cards: the slab look */
+.vcard { flex: 1 1 280px; max-width: 460px; background: var(--white); border: 1px solid var(--line); border-top: 4px solid var(--brand); border-right: 4px solid var(--brand); border-radius: var(--radius); padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; transition: box-shadow .2s, transform .2s; }
+.spinecol .vcard { flex: 0 0 auto; max-width: none; }
+.vcard.lit { box-shadow: 0 0 0 3px var(--amber); }
+.vcard.flash { animation: flash 1.2s ease 2; }
+@keyframes flash { 50% { box-shadow: 0 0 0 5px var(--amber); } }
+.vcard h3 { margin: 0; font-size: 18px; }
+.vcard .sum { margin: 0; color: var(--muted); font-size: 14.5px; flex: 1; }
+.vcard .prog { margin: 0; font-size: 13.5px; color: #3a2600; background: var(--amber-soft); border-radius: 6px; padding: 2px 8px; align-self: flex-start; }
+.acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.btn { display: inline-block; text-decoration: none; border: 2px solid var(--brand); background: var(--brand); color: #fff; border-radius: 8px; padding: 4px 11px; font-weight: 600; font-size: 14px; }
+.btn:hover { background: var(--brand-dark); border-color: var(--brand-dark); }
+.btn.alt { background: #fff; color: var(--brand-dark); }
+.btn.alt:hover { background: var(--panel-soft); }
+.btn.amber { background: var(--amber); border-color: var(--amber); color: #3a2600; }
+.btn.amber:hover { background: #e3931a; border-color: #e3931a; }
+details.about summary { cursor: pointer; color: var(--brand-dark); font-size: 14px; font-weight: 600; }
+.md { font-size: 14.5px; }
+.md h4 { margin: 10px 0 2px; color: var(--navy); font-size: 15px; }
+.md p { margin: 6px 0; }
+.md ul { margin: 4px 0; padding-left: 20px; }
+.more { margin-top: 18px; }
+.more h2 { font-size: 20px; margin: 0 0 8px; }
+.more .shelf { background: var(--white); }
+.status { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; color: var(--muted); }
+footer { text-align: center; color: var(--muted); font-size: 14px; padding: 10px 16px 30px; }
+
+@media (max-width: 760px) {
+  .hero { padding: 18px 16px 14px; }
+  .hero h1 { font-size: 24px; }
+  .hero p { font-size: 16px; }
+  .path { display: none; }
+  .stack, .stack.spine { display: block; }
+  .stack > * { margin-bottom: 8px; }
+  .lbl { min-height: 0; flex-direction: row; flex-wrap: wrap; align-items: baseline; justify-content: flex-start; gap: 2px 10px; }
+  .lbl + .lbl { margin-top: -4px; }
+  .vcard { max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vcard, .bx, .lbl, .shelf { transition: none; }
+  .vcard.flash { animation: none; box-shadow: 0 0 0 3px var(--amber); }
+}
 </style>
 </head>
 <body>
-<header>
-  <h1>Communication Networks – Visualizers</h1>
-  <p>Interactive tools for exploring networking concepts. Pick one to launch it in your browser.</p>
-</header>
+<div class="wrap">
+  <header class="hero">
+    <div class="top">
+      <div>
+        <h1>Communication Networks – Visualizers</h1>
+        <p>Interactive tools for exploring networking concepts. Each one sits on the layer of the network it teaches. Pick one to launch it in your browser.</p>
+      </div>
+      <span class="pill" id="total" hidden></span>
+    </div>
+    <div class="path" id="path">
+      <svg id="pathsvg" viewBox="0 0 920 272" role="group" aria-label="A packet travels from Host A through a switch and a router to Host B. Labels mark where each visualizer works."></svg>
+      <p class="cap" id="pathcap">Watch a packet travel from Host A to Host B. Select a label to jump to its visualizers.</p>
+    </div>
+  </header>
 
-<main id="list"><div class="status">Loading visualizers…</div></main>
-
-<footer>Rose-Hulman Institute of Technology · ECE</footer>
+  <main>
+    <div class="intro">
+      <h2>The network stack</h2>
+      <p>Layer 5 is closest to your programs; layer 1 is the wire.</p>
+    </div>
+    <div id="stack" class="stack"><div class="status">Loading the visualizers…</div></div>
+    <section class="more" id="more" hidden>
+      <h2>More visualizers</h2>
+      <div class="shelf" id="moreshelf"></div>
+    </section>
+  </main>
+</div>
+<footer>Rose-Hulman Institute of Technology · Electrical and Computer Engineering · Your progress is saved in this browser only.</footer>
 
 <script>
-/* ---- Settings ----------------------------------------------------------
-   On GitHub Pages (https://OWNER.github.io/REPO/) the owner and repo are
-   detected automatically. Fill these in only if detection fails.        */
-const OWNER  = "";            // e.g. "asammoud-RH"
-const REPO   = "";            // e.g. "Communication_Networks"
-const FOLDER = "Visualizers"; // top-level folder that holds the apps
-/* ----------------------------------------------------------------------- */
+(function () {
+'use strict';
 
-const list = document.getElementById("list");
+/* ---- Settings ------------------------------------------------------------
+   On GitHub Pages (https://OWNER.github.io/REPO/) the owner and repository
+   are detected from the address. OWNER and REPO are used when the page is
+   opened another way (for example from your computer).
+   To place a visualizer on a layer, put one hidden line in its README.md:
+     <!-- layer: transport -->
+   Layers: application, transport, network, link, physical, or all.
+   Several layers: <!-- layer: physical, link --> (the first one gets the
+   label in the banner).                                                    */
+var OWNER = 'asammoud-RH';
+var REPO = 'Communication_Networks';
+var FOLDER = 'Visualizers';    // top-level folder that holds the apps
+var LIST_MAX_AGE_MIN = 60;     // how long a visitor's browser keeps the app list
+/* ------------------------------------------------------------------------- */
+
+var LAYERS = [
+  { id: 'application', n: 5, name: 'Application', what: 'What programs say to each other' },
+  { id: 'transport', n: 4, name: 'Transport', what: 'Process to process, end to end' },
+  { id: 'network', n: 3, name: 'Network', what: 'Host to host, across routers' },
+  { id: 'link', n: 2, name: 'Link', what: 'One hop, across a switch' },
+  { id: 'physical', n: 1, name: 'Physical', what: 'Bits on the wire' }
+];
+var LAYER_INDEX = {}; LAYERS.forEach(function (L, i) { LAYER_INDEX[L.id] = i; });
+var ALIASES = { app: 'application', applications: 'application', 'data-link': 'link', datalink: 'link', 'data link': 'link',
+  phy: 'physical', phys: 'physical', ip: 'network', internet: 'network', 'all-layers': 'all', every: 'all' };
+var reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+function $(s, r) { return (r || document).querySelector(s); }
+function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function encPath(p) { return p.split('/').map(encodeURIComponent).join('/'); }
+
+/* storage that never throws */
+var store = {
+  get: function (k, d) { try { var v = window.localStorage.getItem('vizhome.' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set: function (k, v) { try { window.localStorage.setItem('vizhome.' + k, JSON.stringify(v)); } catch (e) { /* storage blocked */ } },
+  raw: function (k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } },
+  keys: function () { var out = []; try { for (var i = 0; i < window.localStorage.length; i++) out.push(window.localStorage.key(i)); } catch (e) { /* blocked */ } return out; }
+};
 
 function detectRepo() {
-  if (OWNER && REPO) return { owner: OWNER, repo: REPO };
-  const host = location.hostname;
-  if (host.endsWith(".github.io")) {
-    const owner = host.split(".")[0];
-    const seg = location.pathname.split("/").filter(Boolean)[0];
-    return { owner, repo: seg || host };
+  var host = location.hostname || '';
+  if (/\.github\.io$/i.test(host)) {
+    var seg = location.pathname.split('/').filter(Boolean)[0];
+    var owner = host.split('.')[0];
+    if (seg && !/\.html?$/i.test(seg)) return { owner: owner, repo: decodeURIComponent(seg) };
+    return { owner: owner, repo: host };
   }
-  return null;
+  return { owner: OWNER, repo: REPO };
 }
 
-function prettyName(folder) {
-  return folder.replace(/[_-]+/g, " ").replace(/\bSubNet\b/i, "Subnet").trim();
+/* ===================================================== finding the apps */
+function getJSON(url) {
+  return fetch(url).then(function (r) { if (!r.ok) throw new Error('GitHub answered ' + r.status); return r.json(); });
+}
+function getText(url) {
+  return fetch(url).then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.text(); });
 }
 
-// Pull the first real paragraph out of a README for the card description.
-function summarize(md) {
-  const paras = md.split(/\n\s*\n/).map(p => p.trim())
-    .filter(p => p && !p.startsWith("#") && !p.startsWith("```") && !p.startsWith("|"));
-  if (!paras.length) return "";
-  let t = paras[0]
-    .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
-    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
-    .replace(/[*_`>]/g, "")
-    .replace(/\s+/g, " ").trim();
-  return t.length > 220 ? t.slice(0, 217).replace(/\s+\S*$/, "") + "…" : t;
-}
-
-function card({ name, htmlPath, folderUrl, desc }) {
-  const el = document.createElement("article");
-  el.className = "card";
-  el.innerHTML = `
-    <h2></h2><p></p>
-    <div class="links">
-      <a class="btn primary" target="_blank" rel="noopener">Open</a>
-    </div>`;
-  el.querySelector("h2").textContent = name;
-  el.querySelector("p").textContent = desc || "";
-  el.querySelector(".primary").href = htmlPath;
-  /*
-  <a class="btn secondary" target="_blank" rel="noopener">Source</a>
-  el.querySelector(".secondary").href = folderUrl;
-  */
-  return el;
-}
-
-async function load() {
-  const r = detectRepo();
-  if (!r) {
-    list.innerHTML = `<div class="status">Couldn't detect the repository. Set OWNER and REPO at the
-      top of index.html, or open this page through GitHub Pages.</div>`;
-    return;
-  }
-
-  // One API call lists every file in the repo.
-  const res = await fetch(`https://api.github.com/repos/${r.owner}/${r.repo}/git/trees/HEAD?recursive=1`);
-  if (!res.ok) throw new Error(`GitHub API returned ${res.status}`);
-  const files = (await res.json()).tree.filter(f => f.type === "blob").map(f => f.path);
-
-  // Group: Visualizers/<App>/<file>.html  (only direct children of each app folder)
-  const apps = {};
-  for (const p of files) {
-    const parts = p.split("/");
-    if (parts.length !== 3 || parts[0] !== FOLDER) continue;
-    const [, app, file] = parts;
-    apps[app] ??= { html: [], readme: null };
-    if (/\.html?$/i.test(file)) apps[app].html.push(p);
-    if (/^readme\.md$/i.test(file)) apps[app].readme = p;
-  }
-
-  const names = Object.keys(apps).filter(a => apps[a].html.length).sort();
-  if (!names.length) {
-    list.innerHTML = `<div class="status">No visualizers found in /${FOLDER}.</div>`;
-    return;
-  }
-
-  list.innerHTML = "";
-  for (const app of names) {
-    const info = apps[app];
-    const htmlPath = info.html.find(h => !/index\.html?$/i.test(h)) || info.html[0];
-    const c = card({
-      name: prettyName(app),
-      htmlPath: htmlPath.split("/").map(encodeURIComponent).join("/"),
-      folderUrl: `https://github.com/${r.owner}/${r.repo}/tree/HEAD/${FOLDER}/${encodeURIComponent(app)}`,
-      desc: ""
+function listFiles(r) {
+  var key = 'tree.' + r.owner + '/' + r.repo;
+  var cached = store.get(key, null);
+  if (cached && Date.now() - cached.t < LIST_MAX_AGE_MIN * 60000) return Promise.resolve(cached.files);
+  return getJSON('https://api.github.com/repos/' + encodeURIComponent(r.owner) + '/' + encodeURIComponent(r.repo) + '/git/trees/HEAD?recursive=1')
+    .then(function (data) {
+      var files = (data.tree || []).filter(function (f) { return f.type === 'blob'; }).map(function (f) { return { path: f.path, sha: f.sha }; });
+      store.set(key, { t: Date.now(), files: files });
+      return files;
+    })
+    .catch(function (err) {
+      if (cached) return cached.files;   // GitHub busy or offline: use the last list this browser saw
+      throw err;
     });
-    list.appendChild(c);
-
-    // README text comes from raw.githubusercontent.com, which doesn't count against the API limit.
-    if (info.readme) {
-      fetch(`https://raw.githubusercontent.com/${r.owner}/${r.repo}/HEAD/${info.readme.split("/").map(encodeURIComponent).join("/")}`)
-        .then(x => x.ok ? x.text() : "")
-        .then(md => { c.querySelector("p").textContent = summarize(md); })
-        .catch(() => {});
-    }
-  }
 }
 
-load().catch(err => {
-  list.innerHTML = `<div class="status">Couldn't load the list of visualizers (${err.message}).
-    Browse them directly in the <code>${FOLDER}</code> folder.</div>`;
-});
+function groupApps(files) {
+  var apps = {};
+  files.forEach(function (f) {
+    var parts = f.path.split('/');
+    if (parts.length !== 3 || parts[0] !== FOLDER) return;
+    var folder = parts[1], file = parts[2];
+    if (!apps[folder]) apps[folder] = { folder: folder, html: [], readme: null };
+    if (/\.html?$/i.test(file)) apps[folder].html.push(f);
+    if (/^readme\.md$/i.test(file)) apps[folder].readme = f;
+  });
+  return Object.keys(apps).map(function (k) { return apps[k]; }).filter(function (a) { return a.html.length; }).map(function (a) {
+    var main = a.html.filter(function (h) { return !/(^|\/)index\.html?$/i.test(h.path); })[0] || a.html[0];
+    a.htmlFile = main;
+    a.title = prettyName(a.folder);
+    a.layers = [];
+    a.modes = [];
+    a.summary = '';
+    a.aboutHTML = '';
+    a.lessons = 0;
+    return a;
+  });
+}
+function prettyName(folder) {
+  return folder.replace(/[_-]+/g, ' ').replace(/\bSubNet\b/i, 'Subnet').replace(/\s+/g, ' ').trim();
+}
+
+function loadReadme(r, app) {
+  if (!app.readme) return Promise.resolve('');
+  var key = 'readme.' + app.readme.sha;
+  var cached = store.get(key, null);
+  if (cached !== null) return Promise.resolve(cached);
+  var raw = 'https://raw.githubusercontent.com/' + encodeURIComponent(r.owner) + '/' + encodeURIComponent(r.repo) + '/HEAD/' + encPath(app.readme.path);
+  return getText(raw)
+    .catch(function () { return getText(encPath(app.readme.path)); })   // same site, if the raw address is blocked
+    .then(function (t) { store.set(key, t); return t; })
+    .catch(function () { return ''; });
+}
+
+/* ===================================================== reading a README */
+var NUMBER_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12 };
+var MODES = [
+  { re: /^\*\*\s*learn\b/i, label: 'Learn', mode: 'learn', cls: '' },
+  { re: /^\*\*\s*calculator\b/i, label: 'Calculator', mode: 'calc', cls: 'alt' },
+  { re: /^\*\*\s*challenge\b/i, label: 'Challenge', mode: 'challenge', cls: 'amber' }
+];
+/* paragraphs and sections that are about downloading or building, not about the app */
+var SKIP_PARA = /^(\*\*)?\s*(download|open `|how to open|links? into|link parameters|building|the app is kept|to rebuild|example link)/i;
+var SKIP_SECTION = /how to use|building|link parameters|install/i;
+
+function parseReadme(app, md) {
+  if (!md) return;
+  var hint = md.match(/<!--\s*layers?\s*:\s*([\s\S]*?)-->/i);
+  if (hint) {
+    hint[1].toLowerCase().split(/[,;\/]+/).forEach(function (w) {
+      w = w.trim(); w = ALIASES[w] || w;
+      if ((w === 'all' || LAYER_INDEX[w] !== undefined) && app.layers.indexOf(w) < 0) app.layers.push(w);
+    });
+    if (app.layers.indexOf('all') >= 0) app.layers = ['all'];
+  }
+  md = md.replace(/<!--[\s\S]*?-->/g, '').replace(/\r\n?/g, '\n');
+  var blocks = toBlocks(md);
+  var html = [], skipping = false;
+  blocks.forEach(function (b) {
+    if (b.type === 'h') {
+      if (b.level === 1) { if (!app._titled) { app.title = b.text.trim(); app._titled = true; } return; }
+      skipping = SKIP_SECTION.test(b.text);
+      if (!skipping) html.push('<h4>' + inline(b.text) + '</h4>');
+      return;
+    }
+    if (skipping || b.type === 'code') return;
+    if (b.type === 'p') {
+      if (SKIP_PARA.test(b.text)) return;
+      if (!app.summary && !/:\s*$/.test(b.text)) app.summary = plain(b.text);
+      html.push('<p>' + inline(b.text) + '</p>');
+      return;
+    }
+    if (b.type === 'ul') {
+      var rest = [];
+      b.items.forEach(function (it) {
+        var m = null;
+        MODES.forEach(function (M) { if (M.re.test(it)) m = M; });
+        if (m) {
+          if (!app.modes.some(function (x) { return x.mode === m.mode; })) app.modes.push(m);
+          if (m.mode === 'learn') {
+            var nm = it.toLowerCase().match(/\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b[^.;]*?lessons?/);
+            if (nm) app.lessons = NUMBER_WORDS[nm[1]] || parseInt(nm[1], 10) || 0;
+          }
+        }
+        rest.push(it);
+      });
+      html.push('<ul>' + rest.map(function (it) { return '<li>' + inline(it) + '</li>'; }).join('') + '</ul>');
+    }
+  });
+  app.aboutHTML = html.join('');
+  MODES.forEach(function (M, i) { M.order = i; });
+  app.modes.sort(function (a, b) { return a.order - b.order; });
+}
+
+function toBlocks(md) {
+  var lines = md.split('\n'), out = [], para = [], list = null, inCode = false;
+  function flush() {
+    if (para.length) { out.push({ type: 'p', text: para.join(' ') }); para = []; }
+    if (list) { out.push({ type: 'ul', items: list }); list = null; }
+  }
+  lines.forEach(function (ln) {
+    if (/^\s*```/.test(ln)) { flush(); inCode = !inCode; if (!inCode) out.push({ type: 'code' }); return; }
+    if (inCode) return;
+    var h = ln.match(/^(#{1,6})\s+(.*)$/);
+    if (h) { flush(); out.push({ type: 'h', level: h[1].length, text: h[2] }); return; }
+    var li = ln.match(/^\s*[-*+]\s+(.*)$/);
+    if (li) { if (para.length) { out.push({ type: 'p', text: para.join(' ') }); para = []; } if (!list) list = []; list.push(li[1]); return; }
+    if (/^\s*$/.test(ln)) { flush(); return; }
+    if (list && /^\s+\S/.test(ln)) { list[list.length - 1] += ' ' + ln.trim(); return; }
+    if (list) { out.push({ type: 'ul', items: list }); list = null; }
+    para.push(ln.trim());
+  });
+  flush();
+  return out;
+}
+function inline(s) {
+  var t = esc(s);
+  t = t.replace(/`([^`]+)`/g, '<code>$1</code>');
+  t = t.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+  t = t.replace(/(^|[\s(])\*([^*\s][^*]*)\*/g, '$1<i>$2</i>');
+  t = t.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  return t;
+}
+function plain(s) {
+  return s.replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[*_`]/g, '').replace(/\s+/g, ' ').trim();
+}
+
+/* ===================================================== saved progress (read from each app's own storage) */
+function anyProgressSaved() {
+  return store.keys().some(function (k) { return k && /\.progress$/.test(k) && k.indexOf('vizhome.') !== 0; });
+}
+function findAppId(app) {
+  var key = 'appid.' + app.htmlFile.sha;
+  var cached = store.get(key, null);
+  if (cached !== null) return Promise.resolve(cached);
+  return getText(encPath(app.htmlFile.path)).then(function (src) {
+    var m = src.match(/APP_ID\s*=\s*['"]([^'"]+)['"]/) || src.match(/localStorage\.getItem\(\s*['"]([^'"]+)\.['"]\s*\+/);
+    var id = m ? m[1] : '';
+    store.set(key, id);
+    return id;
+  }).catch(function () { return ''; });
+}
+function readProgress(appId) {
+  if (!appId) return null;
+  var raw = store.raw(appId + '.progress');
+  if (!raw) return null;
+  try { var p = JSON.parse(raw); return p && typeof p === 'object' ? p : null; } catch (e) { return null; }
+}
+function showProgress(apps) {
+  if (!anyProgressSaved()) return;
+  var total = 0;
+  Promise.all(apps.map(function (app) {
+    return findAppId(app).then(function (id) {
+      var p = readProgress(id);
+      if (!p) return;
+      var xp = +p.xp || 0, done = 0;
+      if (p.lessons && typeof p.lessons === 'object') Object.keys(p.lessons).forEach(function (k) { if (p.lessons[k]) done++; });
+      if (!xp && !done) return;
+      total += xp;
+      var bits = [];
+      if (xp) bits.push('★ ' + xp + ' points');
+      if (done) bits.push(app.lessons ? done + ' of ' + app.lessons + ' lessons done' : done + (done === 1 ? ' lesson' : ' lessons') + ' done');
+      $$('.vcard[data-app="' + cssEsc(app.folder) + '"] .prog').forEach(function (el) { el.textContent = bits.join(' · '); el.hidden = false; });
+    });
+  })).then(function () {
+    if (total > 0) { var t = $('#total'); t.textContent = '★ ' + total + ' points so far'; t.hidden = false; }
+  });
+}
+function cssEsc(s) { return String(s).replace(/["\\]/g, '\\$&'); }
+
+/* ===================================================== the stack */
+function cardHTML(app) {
+  var href = encPath(app.htmlFile.path);
+  var acts = app.modes.length
+    ? app.modes.map(function (m) { return '<a class="btn ' + m.cls + '" href="' + href + '?mode=' + m.mode + '" target="_blank" rel="noopener">' + m.label + '</a>'; }).join('')
+    : '<a class="btn" href="' + href + '" target="_blank" rel="noopener">Open</a>';
+  var layerText = app.layers.length ? (app.layers[0] === 'all' ? 'all layers' : app.layers.map(function (l) { return LAYERS[LAYER_INDEX[l]].name; }).join(' and ') + (app.layers.length > 1 ? ' layers' : ' layer')) : '';
+  return '<article class="vcard" data-app="' + esc(app.folder) + '" data-layers="' + esc(app.layers.join(' ')) + '" tabindex="-1">' +
+    '<h3>' + esc(app.title) + '</h3>' +
+    (app.summary ? '<p class="sum">' + esc(app.summary) + '</p>' : '<p class="sum"></p>') +
+    '<p class="prog" hidden></p>' +
+    '<div class="acts">' + acts + '</div>' +
+    (app.aboutHTML ? '<details class="about"><summary>About this visualizer</summary><div class="md">' + app.aboutHTML +
+      (layerText ? '<p><b>Where it sits:</b> the ' + esc(layerText) + '.</p>' : '') + '</div></details>' : '') +
+    '</article>';
+}
+
+function renderStack(apps) {
+  var spineApps = [], rowApps = LAYERS.map(function () { return []; }), loose = [];
+  apps.forEach(function (a) {
+    if (a.layers[0] === 'all') { spineApps.push(a); return; }
+    if (!a.layers.length) { loose.push(a); return; }
+    var idx = a.layers.map(function (l) { return LAYER_INDEX[l]; });
+    a._top = Math.min.apply(null, idx); a._bot = Math.max.apply(null, idx);
+    rowApps[a._top].push(a);
+  });
+  /* rows joined by an app that spans several layers share one shelf */
+  var groups = [], i = 0;
+  while (i < LAYERS.length) {
+    var g = { from: i, to: i, apps: [] }, j = i;
+    while (j <= g.to) {
+      rowApps[j].forEach(function (a) { g.apps.push(a); if (a._bot > g.to) g.to = a._bot; });
+      j++;
+    }
+    groups.push(g); i = g.to + 1;
+  }
+  var byTitle = function (a, b) { return a.title.localeCompare(b.title); };
+  var html = '';
+  if (spineApps.length) {
+    html += '<div class="spinecol" style="grid-column:3;grid-row:1 / span ' + LAYERS.length + '"><div class="head">All layers</div>' +
+      spineApps.sort(byTitle).map(cardHTML).join('') + '</div>';
+  }
+  groups.forEach(function (g) {
+    for (var r = g.from; r <= g.to; r++) {
+      var L = LAYERS[r];
+      html += '<div class="lbl" data-layer="' + L.id + '" id="layer-' + L.id + '" style="grid-column:1;grid-row:' + (r + 1) + '">' +
+        '<span class="n">Layer ' + L.n + '</span><b>' + L.name + '</b><small>' + L.what + '</small></div>';
+    }
+    var shelfLayers = []; for (var k = g.from; k <= g.to; k++) shelfLayers.push(LAYERS[k].id);
+    html += '<div class="shelf" data-layers="' + shelfLayers.join(' ') + '" style="grid-column:2;grid-row:' + (g.from + 1) + ' / span ' + (g.to - g.from + 1) + '">' +
+      (g.apps.length ? g.apps.sort(byTitle).map(cardHTML).join('') : '<div class="empty">No visualizer on this layer yet.</div>') + '</div>';
+  });
+  var stack = $('#stack');
+  stack.className = 'stack' + (spineApps.length ? ' spine' : '');
+  stack.innerHTML = html;
+  if (loose.length) { $('#moreshelf').innerHTML = loose.sort(byTitle).map(cardHTML).join(''); $('#more').hidden = false; }
+  return { spine: spineApps, rows: rowApps, all: apps };
+}
+
+/* ===================================================== the banner: a path with a moving packet */
+var SVGNS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs, parent, text) {
+  var e = document.createElementNS(SVGNS, tag);
+  for (var k in attrs) if (Object.prototype.hasOwnProperty.call(attrs, k)) e.setAttribute(k, attrs[k]);
+  if (text !== undefined) e.textContent = text;
+  if (parent) parent.appendChild(e);
+  return e;
+}
+var ROW_Y = [44, 82, 120, 158, 196], ROW_H = 34;
+function rowMid(r) { return ROW_Y[r] + ROW_H / 2; }
+var DEVICES = [
+  { name: 'Host A', x: 20, w: 120, rows: [0, 1, 2, 3, 4] },
+  { name: 'Switch', x: 300, w: 100, rows: [3, 4] },
+  { name: 'Router', x: 560, w: 100, rows: [2, 3, 4] },
+  { name: 'Host B', x: 780, w: 120, rows: [0, 1, 2, 3, 4] }
+];
+/* where each layer's label sits, and how wide it may be */
+var ANCHOR = {
+  application: { x: 460, y: rowMid(0), max: 560 },
+  transport: { x: 460, y: rowMid(1), max: 560 },
+  network: { x: 270, y: rowMid(2), max: 230 },
+  link: { x: 480, y: rowMid(3), max: 150 },
+  physical: { x: 480, y: 252, max: 330, stem: rowMid(4) },
+  all: { x: 840, y: 252, max: 150 }
+};
+
+function drawBanner(placed) {
+  var svg = $('#pathsvg');
+  svg.innerHTML = '';
+  var gBack = el('g', {}, svg);
+  /* hops: network hop by hop, transport and application end to end */
+  el('line', { 'class': 'hop', x1: 140, y1: rowMid(0), x2: 780, y2: rowMid(0) }, gBack);
+  el('line', { 'class': 'hop', x1: 140, y1: rowMid(1), x2: 780, y2: rowMid(1) }, gBack);
+  el('line', { 'class': 'hop', x1: 140, y1: rowMid(2), x2: 560, y2: rowMid(2) }, gBack);
+  el('line', { 'class': 'hop', x1: 660, y1: rowMid(2), x2: 780, y2: rowMid(2) }, gBack);
+  el('line', { 'class': 'hop', x1: 140, y1: rowMid(3), x2: 300, y2: rowMid(3) }, gBack);
+  el('line', { 'class': 'hop', x1: 400, y1: rowMid(3), x2: 560, y2: rowMid(3) }, gBack);
+  el('line', { 'class': 'hop', x1: 660, y1: rowMid(3), x2: 780, y2: rowMid(3) }, gBack);
+  [[140, 300], [400, 560], [660, 780]].forEach(function (w) { el('line', { 'class': 'wire', x1: w[0], y1: rowMid(4), x2: w[1], y2: rowMid(4) }, gBack); });
+  DEVICES.forEach(function (d) {
+    el('text', { 'class': 'dev', x: d.x + d.w / 2, y: 32, 'text-anchor': 'middle' }, gBack, d.name);
+    d.rows.forEach(function (r) {
+      var L = LAYERS[r];
+      el('rect', { 'class': 'bx L-' + L.id, x: d.x, y: ROW_Y[r], width: d.w, height: ROW_H, rx: 5 }, gBack);
+      el('text', { 'class': 'bt L-' + L.id, x: d.x + d.w / 2, y: ROW_Y[r] + 22, 'text-anchor': 'middle' }, gBack, L.name);
+    });
+  });
+  if (placed.spine.length) {   /* bracket around Host B for apps on every layer */
+    el('path', { d: 'M904 46 H912 V228 H904 M912 137 H918', fill: 'none', stroke: '#fff', 'stroke-width': 2 }, gBack);
+    el('line', { x1: 840, y1: 230, x2: 840, y2: 240, stroke: '#fff', 'stroke-width': 2 }, gBack);
+  }
+  var gPacket = el('g', { 'aria-hidden': 'true' }, svg);
+  var gPins = el('g', {}, svg);
+  /* each app gets one label, on the first layer named in its README */
+  LAYERS.forEach(function (L) {
+    var list = placed.all.filter(function (a) { return a.layers[0] === L.id; });
+    if (list.length) addPin(gPins, L.id, list);
+  });
+  if (placed.spine.length) addPin(gPins, 'all', placed.spine);
+  startPacket(gPacket);
+}
+
+function shortName(t) { return t.replace(/\s+visualizer$/i, ''); }
+function addPin(g, layer, apps) {
+  var a = ANCHOR[layer];
+  var names = apps.map(function (x) { return shortName(x.title); });
+  var label = names.join(' · ');
+  if (estWidth(label) > a.max) label = names.length + (names.length === 1 ? ' visualizer' : ' visualizers');
+  if (estWidth(label) > a.max) label = String(names.length);
+  if (a.stem) el('line', { x1: a.x, y1: a.stem, x2: a.x, y2: a.y - 12, stroke: '#fff', 'stroke-width': 2 }, g);
+  var pin = el('g', { 'class': 'pin', tabindex: '0', role: 'button', 'data-layer': layer,
+    'aria-label': (layer === 'all' ? 'All layers' : LAYERS[LAYER_INDEX[layer]].name + ' layer') + ': ' + names.join(', ') + '. Go to its visualizers.' }, g);
+  var rect = el('rect', { x: 0, y: a.y - 12, height: 24, rx: 12 }, pin);
+  var text = el('text', { x: a.x, y: a.y + 5, 'text-anchor': 'middle' }, pin, label);
+  var w = estWidth(label);
+  try { var bb = text.getBBox(); if (bb && bb.width) w = bb.width + 26; } catch (e) { /* not drawn yet */ }
+  rect.setAttribute('x', a.x - w / 2); rect.setAttribute('width', w);
+  pin.addEventListener('click', function () { goToLayer(layer); });
+  pin.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); goToLayer(layer); } });
+  pin.addEventListener('mouseenter', function () { light(layer, true); });
+  pin.addEventListener('mouseleave', function () { light(layer, false); });
+  pin.addEventListener('focus', function () { light(layer, true); });
+  pin.addEventListener('blur', function () { light(layer, false); });
+}
+function estWidth(s) { return s.length * 7.6 + 26; }
+
+/* highlight a layer everywhere: banner boxes, its label, its pin, its cards */
+function light(layer, on) {
+  var layers = layer === 'all' ? LAYERS.map(function (L) { return L.id; }) : [layer];
+  layers.forEach(function (id) {
+    $$('#pathsvg .L-' + id).forEach(function (n) { n.classList.toggle('lit', on); });
+    $$('.lbl[data-layer="' + id + '"]').forEach(function (n) { n.classList.toggle('lit', on); });
+  });
+  $$('#pathsvg .pin[data-layer="' + layer + '"]').forEach(function (n) { n.classList.toggle('lit', on); });
+  cardsFor(layer).forEach(function (c) { c.classList.toggle('lit', on); });
+}
+function cardsFor(layer) {
+  return $$('.vcard').filter(function (c) {
+    var ls = (c.getAttribute('data-layers') || '').split(' ');
+    if (layer === 'all') return ls[0] === 'all';
+    return ls[0] === layer;
+  });
+}
+function goToLayer(layer) {
+  var cards = cardsFor(layer);
+  if (!cards.length) return;
+  cards[0].scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+  cards.forEach(function (c) { c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash'); });
+  try { cards[0].focus({ preventScroll: true }); } catch (e) { cards[0].focus(); }
+}
+function wireCards() {
+  $$('.vcard').forEach(function (c) {
+    var first = (c.getAttribute('data-layers') || '').split(' ')[0];
+    if (!first) return;
+    c.addEventListener('mouseenter', function () { light(first, true); });
+    c.addEventListener('mouseleave', function () { light(first, false); });
+  });
+}
+
+/* the packet: down Host A's stack, across the switch and the router, up Host B's stack.
+   It gains a header on each layer going down and loses them going up. */
+var ROUTE = [[80, 0], [80, 4], [350, 4], [350, 3], [350, 4], [610, 4], [610, 2], [610, 4], [840, 4], [840, 0]];
+var rafId = 0;
+function startPacket(g) {
+  if (rafId) cancelAnimationFrame(rafId);
+  var pts = ROUTE.map(function (p) { return { x: p[0], y: rowMid(p[1]) }; });
+  var segs = [], total = 0;
+  for (var i = 1; i < pts.length; i++) { var len = Math.abs(pts[i].x - pts[i - 1].x) + Math.abs(pts[i].y - pts[i - 1].y); segs.push(len); total += len; }
+  var speed = 85, pause = 1600;                     /* units per second, rest at each end (ms) */
+  var cycle = total / speed * 1000 + pause;
+  var pkt = el('g', {}, g);
+  function headersAt(y) { var r = Math.round((y - rowMid(0)) / 38); return Math.max(0, Math.min(3, r)); }
+  function draw(x, y) {
+    var h = headersAt(y), w = 12 + h * 7;
+    pkt.innerHTML = '';
+    el('rect', { x: x - w / 2, y: y - 8, width: w, height: 16, rx: 3, fill: '#fff', stroke: '#3a2600', 'stroke-width': 1 }, pkt);
+    /* outermost header first: link (cyan), network (teal), transport (violet) */
+    for (var k = 0; k < h; k++) el('rect', { x: x - w / 2 + 1 + k * 7, y: y - 7, width: 6, height: 14, fill: ['#7B61FF', '#13A88A', '#0081AD'][h - 1 - k] }, pkt);
+    el('rect', { x: x - w / 2 + 1 + h * 7, y: y - 7, width: 10, height: 14, rx: 2, fill: '#F5A524' }, pkt);
+  }
+  function at(d) {
+    for (var i = 0; i < segs.length; i++) {
+      if (d <= segs[i]) { var f = segs[i] ? d / segs[i] : 0; return { x: pts[i].x + (pts[i + 1].x - pts[i].x) * f, y: pts[i].y + (pts[i + 1].y - pts[i].y) * f }; }
+      d -= segs[i];
+    }
+    return pts[pts.length - 1];
+  }
+  if (reduceMotion) { var p = at(total * 0.55); draw(p.x, p.y); return; }
+  var t0 = performance.now();
+  function frame(now) {
+    var t = (now - t0) % cycle, d = Math.max(0, Math.min(total, (t - pause / 2) / 1000 * speed));
+    var p = at(d); draw(p.x, p.y);
+    rafId = requestAnimationFrame(frame);
+  }
+  rafId = requestAnimationFrame(frame);
+}
+
+/* ===================================================== start */
+function fail(msg, r) {
+  var link = 'https://github.com/' + encodeURIComponent(r.owner) + '/' + encodeURIComponent(r.repo) + '/tree/HEAD/' + FOLDER;
+  $('#stack').className = 'stack';
+  $('#stack').innerHTML = '<div class="status" style="grid-column:1 / -1">The list of visualizers could not be loaded (' + esc(msg) +
+    '). Try again in a few minutes, or browse them in the <a href="' + link + '" target="_blank" rel="noopener">' + FOLDER + ' folder</a>.</div>';
+  drawBanner({ spine: [], rows: LAYERS.map(function () { return []; }), all: [] });
+}
+
+var repo = detectRepo();
+listFiles(repo).then(function (files) {
+  var apps = groupApps(files);
+  if (!apps.length) { fail('no apps found in ' + FOLDER, repo); return; }
+  return Promise.all(apps.map(function (a) { return loadReadme(repo, a).then(function (md) { parseReadme(a, md); }); })).then(function () {
+    var placed = renderStack(apps);
+    drawBanner(placed);
+    wireCards();
+    showProgress(apps);
+    window.VisualizerHome = { apps: apps, placed: placed };
+  });
+}).catch(function (err) { fail(err && err.message ? err.message : 'unknown error', repo); });
+
+/* exposed for tests */
+window.VisualizerHomeParse = { parseReadme: parseReadme, groupApps: groupApps };
+})();
 </script>
 </body>
 </html>

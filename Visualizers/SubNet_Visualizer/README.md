@@ -19,3 +19,5 @@ An interactive, single-page app for learning IPv4 (Internet Protocol version 4) 
 Download `subnet-visualizer.html` and open it in any modern browser. It works offline and needs no installation.
 
 Link parameters: `?mode=learn|calc|challenge`, `lesson=0..6`, `ip=192.168.10.130/25`, `level=E|M|H`, `net=192.168.20`. Example: `subnet-visualizer.html?mode=learn&lesson=4`.
+
+<!-- layer: network -->

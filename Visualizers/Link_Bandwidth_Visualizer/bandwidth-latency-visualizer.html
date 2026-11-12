@@ -104,6 +104,8 @@ input[aria-invalid=true] { border-color: var(--bad); background: var(--bad-soft)
 @media (max-width: 980px) { .lesson { grid-template-columns: 1fr; grid-template-areas: "text" "fig" "try"; grid-template-rows: auto; } }
 .intro p { margin: 0 0 10px; }
 .kicker { color: var(--muted); margin: 0; font-size: 14px; }
+.figsay { display: none; font-weight: 600; margin: 6px 0 0; }
+@media (max-width: 600px) { .figsay { display: block; } svg .saytext { display: none; } }
 @media (max-width: 600px) { .stepper button .t, .stepper button[aria-current=step] .t, .stepper button.mapbtn .t { display: none; } .stepper button[aria-current=step], .stepper button.mapbtn { padding-right: 5px; } }
 details.fold { border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; margin: 8px 0; background: #fff; }
 details.fold > summary { padding: 2px 0; }
@@ -114,7 +116,9 @@ details.figfold > summary { font-size: 16px; }
 .terms li { margin: 4px 0; }
 .ctls { border-top: 1px solid var(--line); margin-top: 10px; padding-top: 4px; }
 .speed { font-size: 14px; color: var(--muted); }
-.speed select { padding: 3px 6px; }
+.speed { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.speed input[type=range] { width: 90px; }
+.speed output { min-width: 2.2em; font-weight: 700; color: var(--navy); }
 /* lesson map */
 .mapintro { max-width: 760px; }
 .mapparts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 12px; }
@@ -229,6 +233,7 @@ footer .card { border-top-width: 1px; border-right-width: 1px; }
 .modes .mm { display: inline-flex; align-items: center; gap: 5px; }
 .modes .mm svg { width: 15px; height: 15px; flex: none; }
 @media (max-width: 600px) { .modes .mm .mm-txt { display: none; } }
+@media (max-width: 400px) { .modes button { padding: 6px 4px; font-size: 14px; } .modes .mm { padding: 6px 6px; } .modes { min-width: 0; } }   /* four mode buttons fit a 360-pixel phone */
 </style>
 </head>
 <body>
@@ -637,18 +642,31 @@ function columns(n) { var a = 1.9, b = n === 2 ? 7.2 : 8.1, xs = []; for (var i 
 
 /* The hosts and links, with the packet's bits on each link at time tc */
 function drawWire(svg, o) {
-  var names = o.names, hops = o.hops, tc = o.tc, n = names.length, xs = columns(n), f = new Fig(svg, 0, 10, 0, 2.3, 1.55), W = n > 3 ? 0.95 : 1.1, H = 0.56, yc = 1.42, onLinks = [];
+  var names = o.names, hops = o.hops, tc = o.tc, n = names.length, xs = columns(n), f = new Fig(svg, 0, 10, 0, 2.55, 1.55), W = n > 3 ? 0.95 : 1.1, H = 0.56, yc = 1.66, onLinks = [];
+  var tot = hops[hops.length - 1].end, eps = Math.max(1e-15, tot * 1e-9);
+  function nm(i) { return /^Host/.test(names[i]) ? names[i] : 'the ' + names[i]; }
+  function cap(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
   for (var i = 0; i < n - 1; i++) {
     var xa = xs[i] + W / 2, xb = xs[i + 1] - W / 2, L = xb - xa, h = hops[i], lk = o.links[i];
     var th = 1.5 + 11 * bwFrac(lk.bw), ph = th / 72 + 0.08;   // a link with more bandwidth is drawn thicker
     f.line(xa, yc, xb, yc, { color: C.wire, lw: th, cap: 'butt' });
-    f.text((xa + xb) / 2, yc + 0.6, fmtRate(lk.bw) + '\n' + (lk.dist !== undefined ? fmtDist(lk.dist) : fmtT(h.P)), { fs: 7.4, color: C.muted });
     var sent = clamp(tc - h.start, 0, h.T), got = clamp(tc - h.start - h.P, 0, h.T), onWire = (sent - got) * h.bw;
-    if (h.P > 0 && onWire > 1e-9) {
+    var active = tc > h.start && tc < h.end - eps;   // this link is carrying the packet now
+    f.text((xa + xb) / 2, yc + 0.6, (n > 2 ? 'Link ' + (i + 1) + ': ' : '') + fmtRate(lk.bw) + '\n' + (lk.dist !== undefined ? fmtDist(lk.dist) : fmtT(h.P)), { fs: 7.4, color: active ? C.navy : C.muted, bold: active });
+    if (h.P > 0 && onWire > 1e-9 && tc > h.start) {
       var f1 = clamp((tc - h.start) / h.P, 0, 1), f2 = clamp((tc - h.start - h.T) / h.P, 0, 1);
       var x1 = xa + f2 * L, x2 = xa + f1 * L; if (x2 - x1 < 0.04) { x1 = Math.max(xa, x2 - 0.04); }
+      var headOn = tc < h.firstIn - eps, tailOn = tc >= h.start + h.T - eps;   // the first bit is still travelling; the last bit has left
       f.rect(x1, yc - ph / 2, x2 - x1, ph, { fill: C.panel, stroke: C.brand, lw: 1.3 });
-      if (x2 - x1 < 0.2) {   // a packet too short to see at this scale: point at it
+      if (x2 - x1 > 0.3 && ph >= 0.12) {   // arrows that move with the bits, so a full link still shows the flow
+        var sp = 0.24, ph0 = ((tc - h.start) / (h.T + h.P)) * L * 2 % sp;
+        for (var ax = x1 + ph0 + 0.08; ax < x2 - 0.06; ax += sp) f.text(ax, yc - 0.012, '›', { fs: 11, bold: true, color: C.brand });
+      }
+      var cw = Math.min(0.07, Math.max(0.02, (x2 - x1) / 3)), yl = yc - ph / 2 - 0.15;
+      // the first bit's label goes above the link and the last bit's below it, so they never pile up
+      if (headOn) { f.rect(x2 - cw, yc - ph / 2, cw, ph, { fill: C.amber, stroke: '#B86E00', lw: 0.8 }); f.text(clamp(x2, xa + 0.28, xb - 0.28), yc + ph / 2 + 0.13, 'first bit', { fs: 7, bold: true, color: '#B86E00' }); }
+      if (tailOn) { f.rect(x1, yc - ph / 2, cw, ph, { fill: C.navy, stroke: C.navy, lw: 0.8 }); f.text(clamp(x1, xa + 0.28, xb - 0.28), yl, 'last bit', { fs: 7, bold: true, color: C.navy }); }
+      if (x2 - x1 < 0.2 && !headOn && !tailOn) {   // a packet too short to see at this scale: point at it
         f.poly([[(x1 + x2) / 2, yc + ph / 2 + 0.04], [(x1 + x2) / 2 - 0.07, yc + ph / 2 + 0.18], [(x1 + x2) / 2 + 0.07, yc + ph / 2 + 0.18]], { closed: true, fill: C.amber, color: '#B86E00', lw: 0.8 });
       }
       onLinks.push((n > 2 ? 'link ' + (i + 1) + ': ' : '') + (onWire < 1 ? 'less than 1 bit (one bit is longer than the link)' : fmtBits(onWire, 3)));
@@ -658,22 +676,49 @@ function drawWire(svg, o) {
     f.slab(x - W / 2, yc - H / 2, W, H, { text: names[i], fs: 8.6, bold: true });
     var st = '', col = C.muted, hin = hops[i - 1], hout = hops[i];
     if (i === 0) {
-      if (tc < hout.start) { st = 'waiting in\nthe queue'; col = C.oneway; }
-      else if (tc < hout.start + hout.T) st = 'sending:\n' + Math.floor(100 * (tc - hout.start) / hout.T) + '% sent';
+      if (tc <= 0 && hout.start <= 0) st = 'ready\nto send';
+      else if (tc < hout.start) { st = 'waiting in\nthe queue'; col = C.oneway; }
+      else if (tc < hout.start + hout.T) st = 'sending:\n' + pctS((tc - hout.start) / hout.T) + ' sent';
       else st = 'all bits\nsent';
     } else {
       if (tc < hin.firstIn) st = '';
-      else if (tc < hin.end) st = 'receiving:\n' + Math.floor(100 * (tc - hin.firstIn) / hin.T) + '%';
+      else if (tc < hin.end) st = 'receiving:\n' + pctS((tc - hin.firstIn) / hin.T);
       else if (i === n - 1) { st = '✓ whole\npacket arrived'; col = C.ok; }
-      else if (tc < hout.start) { st = 'stored, waiting\nto send'; col = C.oneway; }
-      else if (tc < hout.start + hout.T) st = 'forwarding:\n' + Math.floor(100 * (tc - hout.start) / hout.T) + '% sent';
+      else if (tc <= hout.start + Math.max(eps, hout.T * 0.02)) { st = tc < hout.start - eps ? 'stored, waiting\nto send' : 'whole packet\nstored'; col = C.oneway; }
+      else if (tc < hout.start + hout.T) st = 'forwarding:\n' + pctS((tc - hout.start) / hout.T) + ' sent';
       else st = 'all bits\nsent';
     }
-    if (st) f.text(x, yc - H / 2 - 0.3, st, { fs: 7.2, color: col, bold: col !== C.muted });
+    var have;   // the share of the packet this device holds now
+    if (i === 0) have = 1 - clamp(tc - hout.start, 0, hout.T) / hout.T;
+    else {
+      var gotIn = clamp(tc - hin.firstIn, 0, hin.T) / hin.T;
+      have = i === n - 1 ? gotIn : gotIn - clamp(tc - hout.start, 0, hout.T) / hout.T;
+    }
+    var bw0 = W * 0.82, by = yc - H / 2 - 0.15, full = i === n - 1 && have >= 1 - 1e-9;
+    f.rect(x - bw0 / 2, by, bw0, 0.09, { fill: '#fff', stroke: C.wire, lw: 0.8 });
+    if (have > 1e-9) f.rect(x - bw0 / 2, by, bw0 * clamp(have, 0, 1), 0.09, { fill: full ? C.ok : C.brand, stroke: 'none', lw: 0 });
+    if (st) f.text(x, yc - H / 2 - 0.4, st, { fs: 7.2, color: col, bold: col !== C.muted });
   });
-  f.text(5, 0.12, onLinks.length ? 'Bits on the wire now: ' + onLinks.join(', ') : 'No bits on the wire right now.', { fs: 7.8, bold: !!onLinks.length, color: C.navy });
+  // what is happening now, in one sentence
+  var say = '', sc = C.navy;
+  if (tc <= 0 && hops[0].start <= 0) say = 'Host A is ready to send the packet. Press Send, or Next moment to go one step at a time.';
+  else if (tc >= tot - eps) { say = 'Host B has the whole packet. Latency = ' + fmtT(tot, 4) + (n > 2 ? ': every link added its own transmit time and propagation delay.' : '.'); sc = '#0B7A64'; }
+  else {
+    for (var k = 0; k < hops.length - 1 && tc >= hops[k].end - eps; k++);
+    var hk = hops[k], A = nm(k), B = nm(k + 1), pre = n > 2 ? 'Link ' + (k + 1) + ': ' : '', headIn = tc >= hk.firstIn - eps, tailOut = tc >= hk.start + hk.T - eps;
+    if (k > 0 && tc >= hk.start - eps && tc <= hk.start + Math.max(eps, hk.T * 0.02)) { say = cap(A) + ' has the whole packet: link ' + k + ' is done. Store and forward: only now does it start sending the packet on link ' + (k + 1) + '.'; sc = C.oneway; }
+    else if (tc < hk.start) { say = k === 0 ? 'The packet waits in Host A\'s queue. No bit has left yet.' : cap(A) + ' has stored the whole packet and waits in its queue before sending it on link ' + (k + 1) + '.'; sc = C.oneway; }
+    else if (!headIn && !tailOut) say = pre + cap(A) + ' has started sending. The first bit (amber) is on its way to ' + B + '; it takes ' + fmtT(hk.P, 3) + ' to cross' + (hk.P < hk.T / 20 ? ', a tiny part of the ' + fmtT(hk.T, 3) + ' it takes to send the whole packet.' : '.');
+    else if (headIn && !tailOut) say = pre + 'the first bit has reached ' + B + ' while ' + A + ' is still sending (' + pctS((tc - hk.start) / hk.T) + ' sent). The packet is longer than the link, so the link is full.' + (k + 1 < n - 1 ? ' ' + cap(B) + ' stores the bits until the whole packet is in.' : '');
+    else if (!headIn && tailOut) say = pre + cap(A) + ' has sent every bit, and the first bit has not reached ' + B + ' yet: the whole packet is on the wire.';
+    else say = pre + cap(A) + ' has sent every bit. The last bit (dark) is on its way to ' + B + '.';
+  }
+  var sayT = f.text(5, 0.56, wrapText(say, 112), { fs: 7.8, bold: true, color: sc });
+  if (o.sayEl) { sayT.setAttribute('class', 'saytext'); o.sayEl.textContent = say; o.sayEl.style.color = sc; }   // on phones the sentence shows as page text instead
+  f.text(5, 0.14, onLinks.length ? 'Bits on the wire now: ' + onLinks.join(', ') : 'No bits on the wire right now.', { fs: 7.4, color: C.muted });
 }
 
+function pctS(x) { return x > 0 && x < 0.01 ? 'less than 1%' : Math.floor(100 * x) + '%'; }   // a share as a whole percent, never a misleading 0%
 function wrapText(t, n) { var out = [], line = ''; t.split(' ').forEach(function (w) { if (line && (line + ' ' + w).length > n) { out.push(line); line = w; } else line = line ? line + ' ' + w : w; }); out.push(line); return out.join('\n'); }
 /* Numbered moments on a time axis from xa (t = 0) to xb (t = tot). Done moments are green; the amber marker is now. */
 function eventAxis(f, xa, xb, Y0, ev, tc, tot) {
@@ -1140,15 +1185,21 @@ var RATE_CHOICES = [[1e3, '1 kbps'], [56e3, '56 kbps'], [1e6, '1 Mbps'], [10e6, 
 function rateOptions(sel) { return RATE_CHOICES.map(function (r) { return '<option value="' + r[0] + '"' + (r[0] === sel ? ' selected' : '') + '>' + r[1] + '</option>'; }).join(''); }
 function stat(k, v, s, hl) { return '<div class="stat' + (hl ? ' hl' : '') + '"><div class="k">' + k + '</div><div class="v">' + v + '</div>' + (s ? '<div class="s">' + s + '</div>' : '') + '</div>'; }
 /* ===================================================== animation speed: one setting for every Send button, 0.5× by default */
-var SPEEDS = [0.25, 0.5, 1, 2];
-var animSpeed = (function () { var v = +store.get('speed', 0.5); return SPEEDS.indexOf(v) >= 0 ? v : 0.5; })();
+var SPEEDS = [0.25, 0.5, 1, 2, 4], SPEED_NAMES = ['¼×', '½×', '1×', '2×', '4×'];
+var speedIdx = (function () { var v = +store.get('speedIdx', 1); return v >= 0 && v < SPEEDS.length && v === Math.floor(v) ? v : 1; })();
+var animSpeed = SPEEDS[speedIdx];
+/* The speed bar: a slider next to every Send button, one setting for every animation, remembered in this browser. */
 function speedHTML() {
-  return '<label class="speed">Speed <select data-speed aria-label="Animation speed">' + SPEEDS.map(function (v) { return '<option value="' + v + '"' + (v === animSpeed ? ' selected' : '') + '>' + v + '×</option>'; }).join('') + '</select></label>';
+  return '<label class="speed">Speed <input type="range" data-speed min="0" max="4" step="1" value="' + speedIdx + '" aria-label="Animation speed" aria-valuetext="' + SPEED_NAMES[speedIdx] + '"><output class="spdout">' + SPEED_NAMES[speedIdx] + '</output></label>';
 }
 function wireSpeeds() {
-  $$('[data-speed]').forEach(function (s) {
-    s.value = String(animSpeed);
-    s.onchange = function () { animSpeed = +s.value; store.set('speed', animSpeed); $$('[data-speed]').forEach(function (o) { o.value = String(animSpeed); }); };
+  $$('[data-speed]').forEach(function (r) {
+    r.value = String(speedIdx);
+    r.oninput = function () {
+      speedIdx = +r.value; animSpeed = SPEEDS[speedIdx]; store.set('speedIdx', speedIdx);   // read every frame, so a change applies mid-run
+      $$('[data-speed]').forEach(function (o) { o.value = String(speedIdx); o.setAttribute('aria-valuetext', SPEED_NAMES[speedIdx]); });
+      $$('.spdout').forEach(function (o) { o.textContent = SPEED_NAMES[speedIdx]; });
+    };
   });
 }
 /* Like animate(), but the run time is ms at 1× and the speed can change mid-run. */
@@ -1167,9 +1218,10 @@ function animateS(ms, step, alive) {
 }
 
 /* ===================================================== player: Send + time slider + speed, repeated next to every figure it moves, all in sync */
-function stripHTML(p, label) {
-  return '<div class="scrub"><button class="btn small" id="' + p + 'play">▶ ' + (label || 'Send') + '</button><label for="' + p + 'scrub">Time</label>' +
-    '<input type="range" id="' + p + 'scrub" min="0" max="1000" value="0"><span class="tnow" id="' + p + 'tnow"></span>' + speedHTML() + '</div>';
+function stripHTML(p, label, paced) {
+  return '<div class="scrub"><button class="btn small" id="' + p + 'play">▶ ' + (label || 'Send') + '</button>' + (paced ? '<button class="btn alt small" id="' + p + 'next">Next moment ⏭</button>' : '') +
+    '<label for="' + p + 'scrub">Time</label><input type="range" id="' + p + 'scrub" min="0" max="1000" value="0"><span class="tnow" id="' + p + 'tnow"></span>' + speedHTML() + '</div>' +
+    (paced ? '<p class="cmdnote">Short steps are stretched so you can see them, so the animation is not to scale in time; t shows the real time.</p>' : '');
 }
 function Player(o) {   // o.strips: id prefixes of the control strips; o.draw(frac) draws and returns the time label; o.ms: run time at 1×
   var self = this; this.o = o; this.frac = o.frac === undefined ? 0 : o.frac; this.tok = 0;
@@ -1196,16 +1248,57 @@ Player.prototype.play = function () {
     .then(function () { btns.forEach(function (b) { b.disabled = false; }); });
 };
 
-/* ===================================================== timeline: wire figure + space-time figure on one player */
+/* ===================================================== timeline: wire figure + space-time figure on one player
+   With o.paced, the slider does not run at a constant pace: each step between two moments (a first or last bit leaving
+   or arriving, a queue ending) gets 35% of its real share of the time plus an equal share, so a 0.4 µs step on a short
+   link is as visible as a 2 ms queue. The time label always shows the real time. */
 function Timeline(o) {
-  var self = this; this.o = o;
+  var self = this; this.o = o; this.warp = null; this.moments = [];
   this.pl = new Player({ strips: o.strips, ms: o.ms || 4500, alive: o.alive, frac: o.frac, draw: function (f) { return self.draw(f); } });
+  o.strips.forEach(function (p) { var b = $('#' + p + 'next'); if (b) b.onclick = function () { self.next(); }; });
 }
-Timeline.prototype.set = function (names, links, bits) { this.names = names; this.links = links; this.r = pathTimes(bits, links); this.pl.show(); };
+Timeline.prototype.set = function (names, links, bits) {
+  this.names = names; this.links = links; this.r = pathTimes(bits, links);
+  var tot = this.r.total, eps = tot * 1e-9, ts = [0, tot];
+  this.r.hops.forEach(function (h) { ts.push(h.start, h.firstIn, h.start + h.T, h.end); if (h.P > 0 && h.T > 0) ts.push(h.start + Math.min(h.P, h.T) / 2); });   // the last one: a moment when each link has just started sending
+  ts.sort(function (a, b) { return a - b; });
+  var u = []; ts.forEach(function (t) { if (!u.length || t - u[u.length - 1] > eps) u.push(t); });
+  this.moments = u;
+  if (this.o.paced && tot > 0 && u.length > 2) {
+    // a switch or router that has just stored the whole packet holds still for one step, so store and forward is seen
+    var holds = this.r.hops.slice(1).map(function (h) { return h.ready; });
+    var n = u.length - 1, T = [u[0]], w = [], sum = 0;
+    for (var k = 0; k < n; k++) {
+      if (k > 0 && holds.some(function (h) { return Math.abs(h - u[k]) <= eps; })) { T.push(u[k]); w.push(0.65 / n); }
+      T.push(u[k + 1]); w.push(0.35 * (u[k + 1] - u[k]) / tot + 0.65 / n);
+    }
+    w.forEach(function (x) { sum += x; });
+    var fs = [0]; for (k = 0; k < w.length; k++) fs.push(fs[k] + w[k] / sum);
+    fs[w.length] = 1; this.warp = { t: T, f: fs };
+  } else this.warp = null;
+  this.pl.show();
+};
+Timeline.prototype.tAt = function (frac) {
+  var tot = this.r.total, W = this.warp; if (!W) return frac * tot;
+  for (var k = 0; k < W.t.length - 1; k++) if (frac <= W.f[k + 1]) return W.t[k] + (W.t[k + 1] - W.t[k]) * (W.f[k + 1] > W.f[k] ? (frac - W.f[k]) / (W.f[k + 1] - W.f[k]) : 0);
+  return tot;
+};
+Timeline.prototype.fracAt = function (t) {
+  var tot = this.r.total, W = this.warp; if (!W) return tot ? clamp(t / tot, 0, 1) : 1;
+  for (var k = 0; k < W.t.length - 1; k++) if (t <= W.t[k + 1]) return W.f[k] + (W.f[k + 1] - W.f[k]) * (W.t[k + 1] > W.t[k] ? (t - W.t[k]) / (W.t[k + 1] - W.t[k]) : 0);
+  return 1;
+};
+Timeline.prototype.jumpT = function (t) { this.pl.jump(this.fracAt(t)); };
+Timeline.prototype.next = function () {   // jump to the next moment after now (back to the start after the last one)
+  if (!this.r) return;
+  var now = this.tAt(this.pl.frac), eps = this.r.total * 1e-6, m = this.moments;
+  for (var k = 0; k < m.length; k++) if (m[k] > now + eps) { this.jumpT(m[k]); return; }
+  this.jumpT(0);
+};
 Timeline.prototype.draw = function (frac) {
   if (!this.r) return '';
-  var tot = this.r.total, tc = tot * frac;
-  if (this.o.wire) drawWire(this.o.wire, { names: this.names, hops: this.r.hops, links: this.links, tc: tc });
+  var tot = this.r.total, tc = this.tAt(frac);
+  if (this.o.wire) drawWire(this.o.wire, { names: this.names, hops: this.r.hops, links: this.links, tc: tc, sayEl: this.o.sayEl });
   if (this.o.extra) this.o.extra(tc, this.r);
   if (this.o.st) drawSpaceTime(this.o.st, { names: this.names, hops: this.r.hops, tc: tc, tMax: tot, detail: this.o.detail });
   return 't = ' + fmtT(tc, 4);
@@ -1410,7 +1503,7 @@ function l2() {
       if (key !== evKey) {   // rebuild the list only when the link changes
         evKey = key;
         $('#l2ev').innerHTML = evList('l2ev', ev, true);
-        $$('[data-ev]', $('#l2ev')).forEach(function (b) { b.onclick = function () { var e = ev[+b.getAttribute('data-ev')]; tl.jump(h.end ? e.t / h.end : 1); }; });
+        $$('[data-ev]', $('#l2ev')).forEach(function (b) { b.onclick = function () { tl.jumpT(ev[+b.getAttribute('data-ev')].t); }; });
       }
       markEvents($('#l2ev'), tc, h.end);
     } });
@@ -1678,14 +1771,14 @@ function l6() {
       '<details class="fold"><summary>Queues at the switch and the router</summary><div class="row"><label>At the switch, up to ' + numIn('l6qs', s.qs, 0, 1e4, 'Queue at the switch in milliseconds') + ' ms</label><label>at the router, up to ' + numIn('l6qr', s.qr, 0, 1e4, 'Queue at the router in milliseconds') + ' ms</label></div></details>'
   });
   setTry('<p>A <b>1500-byte</b> packet crosses three links with no queuing: <b>' + t.links.map(function (L) { return fmtRate(L.bw) + ' over ' + fmtDist(L.dist) + ' of ' + MEDIUM_NAME[L.medium]; }).join('</b>, then <b>') + '</b>. What is its latency from Host A to Host B, in <b>ms</b>?</p>' + answerRow('l6', 'Latency in milliseconds'));
-  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">One packet from Host A to Host B</p>' + stripHTML('l6') +
-    '<div class="fig"><svg id="l6wire" role="img" aria-label="One packet crossing a switch and a router at the chosen time"></svg></div>' +
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">One packet from Host A to Host B</p>' + stripHTML('l6', 'Send', true) +
+    '<div class="fig"><svg id="l6wire" role="img" aria-label="One packet crossing a switch and a router at the chosen time"></svg></div><p class="figsay" id="l6say" aria-live="polite"></p>' +
     '<ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>the packet\'s bits</li><li><i style="background:#9DB3C1;height:9px"></i>a thicker link has more bandwidth</li></ul><div class="calcgrid" id="l6key"></div></div>' +
-    figFold('The same packet on a time diagram (time runs down)', stripHTML('l6b') + '<div class="fig"><svg id="l6st" role="img" aria-label="Space-time diagram: one packet crossing a switch and a router"></svg></div>' + ST_LEGEND) +
+    figFold('The same packet on a time diagram (time runs down)', stripHTML('l6b', 'Send', true) + '<div class="fig"><svg id="l6st" role="img" aria-label="Space-time diagram: one packet crossing a switch and a router"></svg></div>' + ST_LEGEND) +
     figFold('The delay on each link', '<div class="calcgrid" id="l6stats"></div>') +
     figFold('Ping Host B from Host A', '<div class="row"><button class="btn small" id="l6ping">▶ Run 5 pings</button></div><div class="term" id="l6term" aria-live="polite"><span class="d">Press Run 5 pings.</span></div><p class="cmdnote">Linux output. Host B is at 192.168.20.20; the router lowers the TTL (Time To Live) from 64 to 63. Each RTT (round-trip time) is the request and the reply crossing all three links, plus the queues.</p>') +
     figFold('Measure it on your own computers', '<div id="l6cmds"></div>');
-  var tl = new Timeline({ strips: ['l6', 'l6b'], wire: $('#l6wire'), st: $('#l6st'), detail: false, alive: lessonAlive() }), links = [];
+  var tl = new Timeline({ strips: ['l6', 'l6b'], wire: $('#l6wire'), sayEl: $('#l6say'), st: $('#l6st'), detail: false, alive: lessonAlive(), paced: true, ms: 9000 }), links = [];
   function upd() {
     var size = readF('#l6s', 64, 65535), qs = readF('#l6qs', 0, 1e4), qr = readF('#l6qr', 0, 1e4); if (size === null || qs === null || qr === null) return;
     size = Math.round(size);
@@ -1829,10 +1922,10 @@ function calcInit() {
   };
   ['#c_size', '#c_bw', '#c_dist', '#c_q', '#c_rtt'].forEach(function (id) { $(id).oninput = calc; });
   ['#c_unit', '#c_bwu', '#c_distu', '#c_med'].forEach(function (id) { $(id).onchange = calc; });
-  $('#c_strip').innerHTML = stripHTML('c_'); $('#c_stripb').innerHTML = stripHTML('c_b');
-  $('#p_strip').innerHTML = stripHTML('p_', 'Send one packet'); $('#p_stripb').innerHTML = stripHTML('p_b', 'Send one packet');
-  calcTL = new Timeline({ strips: ['c_', 'c_b'], wire: $('#c_wire'), st: $('#c_st'), detail: true, alive: function () { return current === 'calc'; } });
-  pathTL = new Timeline({ strips: ['p_', 'p_b'], wire: $('#p_wire'), st: $('#p_st'), detail: false, alive: function () { return current === 'calc'; } });
+  $('#c_strip').innerHTML = stripHTML('c_', 'Send', true); $('#c_stripb').innerHTML = stripHTML('c_b', 'Send', true);
+  $('#p_strip').innerHTML = stripHTML('p_', 'Send one packet', true); $('#p_stripb').innerHTML = stripHTML('p_b', 'Send one packet', true);
+  calcTL = new Timeline({ strips: ['c_', 'c_b'], wire: $('#c_wire'), st: $('#c_st'), detail: true, paced: true, ms: 6000, alive: function () { return current === 'calc'; } });
+  pathTL = new Timeline({ strips: ['p_', 'p_b'], wire: $('#p_wire'), st: $('#p_st'), detail: false, paced: true, ms: 9000, alive: function () { return current === 'calc'; } });
   function seg(path) { $('#c_one').hidden = path; $('#c_path').hidden = !path; $('#c_seg1').setAttribute('aria-pressed', String(!path)); $('#c_seg2').setAttribute('aria-pressed', String(path)); }
   $('#c_seg1').onclick = function () { seg(false); }; $('#c_seg2').onclick = function () { seg(true); };
   $('#p_size').oninput = pathCalc; $('#p_n').oninput = pathCalc;

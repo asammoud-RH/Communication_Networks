@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Network Layers Visualizer</title>
-<meta name="description" content="See the OSI model and the TCP/IP models side by side, watch a message gain its headers, find out what each device reads and rewrites, and troubleshoot one layer at a time.">
+<meta name="description" content="See the OSI model and the TCP/IP model side by side, watch a message gain its headers, find out what each device reads and rewrites, and troubleshoot one layer at a time.">
 <style>
 /* ===================================================== theme (shared by all apps) */
 :root {
@@ -37,6 +37,7 @@ button, input, select { font: inherit; color: inherit; }
 .modes { display: flex; gap: 4px; background: rgba(255,255,255,.12); border-radius: 999px; padding: 4px; }
 .modes button { border: 0; background: transparent; color: #fff; padding: 6px 14px; border-radius: 999px; cursor: pointer; font-weight: 600; }
 .modes button[aria-pressed=true] { background: #fff; color: var(--navy); }
+@media (max-width: 400px) { .modes button { padding: 6px 10px; } }   /* room for the Menu button on small phones */
 .spacer { flex: 1; }
 .pill { background: var(--amber); color: #3a2600; font-weight: 700; border-radius: 999px; padding: 4px 12px; white-space: nowrap; }
 
@@ -71,6 +72,9 @@ input[type=number] { width: 6em; }
 .hero h1 { color: #fff; font-size: 32px; margin: 0 0 8px; }
 .hero p { font-size: 17px; max-width: 560px; }
 .hero svg { width: 100%; height: auto; max-height: 230px; }
+.sitehome { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; color: #fff; border: 2px solid rgba(255,255,255,.75); border-radius: 8px; padding: 6px 14px; font-weight: 600; text-decoration: none; }
+.sitehome:hover { background: rgba(255,255,255,.15); }
+.sitehome svg { width: 16px; height: 16px; }
 .modecards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 18px; }
 .modecard { display: flex; flex-direction: column; gap: 6px; }
 .modecard .icon { font-size: 30px; line-height: 1; }
@@ -141,10 +145,11 @@ details.more, details.terms { border-top: 1px solid var(--line); padding-top: 6p
 details { margin-top: 8px; }
 summary { cursor: pointer; color: var(--brand-dark); font-weight: 600; }
 
-/* layer chip: one layer named in all three models */
-.lchip { display: inline-flex; flex-wrap: wrap; gap: 4px; align-items: center; font-size: 13px; }
-.lchip span { border-radius: 999px; padding: 1px 9px; border: 1px solid var(--line); background: #fff; }
-.lchip span:first-child { background: var(--navy); color: #fff; border-color: var(--navy); }
+/* layer line: one job, named in both models (plain text, so nobody takes it for a button) */
+.lyr { font-size: 14px; color: var(--ink); cursor: default; }
+.lyr i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: 0; }
+.lyr b { color: var(--navy); }
+.count { font-family: var(--mono); font-size: 14px; color: var(--muted); cursor: default; }
 .bandsel { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
 .bandsel button { border: 2px solid var(--line); background: #fff; border-radius: 999px; padding: 3px 12px; cursor: pointer; font-size: 14px; font-weight: 600; }
 .bandsel button[aria-pressed=true] { border-color: var(--navy); background: var(--panel-soft); }
@@ -192,6 +197,7 @@ summary { cursor: pointer; color: var(--brand-dark); font-weight: 600; }
 .rung { border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; margin: 8px 0; background: #fff; }
 .rung h4 { margin: 2px 0; color: var(--navy); font-size: 15px; }
 .rung.hl { box-shadow: 0 0 0 3px var(--amber) inset; }
+.rung.off { opacity: .5; filter: grayscale(1); }   /* once one step is outlined, the others fade */
 
 /* calculator */
 .calcgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin: 10px 0; }
@@ -266,9 +272,10 @@ footer .card { border-top-width: 1px; border-right-width: 1px; }
   <div class="hero">
     <div>
       <h1>Network Layers Visualizer</h1>
-      <p>Every message you send is wrapped in layers, like an onion. There is more than one way to name those layers: the seven-layer OSI (Open Systems Interconnection) model, and the four-layer and five-layer TCP/IP models. See all three side by side, watch the headers go on and come off, and find out what every switch and router reads and rewrites.</p>
+      <p>Every message you send is wrapped in layers, like an onion. There is more than one way to name those layers: the seven-layer OSI (Open Systems Interconnection) model, and the four-layer TCP/IP model the Internet uses. See both side by side, watch the headers go on and come off, and find out what every switch and router reads and rewrites.</p>
+      <a class="sitehome" id="siteHome" href="#" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>All Visualizers</a>
     </div>
-    <svg id="heroFig" viewBox="0 0 360 200" role="img" aria-label="The OSI model and the two TCP/IP models side by side, next to a frame with its headers"></svg>
+    <svg id="heroFig" viewBox="0 0 360 200" role="img" aria-label="The OSI model and the TCP/IP model side by side, next to a frame with its headers"></svg>
   </div>
   <div class="modecards">
     <div class="card modecard">
@@ -293,7 +300,7 @@ footer .card { border-top-width: 1px; border-right-width: 1px; }
   <div class="card" style="margin-top:16px">
     <h3 style="margin-top:0">What you will be able to do</h3>
     <ul class="skills">
-      <li>Name the layers of the OSI model and of both TCP/IP models, and map one model onto another</li>
+      <li>Name the layers of the OSI model and the TCP/IP model, and map one onto the other</li>
       <li>Recognize the other names the same layer goes by</li>
       <li>Name the unit of data at each layer: message, segment, packet, frame, bits</li>
       <li>Count the header bytes, padding, frame size, and efficiency of an Ethernet frame</li>
@@ -373,7 +380,7 @@ footer .card { border-top-width: 1px; border-right-width: 1px; }
     <h2>Challenge</h2>
     <p>Answer ten questions. A correct answer earns 10 points, and a streak adds a bonus. A hint costs 3 points. Every answer comes with an explanation. Sizes use Ethernet II and headers with no options unless a question says otherwise.</p>
     <div class="levels" id="levels">
-      <button class="level" data-level="E" aria-pressed="true"><b>Easy</b>Layer names in all three models, mapping between models, other names, units of data, devices.</button>
+      <button class="level" data-level="E" aria-pressed="true"><b>Easy</b>Layer names in both models, mapping between them, other names, units of data, devices.</button>
       <button class="level" data-level="M" aria-pressed="false"><b>Medium</b>Header bytes, frame sizes, padding, what Wireshark shows, and the fields that pick the next layer.</button>
       <button class="level" data-level="H" aria-pressed="false"><b>Hard</b>What routers and switches rewrite, tricky protocols, efficiency, and troubleshooting.</button>
     </div>
@@ -399,7 +406,7 @@ footer .card { border-top-width: 1px; border-right-width: 1px; }
 
 <footer>
   <div class="card">
-    <details><summary>About this app</summary><p>Network Layers Visualizer works offline in any current browser. It compares the OSI (Open Systems Interconnection) seven-layer model with the four-layer and five-layer TCP/IP models. Sizes follow Ethernet II: a 14-byte header, a 4-byte FCS (Frame Check Sequence), a 64-byte minimum frame, a 1500-byte MTU (Maximum Transmission Unit), an 8-byte preamble with its start delimiter, and a 12-byte gap between frames. Headers are IPv4 (Internet Protocol version 4) 20 bytes, IPv6 (version 6) 40 bytes, TCP (Transmission Control Protocol) 20 bytes, and UDP (User Datagram Protocol) 8 bytes, with no options unless you choose them. Wireshark on the sending host captures a frame before the network adapter pads it and adds the FCS. Progress, badges, and the animation speed are kept in this browser only.</p></details>
+    <details><summary>About this app</summary><p>Network Layers Visualizer works offline in any current browser. It compares the OSI (Open Systems Interconnection) seven-layer model with the four-layer TCP/IP model. Sizes follow Ethernet II: a 14-byte header, a 4-byte FCS (Frame Check Sequence), a 64-byte minimum frame, a 1500-byte MTU (Maximum Transmission Unit), an 8-byte preamble with its start delimiter, and a 12-byte gap between frames. Headers are IPv4 (Internet Protocol version 4) 20 bytes, IPv6 (version 6) 40 bytes, TCP (Transmission Control Protocol) 20 bytes, and UDP (User Datagram Protocol) 8 bytes, with no options unless you choose them. Wireshark on the sending host captures a frame before the network adapter pads it and adds the FCS. Progress, badges, and the animation speed are kept in this browser only.</p></details>
     <details>
       <summary>Settings</summary>
       <div class="row"><button class="btn alt small" id="resetProgress">Reset my progress</button></div>
@@ -512,7 +519,7 @@ function showXP(pop) { var p = $('#xp'); p.textContent = '★ ' + progress.xp + 
 function addXP(n) { progress.xp += n; store.set('progress', progress); showXP(true); }
 
 /* ===================================================== MODEL 1: the layer models
-   Five jobs ("bands") line up across the three models. A layer covers one band, or more. */
+   Five jobs ("bands") line up across the two models. A layer covers one band, or more. */
 var BANDS = [
   { id: 'app', short: 'Applications', name: 'Application services', pdu: 'message (the data)',
     job: 'Gives programs the services they need: web pages, names, addresses, remote logins.',
@@ -540,33 +547,27 @@ var MODELS = {
     { n: 3, name: 'Network', bands: ['net'], alt: [] },
     { n: 2, name: 'Data link', bands: ['link'], alt: ['Link'] },
     { n: 1, name: 'Physical', bands: ['phys'], alt: [] }] },
-  t4: { key: 't4', name: 'TCP/IP 4-layer', long: 'TCP/IP model (4 layers)', layers: [
+  t4: { key: 't4', name: 'TCP/IP', long: 'TCP/IP model (4 layers)', layers: [
     { n: 4, name: 'Application', bands: ['app'], alt: ['Process'] },
     { n: 3, name: 'Transport', bands: ['e2e'], alt: ['Host-to-host'] },
     { n: 2, name: 'Internet', bands: ['net'], alt: ['Network', 'Internetwork'] },
-    { n: 1, name: 'Link', bands: ['link', 'phys'], alt: ['Network access', 'Network interface', 'Host-to-network', 'Subnetwork'] }] },
-  t5: { key: 't5', name: 'TCP/IP 5-layer', long: 'TCP/IP model (5 layers)', layers: [
-    { n: 5, name: 'Application', bands: ['app'], alt: [] },
-    { n: 4, name: 'Transport', bands: ['e2e'], alt: [] },
-    { n: 3, name: 'Network', bands: ['net'], alt: ['Internet'] },
-    { n: 2, name: 'Data link', bands: ['link'], alt: ['Link'] },
-    { n: 1, name: 'Physical', bands: ['phys'], alt: [] }] }
+    { n: 1, name: 'Link', bands: ['link', 'phys'], alt: ['Network access', 'Network interface', 'Host-to-network', 'Subnetwork'] }] }
 };
-var MKEYS = ['osi', 't4', 't5'];
+var MKEYS = ['osi', 't4'];   // the OSI model and the four-layer TCP/IP model (the Internet's own model, RFC 1122)
 function shares(a, b) { return a.bands.some(function (x) { return b.bands.indexOf(x) >= 0; }); }
 function layersFor(mk, bands) { return MODELS[mk].layers.filter(function (L) { return L.bands.some(function (b) { return bands.indexOf(b) >= 0; }); }); }
 function mapLayer(srcKey, n, dstKey) { var L = MODELS[srcKey].layers.filter(function (x) { return x.n === n; })[0]; return MODELS[dstKey].layers.filter(function (d) { return shares(L, d); }); }
-function layerLabel(mk, L) { return (mk === 'osi' ? 'OSI ' : mk === 't4' ? '4-layer ' : '5-layer ') + L.n + ' ' + L.name; }
+function layerLabel(mk, L) { return (mk === 'osi' ? 'OSI ' : 'TCP/IP ') + L.n + ' ' + L.name; }
 function namesJoin(arr) { return arr.map(function (L) { return L.name; }).join(' + '); }
-var chipSeen = false;   // the first chip on a screen spells out OSI
-function chip(bands) {   // one job, and its layer number and name in each of the three models
+var chipSeen = false;   // the first layer line on a screen spells out OSI
+function chip(bands) {   // one job, and its layer number and name in both models: plain text, not a button
   var osi = chipSeen ? 'OSI' : 'OSI (Open Systems Interconnection)'; chipSeen = true;
   var b = BAND[bands[0]];
-  return '<span class="lchip"><span>Job: ' + esc(bands.length > 1 ? 'Link and signals' : b.short) + '</span>' + MKEYS.map(function (mk) {
+  return '<span class="lyr"><i style="background:' + b.col.line + '"></i><b>' + esc(bands.length > 1 ? 'Link and signals' : b.short) + ':</b> ' + MKEYS.map(function (mk) {
     var Ls = layersFor(mk, bands), nums = Ls.map(function (L) { return L.n; });
     var num = nums.length > 1 ? 'layers ' + nums[0] + '–' + nums[nums.length - 1] : 'layer ' + nums[0];
-    return '<span>' + (mk === 'osi' ? osi : mk === 't4' ? 'TCP/IP 4-layer' : 'TCP/IP 5-layer') + ': ' + num + ', ' + esc(Ls.map(function (L) { return L.name; }).join(', ')) + '</span>';
-  }).join('') + '</span>';
+    return (mk === 'osi' ? osi : 'TCP/IP') + ' ' + num + ' (' + esc(Ls.map(function (L) { return L.name; }).join(', ')) + ')';
+  }).join(' · ') + '</span>';
 }
 
 /* ===================================================== MODEL 2: frame sizes (Ethernet II) */
@@ -749,7 +750,7 @@ function renderCmds(box, opts) {   // the ladder with Linux and Windows tabs, ed
   function draw() {
     chipSeen = false;   // the first rung spells out OSI
     $('.rungs', box).innerHTML = RUNGS.map(function (r) {
-      return '<div class="rung' + (opts.hl === r.id ? ' hl' : '') + '" data-r="' + r.id + '"><h4>' + esc(r.t) + '</h4>' + chip([r.band]) + rungCmds(r, cmdState.os, cmdState).map(function (c) {
+      return '<div class="rung' + (opts.hl === r.id ? ' hl' : opts.hl ? ' off' : '') + '" data-r="' + r.id + '"><h4>' + esc(r.t) + '</h4>' + chip([r.band]) + rungCmds(r, cmdState.os, cmdState).map(function (c) {
         return '<div class="cmd"><code>' + esc(c[0]) + '</code><button type="button" data-copy="' + esc(c[0]) + '">Copy</button></div><p class="cmdnote">' + esc(c[1]) + '</p>';
       }).join('') + '</div>';
     }).join('');
@@ -762,8 +763,9 @@ function renderCmds(box, opts) {   // the ladder with Linux and Windows tabs, ed
 }
 
 /* ===================================================== FIGURES */
-/* 1. The three models side by side, with one colored band per job */
-var STACK_COLS = { osi: 3.0, t4: 5.75, t5: 8.5 }, STACK_W = 2.45, ROW_H = 0.6, ROW_Y0 = 0.3;
+/* 1. The two models side by side, with one colored band per job */
+var STACK_COLS = { osi: 3.4, t4: 7.2 }, STACK_W = 3.0, ROW_H = 0.6, ROW_Y0 = 0.3;
+var OFF = { fill: '#EEF1F3', line: '#C3CBD1', text: '#8A97A1' };   // gray: not used by what the student picked
 var BAND_ROWS = { app: [4, 6], e2e: [3, 3], net: [2, 2], link: [1, 1], phys: [0, 0] };   // rows each job covers (0 = bottom)
 function layerRows(mk, L) {   // OSI gives every layer its own row; the TCP/IP layers cover whole jobs
   if (mk === 'osi') return [L.n - 1, L.n - 1];
@@ -773,18 +775,18 @@ function layerRows(mk, L) {   // OSI gives every layer its own row; the TCP/IP l
 function drawStacks(svg, sel, onPick) {
   var f = new Fig(svg, 0, 11.1, 0, ROW_Y0 + 7 * ROW_H + 0.75, 1.55), top = ROW_Y0 + 7 * ROW_H;
   BANDS.forEach(function (b) {   // band backgrounds and names
-    var r = BAND_ROWS[b.id], y = ROW_Y0 + r[0] * ROW_H, h = (r[1] - r[0] + 1) * ROW_H, on = sel.indexOf(b.id) >= 0;
-    f.rect(0.05, y + 0.02, 11.0, h - 0.04, { fill: b.col.fill, stroke: on ? C.navy : b.col.fill, lw: on ? 2 : 0.5, rx: 0.06 });
-    f.rect(0.12, y + h / 2 - 0.08, 0.16, 0.16, { fill: b.col.line, stroke: b.col.line, lw: 0.5 });
-    f.text(0.38, y + h / 2, b.short, { fs: 8.5, bold: true, ha: 'left', color: C.navy });
+    var r = BAND_ROWS[b.id], y = ROW_Y0 + r[0] * ROW_H, h = (r[1] - r[0] + 1) * ROW_H, on = sel.indexOf(b.id) >= 0, off = sel.length && !on;   // jobs not picked turn gray
+    f.rect(0.05, y + 0.02, 11.0, h - 0.04, { fill: off ? OFF.fill : b.col.fill, stroke: on ? C.navy : off ? OFF.fill : b.col.fill, lw: on ? 2 : 0.5, rx: 0.06 });
+    f.rect(0.12, y + h / 2 - 0.08, 0.16, 0.16, { fill: off ? OFF.line : b.col.line, stroke: off ? OFF.line : b.col.line, lw: 0.5 });
+    f.text(0.38, y + h / 2, b.short, { fs: 8.5, bold: true, ha: 'left', color: off ? OFF.text : C.navy });
   });
   MKEYS.forEach(function (mk) {
     var x = STACK_COLS[mk];
     f.text(x + STACK_W / 2, top + 0.42, MODELS[mk].long, { fs: 9, bold: true, color: C.navy });
     MODELS[mk].layers.forEach(function (L) {
       var lr = layerRows(mk, L), lo = lr[0], hi = lr[1];
-      var y = ROW_Y0 + lo * ROW_H + 0.05, h = (hi - lo + 1) * ROW_H - 0.1, on = sel.length && L.bands.some(function (b) { return sel.indexOf(b) >= 0; });
-      var g = f.slab(x, y, STACK_W, h, { fill: on ? '#fff' : '#fff', stroke: on ? C.navy : BAND[L.bands[0]].col.line, thick: on ? 4.2 : 3, lw: on ? 1.8 : 1.1, text: L.n + '  ' + L.name, fs: 9, bold: on });
+      var y = ROW_Y0 + lo * ROW_H + 0.05, h = (hi - lo + 1) * ROW_H - 0.1, on = sel.length && L.bands.some(function (b) { return sel.indexOf(b) >= 0; }), off = sel.length && !on;
+      var g = f.slab(x, y, STACK_W, h, { fill: off ? OFF.fill : '#fff', stroke: on ? C.navy : off ? OFF.line : BAND[L.bands[0]].col.line, thick: on ? 4.2 : 3, lw: on ? 1.8 : 1.1, text: L.n + '  ' + L.name, fs: 9, bold: on, color: off ? OFF.text : null });
       if (onPick) { g.setAttribute('class', 'hit'); g.addEventListener('click', function () { onPick(L.bands.slice(), mk, L.n); }); }
     });
   });
@@ -845,7 +847,9 @@ function drawHourglass(svg, selId) {
     row.items.forEach(function (id) {
       var x = HG_X[id], y = row.y * RY + 0.18, w = id === 'ip4' ? 2.6 : BW, on = chain.indexOf(id) >= 0, p = PROTO[id], b = p ? BAND[p.band] : (row.y === 0 ? BAND.phys : BAND.link);
       if (id === 'ip4') on = on || chain.indexOf('ip6') >= 0;
-      f.slab(x - w / 2, y, w, BH, { fill: on ? C.amber : b.col.fill, stroke: on ? C.navy : b.col.line, thick: on ? 4 : 2.6, text: HG_LABEL[id] || (p ? p.name : id), fs: 8.5, bold: on });
+      if (id === 'copper' || id === 'fiber') on = chain.indexOf('eth') >= 0;   // an Ethernet frame goes out on copper or fiber
+      var off = selId && !on;   // a protocol is picked: everything that does not carry it turns gray
+      f.slab(x - w / 2, y, w, BH, { fill: on ? C.amber : off ? OFF.fill : b.col.fill, stroke: on ? C.navy : off ? OFF.line : b.col.line, thick: on ? 4 : 2.6, text: HG_LABEL[id] || (p ? p.name : id), fs: 8.5, bold: on, color: off ? OFF.text : null });
     });
   });
   return f;
@@ -908,15 +912,15 @@ function drawBar(svg, s, fr) {
   f.text(0.2, 0.3, 'Application data: ' + (100 * fr.app / tot).toFixed(1) + '% of this frame\'s time on the wire', { fs: 8, ha: 'left', bold: true, color: C.navy });
   return parts;
 }
-/* hero: three stacks and a frame */
+/* hero: the two models and a frame */
 function drawHero() {
-  var f = new Fig($('#heroFig'), 0, 7.2, 0, 4, 1.4), xs = [0.25, 1.75, 3.25], rows = { osi: MODELS.osi.layers, t4: MODELS.t4.layers, t5: MODELS.t5.layers };
+  var f = new Fig($('#heroFig'), 0, 7.2, 0, 4, 1.4), xs = [0.45, 2.35], W = 1.6;
   MKEYS.forEach(function (mk, j) {
-    f.text(xs[j] + 0.62, 3.75, ['OSI', 'TCP/IP 4', 'TCP/IP 5'][j], { fs: 8.5, color: '#fff', bold: true });
-    rows[mk].forEach(function (L) {
+    f.text(xs[j] + W / 2, 3.75, ['OSI', 'TCP/IP'][j], { fs: 8.5, color: '#fff', bold: true });
+    MODELS[mk].layers.forEach(function (L) {
       var lr = layerRows(mk, L), lo = lr[0], hi = lr[1];
-      f.rect(xs[j], 0.3 + lo * 0.46 + 0.03, 1.25, (hi - lo + 1) * 0.46 - 0.06, { fill: BAND[L.bands[0]].col.fill, stroke: '#fff', lw: 1, rx: 0.05 });
-      f.text(xs[j] + 0.62, 0.3 + (lo + hi + 1) / 2 * 0.46, L.name, { fs: 7 });
+      f.rect(xs[j], 0.3 + lo * 0.46 + 0.03, W, (hi - lo + 1) * 0.46 - 0.06, { fill: BAND[L.bands[0]].col.fill, stroke: '#fff', lw: 1, rx: 0.05 });
+      f.text(xs[j] + W / 2, 0.3 + (lo + hi + 1) / 2 * 0.46, L.name, { fs: 7 });
     });
   });
   var segs = [['Eth', 'link', 0.55], ['IP', 'net', 0.5], ['TCP', 'e2e', 0.55], ['Data', 'app', 0.8], ['FCS', 'link', 0.35]], x = 4.75;
@@ -948,7 +952,7 @@ function wireSpeed() {
 /* terms: every acronym and key word, spelled out in "Terms in this lesson" */
 var TERMS = [
   ['OSI', 'Open Systems Interconnection. The seven-layer reference model.'],
-  ['TCP/IP model', 'The model named after the Internet\'s two main protocols, TCP and IP. Drawn with four or with five layers.'],
+  ['TCP/IP model', 'The four-layer model the Internet\'s own standards use, named after its two main protocols, TCP and IP.'],
   ['Layer', 'One level of the stack. It does one job, uses the layer below it, and serves the layer above it.'],
   ['Protocol', 'The rules two sides follow to talk, including the header they add.'],
   ['TCP', 'Transmission Control Protocol. Reliable, in-order delivery between two programs. Its unit of data is a segment.'],
@@ -1025,7 +1029,7 @@ function tryBox(id, task, inner) { return '<div class="tryit"><h3>Try it</h3><di
 function opts(list, val) { return list.map(function (o) { var v = typeof o === 'string' ? o : o[0], t = typeof o === 'string' ? o : o[1]; return '<option value="' + esc(v) + '"' + (String(v) === String(val) ? ' selected' : '') + '>' + esc(t) + '</option>'; }).join(''); }
 function bandInfo(bands) {
   var parts = bands.map(function (id) { return BAND[id]; });
-  return '<div class="info"><p class="cmdnote" style="margin:0 0 4px">This job in each of the three models (layers are numbered from the bottom):</p>' + chip(bands) + parts.map(function (b) {
+  return '<div class="info"><p class="cmdnote" style="margin:0 0 4px">This job in both models (layers are numbered from the bottom):</p>' + chip(bands) + parts.map(function (b) {
     return '<p><b>' + esc(b.name) + '.</b> ' + esc(b.job) + '</p><p><b>Unit of data:</b> ' + esc(b.pdu) + '. <b>Examples:</b> ' + esc(b.ex) + '.</p>';
   }).join('') + more('Other names for ' + (bands.length > 1 || bands[0] === 'app' ? 'these layers' : 'this layer'), '<ul class="list">' + MKEYS.map(function (mk) {
     return '<li>' + esc(MODELS[mk].long) + ': ' + layersFor(mk, bands).map(function (L) { return '<b>' + L.n + ' ' + esc(L.name) + '</b>' + (L.alt.length ? ' (also called ' + esc(L.alt.join(', ')) + ')' : '') + (L.note ? ' (' + esc(L.note.replace(/\.$/, '').charAt(0).toLowerCase() + L.note.replace(/\.$/, '').slice(1)) + ')' : ''); }).join('; ') + '</li>';
@@ -1036,20 +1040,20 @@ function bandButtons(sel) {
 }
 function bandLegend(short) { return '<ul class="legend">' + BANDS.map(function (b) { return '<li><i style="background:' + b.col.fill + ';border:1px solid ' + b.col.line + '"></i>' + esc(short ? b.short : b.name) + '</li>'; }).join(''); }
 
-var PARTS = ['The three models', 'One packet\'s journey', 'Layers at work'];
+var PARTS = ['The two models', 'One packet\'s journey', 'Layers at work'];
 var LESSONS = [
-/* ---------- Lesson 1: three models */
-{ t: 'One stack, three models', part: 1, d: 'See the OSI model and the two TCP/IP models side by side, and match their layers.',
+/* ---------- Lesson 1: two models */
+{ t: 'One stack, two models', part: 1, d: 'See the OSI model and the TCP/IP model side by side, and match their layers.',
   terms: ['OSI', 'TCP/IP model', 'Layer', 'Protocol'], setup: function () {
   var sel = ['net'], task = null; chipSeen = true;   // the intro spells out OSI
-  $('#ltext').innerHTML = head(0, 'One stack, three models') +
+  $('#ltext').innerHTML = head(0, 'One stack, two models') +
     '<p>Networks are built in <b>layers</b>. Each layer does one job for the layer above it, using the layer below it.</p>' +
-    '<p>People cut the stack in different places, so you will meet three models: the seven-layer <b>OSI (Open Systems Interconnection) model</b>, and the four-layer and five-layer <b>TCP/IP models</b>, named after TCP (Transmission Control Protocol) and IP (Internet Protocol).</p>' +
-    '<p>In the figure, each colored band is one job. Read across a band to find that job in all three models. Layers are numbered from the bottom. Click a layer, or pick a job:</p>' + bandButtons(sel) +
-    more('Show more: why are there three models?', '<ul class="list"><li>OSI was written as a reference before most of its protocols existed. People still say "layer 2 switch" and "layer 7 firewall" because of it.</li>' +
-      '<li>The TCP/IP model grew out of the protocols the Internet actually runs. Some people draw it with four layers, others with five.</li>' +
-      '<li>All three agree in the middle (Transport and Network). OSI splits the application work into three layers, and the 4-layer model joins the link and the signals into one Link layer.</li></ul>') + TERMS_BOX;
-  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">The OSI model and the two TCP/IP models, side by side</p><div class="fig"><svg id="l1svg" role="img" aria-label="Three layer models side by side; each colored band is one job"></svg></div>' +
+    '<p>People cut the stack in different places, so you will meet two models: the seven-layer <b>OSI (Open Systems Interconnection) model</b>, and the four-layer <b>TCP/IP model</b> the Internet uses, named after TCP (Transmission Control Protocol) and IP (Internet Protocol).</p>' +
+    '<p>In the figure, each colored band is one job. Read across a band to find that job in both models. Layers are numbered from the bottom. Click a layer, or pick a job:</p>' + bandButtons(sel) +
+    more('Show more: why are there two models?', '<ul class="list"><li>OSI was written as a reference before most of its protocols existed. People still say "layer 2 switch" and "layer 7 firewall" because of it.</li>' +
+      '<li>The TCP/IP model grew out of the protocols the Internet actually runs. Its four layers come from the Internet\'s own standards.</li>' +
+      '<li>Both agree in the middle (Transport, and Network, which TCP/IP calls Internet). OSI splits the application work into three layers, and TCP/IP joins the link and the signals into one Link layer. Some books draw a five-layer version that splits Link into Data link and Physical, as OSI does.</li></ul>') + TERMS_BOX;
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">The OSI model and the TCP/IP model, side by side</p><div class="fig"><svg id="l1svg" role="img" aria-label="Two layer models side by side; each colored band is one job"></svg></div>' +
     bandLegend(false) + '</ul><div id="l1info"></div></div>';
   $('#ltry').innerHTML = tryBox('l1', '', '<div id="l1q"></div><div class="row"><button class="btn small" id="l1c">Check</button><button class="btn alt small" id="l1n">New layers</button></div>');
   function pickBands(b) { sel = b; draw(); }
@@ -1066,7 +1070,7 @@ var LESSONS = [
       if (used[key]) continue; used[key] = 1; items.push({ mk: mk, n: L.n });
     }
     task = items;
-    $('#l1task').innerHTML = '<p>Each line names one layer. Pick the layer that does the same job in each of the other two models.</p>';
+    $('#l1task').innerHTML = '<p>Each line names one layer. Pick the layer that does the same job in the other model.</p>';
     $('#l1q').innerHTML = items.map(function (it, i) {
       var L = MODELS[it.mk].layers.filter(function (x) { return x.n === it.n; })[0];
       return '<div class="qrow"><b>' + esc(layerLabel(it.mk, L)) + '</b><div class="r">' + MKEYS.filter(function (m) { return m !== it.mk; }).map(function (m) {
@@ -1080,8 +1084,8 @@ var LESSONS = [
     var bad = 0, blank = 0;
     $$('#l1q select').forEach(function (s) { var it = task[+s.getAttribute('data-q')], want = mapLayer(it.mk, it.n, s.getAttribute('data-m')).map(function (x) { return x.n; }); if (!s.value) blank++; else if (want.indexOf(+s.value) < 0) bad++; });
     if (blank) wrong($('#l1fb'), 'Choose a layer in every box first.');
-    else if (bad) wrong($('#l1fb'), bad + ' of 6 are not right yet. Find each layer\'s colored band in the figure, then look across to the other two models.');
-    else lessonDone($('#l1fb'), 'All six match. The job stays the same; only the name and the number change.');
+    else if (bad) wrong($('#l1fb'), bad + ' of ' + $$('#l1q select').length + ' are not right yet. Find each layer\'s colored band in the figure, then look across to the other model.');
+    else lessonDone($('#l1fb'), 'All three match. The job stays the same; only the name and the number change.');
   };
   newTask(); draw();
 } },
@@ -1099,7 +1103,7 @@ var LESSONS = [
       '<li>Data link adds a 14-byte Ethernet header in front and the FCS at the end. The result is a <b>frame</b>. If the packet is under 46 bytes, padding fills it up to 46, so the frame reaches 64.</li><li>Physical sends the bits, after an 8-byte <b>preamble</b> that ends with the SFD (Start Frame Delimiter), and leaves a 12-byte gap before the next frame.</li></ul>' +
       '<p>The receiver\'s Wireshark shows the padding, but still no FCS. Neither side shows the preamble or the gap.</p><p class="cmdnote">Real TCP on Linux usually adds 12 bytes of timestamp options, so captures often show a 32-byte TCP header. This lesson uses the plain 20-byte header.</p>') + TERMS_BOX;
   $('#lfig').innerHTML = '<div class="card"><p class="figtitle">Each layer wraps what it gets from above (widths not to scale)</p>' +
-    '<div class="playbar"><button class="btn alt small" id="l2prev">◀ Step back</button><button class="btn" id="l2go">Add the next header ▼</button><button class="btn amber small" id="l2play">▶ Play</button><button class="btn alt small" id="l2r">Start over</button><span class="chip" id="l2count"></span>' + speedBar() + '</div>' +
+    '<div class="playbar"><button class="btn alt small" id="l2prev">◀ Step back</button><button class="btn" id="l2go">Add the next header ▼</button><button class="btn amber small" id="l2play">▶ Play</button><button class="btn alt small" id="l2r">Start over</button><span class="count" id="l2count"></span>' + speedBar() + '</div>' +
     '<div class="fig"><svg id="l2svg" role="img" aria-label="Encapsulation, one row per layer"></svg></div>' +
     bandLegend(true) + '<li><i style="background:#E4E4E4;border:1px solid #8A9AA6"></i>Padding</li></ul><div id="l2stats" class="keytiles"></div><div id="l2chip"></div>' +
     more('All the sizes so far', '<div id="l2all" class="calcgrid"></div>') + '</div>';
@@ -1157,7 +1161,7 @@ var LESSONS = [
     '<p>The figure is Wireshark\'s packet details pane: one line per layer, top to bottom. The amber lines are those fields. Click a line to see its layer.</p>' +
     '<div class="row"><label>What was sent <select id="l3app">' + opts([['http', 'A web request (HTTP over TCP)'], ['dns', 'A name lookup (DNS over UDP)'], ['ping', 'A ping (ICMP)'], ['arp', 'An ARP request']], 'http') + '</select></label><label>Network <select id="l3ip">' + opts([['4', 'IPv4'], ['6', 'IPv6']], '4') + '</select></label></div>' + TERMS_BOX;
   $('#lfig').innerHTML = '<div class="card"><p class="figtitle">Wireshark\'s packet details, one line per layer</p><div class="pane" id="l3pane"></div><div id="l3chip" style="margin-top:8px"></div>' +
-    more('This line\'s layer in the three models', '<div class="fig"><svg id="l3svg" role="img" aria-label="The three models with the picked layer outlined"></svg></div>') + '</div>';
+    more('This line\'s layer in both models', '<div class="fig"><svg id="l3svg" role="img" aria-label="The two models with the picked layer outlined"></svg></div>') + '</div>';
   $('#ltry').innerHTML = tryBox('l3', '', '<div class="row"><select id="l3a" aria-label="Your answer"></select><button class="btn small" id="l3c">Check</button><button class="btn alt small" id="l3n">New field</button></div>');
   function lines() {
     var v6 = st.ip === 6 && st.app !== 'arp', a = v6 ? ADDR[6] : ADDR[4], L = [], l4, appLen, ipName = v6 ? 'Internet Protocol Version 6' : 'Internet Protocol Version 4';
@@ -1227,7 +1231,7 @@ var LESSONS = [
       '<li>The router removes the old frame and builds a <b>new frame</b> for the next link: new MAC addresses and a new FCS (Frame Check Sequence). It lowers the TTL (Time to Live), called the hop limit in IPv6, and for IPv4 it fixes the header checksum.</li>' +
       '<li>The IP addresses, the ports, and the data travel from end to end untouched, unless the router does NAT. NAT rewrites the source address and port, so the TCP or UDP checksum changes too.</li></ul>') + TERMS_BOX;
   $('#lfig').innerHTML = '<div class="card"><p class="figtitle">One packet\'s trip: each device drawn with the layers it uses</p>' +
-    '<div class="playbar"><button class="btn alt small" id="l4prev">◀ Step back</button><button class="btn" id="l4next">Next step ▶</button><button class="btn amber small" id="l4play">▶ Play the trip</button><button class="btn alt small" id="l4reset">Start over</button><span class="chip" id="l4count"></span>' + speedBar() + '</div>' +
+    '<div class="playbar"><button class="btn alt small" id="l4prev">◀ Step back</button><button class="btn" id="l4next">Next step ▶</button><button class="btn amber small" id="l4play">▶ Play the trip</button><button class="btn alt small" id="l4reset">Start over</button><span class="count" id="l4count"></span>' + speedBar() + '</div>' +
     '<div class="fig" id="l4box"><svg id="l4svg" role="img" aria-label="Host A, Switch 1, the Router, Switch 2 and Host B, with the packet\'s position"></svg></div><p class="cmdnote" id="l4swipe" hidden>The figure follows the packet. Swipe it sideways to see the whole path.</p>' +
     '<div class="info" id="l4cap" aria-live="polite"></div>' +
     '<p class="figtitle" id="l4striptitle"></p><div class="strip" id="l4strip"></div>' +
@@ -1277,7 +1281,7 @@ var LESSONS = [
     var v2 = i >= 4, cur = model.links[v2 ? 2 : 0], first = model.links[0], S = STEPS[i], dev = S && S.dev !== undefined && S.dev > 0 ? DEVS[S.dev] : null, reads = dev ? model.reads[dev.id] : [];
     $('#l4fields').innerHTML = cur.map(function (f, k) {
       var chg = f.v !== first[k].v, rd = reads.indexOf(f.id) >= 0;
-      return '<div class="field' + (chg ? ' chg' : '') + (rd ? ' read' : '') + '"><b>' + esc(f.name) + '</b> <span class="lchip"><span style="background:' + BAND[f.band].col.line + ';border-color:' + BAND[f.band].col.line + '">' + esc(BAND[f.band].short) + '</span></span><div class="v">' + esc(f.v) + '</div>' +
+      return '<div class="field' + (chg ? ' chg' : '') + (rd ? ' read' : '') + '"><b>' + esc(f.name) + '</b> <span class="lyr"><i style="background:' + BAND[f.band].col.line + '"></i>' + esc(BAND[f.band].short) + '</span><div class="v">' + esc(f.v) + '</div>' +
         '<div class="s ' + (chg ? 'c">rewritten' : 'k">same as sent') + '</div>' + (rd ? '<div class="s r">read by ' + esc(dev.name) + '</div>' : '') + '</div>';
     }).join('');
   }
@@ -1334,11 +1338,11 @@ var LESSONS = [
   var st = { p: 'ospf' }, task;
   $('#ltext').innerHTML = head(4, 'Where does it really sit?') +
     '<p>Draw every protocol the Internet uses and you get an <b>hourglass</b>: many applications on top, many kinds of links at the bottom (Ethernet, Wi-Fi, PPP (Point-to-Point Protocol), fiber, radio), and IP (Internet Protocol) alone in the narrow waist.</p>' +
-    '<p>Some protocols are hard to place, because what <b>carries</b> them and the <b>job</b> they do point to different layers. Pick one to see, in amber, the protocols that carry it down to the wire.</p>' +
+    '<p>Some protocols are hard to place, because what <b>carries</b> them and the <b>job</b> they do point to different layers. Pick one: it and the protocols that carry it down to the wire turn amber, and everything it does not use turns gray.</p>' +
     '<div class="row"><label>Protocol <select id="l5p">' + opts(['ip4', 'ip6', 'tcp', 'udp'].concat(PLACEABLE).map(function (id) { return [id, PROTO[id].full]; }), 'ospf') + '</select></label></div>' +
     more('Show more: the tricky ones', '<ul class="list"><li>ARP (Address Resolution Protocol) is carried directly in an Ethernet frame, but it serves IP.</li><li>ICMP (Internet Control Message Protocol) and OSPF (Open Shortest Path First) ride directly in IP, with no TCP (Transmission Control Protocol) or UDP (User Datagram Protocol). The Internet does not force every protocol through every layer.</li><li>BGP (Border Gateway Protocol) and RIP (Routing Information Protocol) do routing work, but they run as applications over TCP and UDP.</li>' +
       '<li>TLS (Transport Layer Security) sits between TCP and the application. QUIC does transport work inside UDP.</li></ul>') + TERMS_BOX;
-  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">The Internet\'s hourglass: the protocol you picked, and everything that carries it, in amber</p><div class="fig"><svg id="l5svg" role="img" aria-label="The protocol hourglass with IP at the waist"></svg></div><div id="l5info"></div></div>';
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">The Internet\'s hourglass: the protocol you picked and everything that carries it in amber; what it does not use in gray</p><div class="fig"><svg id="l5svg" role="img" aria-label="The protocol hourglass with IP at the waist"></svg></div><div id="l5info"></div></div>';
   $('#ltry').innerHTML = tryBox('l5', '<p>What carries each protocol directly? Pick each one in the list above to check it in the hourglass.</p>', '<div id="l5q"></div><div class="row"><button class="btn small" id="l5c">Check</button><button class="btn alt small" id="l5n">New protocols</button></div>');
   function draw() {
     var p = PROTO[st.p];
@@ -1380,8 +1384,8 @@ var LESSONS = [
     var f = new Fig($('#l6svg'), 0, 9, 0, 4.1, 1.5);
     f.line(0.5, 0.1, 0.5, 4.0, { lw: 3, color: C.muted }); f.line(8.5, 0.1, 8.5, 4.0, { lw: 3, color: C.muted });
     RUNGS.forEach(function (r, i) {
-      var y = 0.25 + i * 0.62, on = hl === r.id, b = BAND[r.band];
-      f.slab(0.8, y, 7.4, 0.48, { fill: on ? C.amber : b.col.fill, stroke: on ? C.navy : b.col.line, thick: on ? 4 : 2.6, text: r.t + '   (' + b.short + ')', fs: 8.5, bold: on });
+      var y = 0.25 + i * 0.62, on = hl === r.id, off = hl && !on, b = BAND[r.band];   // once a step is outlined, the others turn gray
+      f.slab(0.8, y, 7.4, 0.48, { fill: on ? C.amber : off ? OFF.fill : b.col.fill, stroke: on ? C.navy : off ? OFF.line : b.col.line, thick: on ? 4 : 2.6, text: r.t + '   (' + b.short + ')', fs: 8.5, bold: on, color: off ? OFF.text : null });
     });
     f.arrow(8.75, 0.3, 8.75, 3.8, { color: C.navy, lw: 1.6 }); f.text(8.75, 3.95, 'up', { fs: 7.5, color: C.navy });
   }
@@ -1412,7 +1416,7 @@ function renderStepper() {
 function renderMap() {
   var next = 0; while (next < LESSONS.length - 1 && progress.lessons[next]) next++;
   var started = Object.keys(progress.lessons).length > 0;
-  $('#lmap').innerHTML = '<h2>Lesson map</h2><p>Six short lessons in three parts compare the OSI (Open Systems Interconnection) model with the TCP/IP models, named after TCP (Transmission Control Protocol) and IP (Internet Protocol). Each lesson has a live figure and ends with a quick task worth 20 points. Pick any lesson, or start at the top.</p>' +
+  $('#lmap').innerHTML = '<h2>Lesson map</h2><p>Six short lessons in three parts compare the OSI (Open Systems Interconnection) model with the TCP/IP model, named after TCP (Transmission Control Protocol) and IP (Internet Protocol). Each lesson has a live figure and ends with a quick task worth 20 points. Pick any lesson, or start at the top.</p>' +
     PARTS.map(function (P, k) {
       return '<h3 class="part">Part ' + (k + 1) + ': ' + esc(P) + '</h3>' + LESSONS.map(function (L, i) {
         if (L.part !== k + 1) return '';
@@ -1525,14 +1529,14 @@ function mapQ() {
     'Find the job first: ' + JOB_SHORT[L.bands[0]] + '.', esc(layerLabel(src, L)) + ' ' + JOB_SHORT[L.bands[0]] + '. In the ' + MODELS[dst].long + ' that job belongs to ' + right + '.', { kind: 'map', src: src, n: L.n, dst: dst });
 }
 function altQ() {
-  var all = []; ['t4', 't5', 'osi'].forEach(function (mk) { MODELS[mk].layers.forEach(function (L) { L.alt.forEach(function (a) { all.push({ mk: mk, L: L, a: a }); }); }); });
+  var all = []; ['t4', 'osi'].forEach(function (mk) { MODELS[mk].layers.forEach(function (L) { L.alt.forEach(function (a) { all.push({ mk: mk, L: L, a: a }); }); }); });
   var it = pick(all), right = lname(it.mk, it.L);
   return choiceQ('alt', 'model', 'In the <b>' + MODELS[it.mk].long + '</b>, which layer is also called the <b>"' + esc(it.a) + '"</b> layer?', right, MODELS[it.mk].layers.filter(function (x) { return x !== it.L; }).map(function (x) { return lname(it.mk, x); }),
     'Think about the job the name describes.', '"' + esc(it.a) + '" is another name for ' + right + ' in the ' + MODELS[it.mk].long + '. Other names for it: ' + esc([it.L.name].concat(it.L.alt).join(', ')) + '.', { kind: 'alt', mk: it.mk, a: it.a });
 }
 function pduQ() {
   var b = pick(BANDS), mk = pick(MKEYS), L = layersFor(mk, [b.id]).filter(function (x) { return x.bands.length === 1; })[0];
-  if (!L) { mk = 't5'; L = layersFor('t5', [b.id])[0]; }
+  if (!L) { mk = 'osi'; L = layersFor('osi', [b.id])[0]; }
   return choiceQ('pdu', 'model', 'What is the unit of data called at the <b>' + esc(layerLabel(mk, L)) + '</b> layer?', PDU_SHORT[b.id], BANDS.filter(function (x) { return x !== b; }).map(function (x) { return PDU_SHORT[x.id]; }),
     'From the top: message, segment, packet, frame, bits.', 'At ' + esc(layerLabel(mk, L)) + ' the unit is the ' + PDU_SHORT[b.id] + '.', { kind: 'pdu', band: b.id });
 }
@@ -1810,7 +1814,17 @@ function init() {
   wireSpeed();
   $('#resetProgress').onclick = function () { progress = { xp: 0, lessons: {}, badges: {}, best: {} }; store.set('progress', progress); showXP(false); renderShelf(); if (current === 'learn') renderStepper(); };
   $('#verifyBtn').onclick = function () { var r = checkCode($('#verifyIn').value); $('#verifyOut').innerHTML = r ? '<span class="yes">Valid:</span> ' + { E: 'Easy', M: 'Medium', H: 'Hard', S: 'Sprint' }[r.level] + ', ' + r.score + ' points, ' + r.right + ' of ' + r.total + ' right.' : '<span class="no">Not a valid code.</span>'; };
+  siteLink();
   go(mode || 'home');
+}
+function siteLink() {   // "All Visualizers": back to the website's home page (index.html), shown only when the app is served from a website
+  var a = $('#siteHome'); if (!a) return;
+  if (!/^https?:$/.test(location.protocol) || !window.fetch) return;   // a downloaded copy has no website to go back to
+  var tries = ['../index.html', '../../index.html'];
+  (function next(i) {
+    if (i >= tries.length) return;
+    fetch(tries[i], { method: 'HEAD', cache: 'no-store' }).then(function (r) { if (r.ok) { a.href = tries[i]; a.hidden = false; } else next(i + 1); }, function () { next(i + 1); });
+  })(0);
 }
 init();
 window.NetworkLayersVisualizer = { sizes: sizes, buildFrame: buildFrame, hopModel: hopModel, mapLayer: mapLayer, layersFor: layersFor, MODELS: MODELS, BANDS: BANDS, PROTOS: PROTOS, DEMUX: DEMUX, SYMPTOMS: SYMPTOMS, RUNGS: RUNGS, GEN: GEN, makeRound: makeRound, code: code, checkCode: checkCode, TERMS: TERMS, LESSONS: LESSONS };

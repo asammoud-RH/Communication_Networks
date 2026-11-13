@@ -71,6 +71,9 @@ input[type=range] { accent-color: var(--brand); width: 200px; max-width: 100%; }
 .hero h1 { color: #fff; font-size: 32px; margin: 0 0 8px; }
 .hero p { font-size: 17px; max-width: 560px; }
 .hero svg { width: 100%; height: auto; max-height: 220px; }
+.sitehome { display: inline-flex; align-items: center; gap: 7px; margin-top: 12px; padding: 6px 16px; border: 2px solid rgba(255,255,255,.75); border-radius: 999px; color: #fff; font-weight: 600; text-decoration: none; }
+.sitehome:hover { background: rgba(255,255,255,.15); }
+.sitehome svg { width: 15px; height: 15px; flex: none; }
 .modecards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 18px; }
 .modecard { display: flex; flex-direction: column; gap: 6px; }
 .modecard .icon { font-size: 30px; line-height: 1; }
@@ -235,6 +238,7 @@ footer .card { border-top-width: 1px; border-right-width: 1px; }
     <div>
       <h1>Fragmentation Visualizer</h1>
       <p>Every link has a largest packet it can carry. When an IP (Internet Protocol) datagram meets a smaller link, IP cuts it into fragments, and only the destination puts them back together. See where the cuts fall, read every header field, and find the largest packet a path can carry with real ping commands.</p>
+      <a class="sitehome" id="siteHome" href="https://asammoud-rh.github.io/Communication_Networks/" title="All the Network Visualizers"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>All Visualizers</a>
     </div>
     <svg id="heroFig" viewBox="0 0 360 200" role="img" aria-label="A datagram cut into three fragments at a router"></svg>
   </div>
@@ -883,7 +887,7 @@ var PARTS = [
   { t: 'Part 3: Avoiding fragmentation', l: [5] }
 ];
 var LESSONS = [
-  { t: 'What an MTU is', d: 'Compare a datagram with a link\'s largest frame, and find the biggest one that fits.', setup: l1 },
+  { t: 'What is an MTU?', d: 'Compare a datagram with a link\'s largest frame, and find the biggest one that fits.', setup: l1 },
   { t: 'Cutting a datagram', d: 'Cut the data into fragments that each fit, and see why the cuts fall on 8-byte steps.', setup: l2 },
   { t: 'The header fields', d: 'Fill in the four fields that let the destination put the pieces back together.', setup: l3 },
   { t: 'Across an internetwork', d: 'Send a datagram through two routers and watch a smaller link cut it again.', setup: l4 },
@@ -955,7 +959,7 @@ var T_ID = ['Ident (Identification)', 'A number the source picks for each datagr
 /* Lesson 1: what an MTU is */
 function l1() {
   var s = lessonState.l1, t = lessonState.task || (lessonState.task = { k: pick([1, 2, 3]) }), tl = LINKS[t.k];
-  lessonPage({ title: 'What an MTU is',
+  lessonPage({ title: 'What is an MTU?',
     intro: '<p>An IP (Internet Protocol) datagram travels inside one frame of the link it crosses. The <b>MTU (Maximum Transmission Unit)</b> is the largest datagram one frame can carry.</p>' +
       '<p>A datagram is a <b>20-byte header</b> plus its <b>data</b>. If it is bigger than the MTU, IP must <b>fragment</b> it: cut it into smaller datagrams that each fit.</p>',
     controls: '<div class="row"><label>Link <select id="l1link">' + LINKS.map(function (L, i) { return '<option value="' + i + '"' + (i === s.link ? ' selected' : '') + '>' + esc(L[2]) + ' (' + L[1] + ')</option>'; }).join('') + '</select></label></div>' +

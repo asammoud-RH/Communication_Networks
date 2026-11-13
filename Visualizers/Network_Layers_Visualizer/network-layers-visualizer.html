@@ -134,6 +134,8 @@ details.more, details.terms { border-top: 1px solid var(--line); padding-top: 6p
 .fig svg { display: block; width: 100%; height: auto; min-width: 520px; }
 .fig svg .hit { cursor: pointer; }
 .figtitle { font-weight: 600; color: var(--navy); margin: 4px 0; }
+.legtitle { font-size: 14px; font-weight: 600; color: var(--muted); margin: 8px 0 0; }
+.legend b { color: var(--ink); }
 .legend { list-style: none; padding: 0; margin: 6px 0; display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 14px; color: var(--muted); }
 .legend i { display: inline-block; width: 22px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; }
 
@@ -273,7 +275,7 @@ footer .card { border-top-width: 1px; border-right-width: 1px; }
     <div>
       <h1>Network Layers Visualizer</h1>
       <p>Every message you send is wrapped in layers, like an onion. There is more than one way to name those layers: the seven-layer OSI (Open Systems Interconnection) model, and the four-layer TCP/IP model the Internet uses. See both side by side, watch the headers go on and come off, and find out what every switch and router reads and rewrites.</p>
-      <a class="sitehome" id="siteHome" href="#" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>All Visualizers</a>
+      <a class="sitehome" id="siteHome" href="https://asammoud-rh.github.io/Communication_Networks/"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>All Visualizers</a>
     </div>
     <svg id="heroFig" viewBox="0 0 360 200" role="img" aria-label="The OSI model and the TCP/IP model side by side, next to a frame with its headers"></svg>
   </div>
@@ -1375,7 +1377,11 @@ var LESSONS = [
   $('#ltext').innerHTML = head(5, 'Troubleshoot one layer at a time') +
     '<p>Each layer depends on the ones below it, so a failure low in the stack breaks everything above it. Climb the ladder in the figure from the bottom: the first step that fails tells you the layer. Step 4 asks whether ARP (Address Resolution Protocol) found the MAC (Media Access Control) address of the next hop.</p>' +
     '<p>Two quick rules. <b>Ping</b> sends ICMP (Internet Control Message Protocol) echo requests. If ping works, layers 1 to 3 work, so look at the transport and the application, such as a TCP (Transmission Control Protocol) or UDP (User Datagram Protocol) port. If ping fails <b>at once</b> with "Network is unreachable", your host sent nothing: check its own IP (Internet Protocol) address, IPv4 or IPv6 (version 4 or 6), and its routes.</p>' + TERMS_BOX;
+  var keyItem = function (fill, line, html, w) { return '<li><i style="background:' + fill + ';border:' + (w || 1) + 'px solid ' + line + '"></i>' + html + '</li>'; };
+  var nums = function (id) { return MKEYS.map(function (mk) { return (mk === 'osi' ? 'OSI ' : 'TCP/IP ') + layersFor(mk, [id]).filter(function (L) { return L.bands.length === 1 || mk !== 'osi'; }).map(function (L) { return L.n; }).join(', '); }).join(' · '); };
   $('#lfig').innerHTML = '<div class="card"><p class="figtitle">The ladder: climb from the bottom</p><div class="fig"><svg id="l6svg" role="img" aria-label="Six troubleshooting steps from the link up to the application"></svg></div>' +
+    '<p class="legtitle">Color key: the layer job each step tests, with its OSI (Open Systems Interconnection) and TCP/IP layer numbers</p><ul class="legend" id="l6key">' + ['link', 'net', 'e2e'].map(function (id) { var b = BAND[id]; return keyItem(b.col.fill, b.col.line, '<b>' + esc(b.short) + '</b> (' + nums(id) + ')'); }).join('') +
+    keyItem(C.amber, C.navy, 'the step to check first (shown when you answer)', 2) + keyItem(OFF.fill, OFF.line, 'other steps, once one is chosen') + '</ul>' +
     '<details id="l6more"><summary>The commands for each step (Linux and Windows)</summary><div id="l6cmds"></div></details></div>';
   $('#ltry').innerHTML = tryBox('l6', '', '<div class="row"><label>Failing layer <select id="l6l"><option value="">choose…</option>' + opts(LAYER3.map(function (x, i) { return [i, x]; }), '') + '</select></label></div><div class="row"><label>First thing to check <select id="l6r"><option value="">choose…</option>' + opts(RUNGS.map(function (r) { return [r.id, r.t.replace(/^\d\. /, '')]; }), '') + '</select></label></div>' +
       '<div class="row"><button class="btn small" id="l6c">Check</button><button class="btn alt small" id="l6n">New symptom</button></div>');
@@ -1814,17 +1820,7 @@ function init() {
   wireSpeed();
   $('#resetProgress').onclick = function () { progress = { xp: 0, lessons: {}, badges: {}, best: {} }; store.set('progress', progress); showXP(false); renderShelf(); if (current === 'learn') renderStepper(); };
   $('#verifyBtn').onclick = function () { var r = checkCode($('#verifyIn').value); $('#verifyOut').innerHTML = r ? '<span class="yes">Valid:</span> ' + { E: 'Easy', M: 'Medium', H: 'Hard', S: 'Sprint' }[r.level] + ', ' + r.score + ' points, ' + r.right + ' of ' + r.total + ' right.' : '<span class="no">Not a valid code.</span>'; };
-  siteLink();
   go(mode || 'home');
-}
-function siteLink() {   // "All Visualizers": back to the website's home page (index.html), shown only when the app is served from a website
-  var a = $('#siteHome'); if (!a) return;
-  if (!/^https?:$/.test(location.protocol) || !window.fetch) return;   // a downloaded copy has no website to go back to
-  var tries = ['../index.html', '../../index.html'];
-  (function next(i) {
-    if (i >= tries.length) return;
-    fetch(tries[i], { method: 'HEAD', cache: 'no-store' }).then(function (r) { if (r.ok) { a.href = tries[i]; a.hidden = false; } else next(i + 1); }, function () { next(i + 1); });
-  })(0);
 }
 init();
 window.NetworkLayersVisualizer = { sizes: sizes, buildFrame: buildFrame, hopModel: hopModel, mapLayer: mapLayer, layersFor: layersFor, MODELS: MODELS, BANDS: BANDS, PROTOS: PROTOS, DEMUX: DEMUX, SYMPTOMS: SYMPTOMS, RUNGS: RUNGS, GEN: GEN, makeRound: makeRound, code: code, checkCode: checkCode, TERMS: TERMS, LESSONS: LESSONS };

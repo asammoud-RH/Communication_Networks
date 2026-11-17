@@ -138,7 +138,7 @@ footer { text-align: center; color: var(--muted); font-size: 14px; padding: 10px
     </div>
     <div class="map" id="map">
       <svg id="pathsvg" viewBox="0 0 1310 236" role="group" aria-label="Map of a network path: Host A, a switch, a router, and Host B, with each layer drawn. Each layer is a row; each visualizer is a label at the right end of the row of the layer it teaches."></svg>
-      <p class="mapbar"><span>A packet crosses from Host A to Host B, gaining and losing a header at each layer.</span><button class="ghost" id="animbtn" aria-pressed="false">❚❚ Pause</button></p>
+      <p class="mapbar"><span>A packet crosses from Host A to Host B. Each layer adds or removes its header, and on the wire the physical layer sends it as a signal of bits.</span><button class="ghost" id="animbtn" aria-pressed="false">❚❚ Pause</button></p>
     </div>
     <div class="list" id="list"></div>
     <div class="detail" id="detail" aria-live="polite"><p class="hint">Loading the visualizers…</p></div>
@@ -662,32 +662,56 @@ function startPacket(g) {
   /* share of header k that is on the packet (0 to 1): it is fully on below row k + EASE,
      so it slides off over the last stretch before row k going up, and back on just after row k going down */
   function headerShare(k, rowPos) { return clamp((rowPos - k) / EASE); }
-  function draw(x, y, dir) {
+  /* On the wire the physical layer sends the frame as a signal: the packet turns into a square wave of bits
+     as it leaves a device, travels along the wire, and turns back into a packet as it reaches the next device.
+     m = 0 is a packet, m = 1 is a signal. */
+  var BITS = [1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1], BIT_W = 4.4, WAVE_H = 12;
+  function drawSignal(x, y, m, w0) {
+    var full = BITS.length * BIT_W, wv = w0 + (full - w0) * m, bw = wv / BITS.length, x0 = x - wv / 2;
+    var gs = el('g', { 'class': 'signal', opacity: m }, pkt);
+    el('rect', { 'class': 'wavebg', x: x0 - 5, y: y - WAVE_H / 2 - 5, width: wv + 10, height: WAVE_H + 10, rx: 6, fill: 'rgba(11,61,92,.92)', stroke: WIRE, 'stroke-width': 1.5 }, gs);
+    var d = '', prev = null;
+    BITS.forEach(function (b, i) {
+      var yy = b ? y - WAVE_H / 2 : y + WAVE_H / 2, xa = x0 + i * bw;
+      d += (prev === null ? 'M' + xa + ' ' + yy : (prev !== b ? 'L' + xa + ' ' + yy : '')) + ' L' + (xa + bw) + ' ' + yy + ' ';
+      prev = b;
+    });
+    el('path', { 'class': 'wave', d: d, fill: 'none', stroke: '#FF9CC2', 'stroke-width': 2.2, 'stroke-linejoin': 'miter' }, gs);
+  }
+  function draw(x, y, dir, m) {
     var rowPos = (y - rowMid(0)) / 38, f = {}, w = 12;
     for (var k = 3; k >= 1; k--) { f[k] = headerShare(k, rowPos); w += 7 * f[k]; }
     pkt.innerHTML = '';
+    pkt.setAttribute('data-x', x.toFixed(2)); pkt.setAttribute('data-y', y.toFixed(2)); pkt.setAttribute('data-m', (m || 0).toFixed(2));
+    if (m >= 0.999) { drawSignal(x, y, 1, w); return; }
+    var host = pkt;
+    if (m > 0) { host = el('g', { 'class': 'pkt', opacity: 1 - m }, pkt); }
     var left = x - w / 2;
     var fw = clamp((rowPos - 3.4) / EASE);   /* on the physical layer: a frame in the physical color */
-    el('rect', { x: left, y: y - 8, width: w, height: 16, rx: 3, fill: '#fff', stroke: '#3a2600', 'stroke-width': 1 }, pkt);
-    if (fw > 0.01) el('rect', { 'class': 'pframe', x: left - 3, y: y - 11, width: w + 6, height: 22, rx: 5, fill: 'none', stroke: WIRE, 'stroke-width': 2.5, opacity: fw }, pkt);
+    el('rect', { x: left, y: y - 8, width: w, height: 16, rx: 3, fill: '#fff', stroke: '#3a2600', 'stroke-width': 1 }, host);
+    if (fw > 0.01) el('rect', { 'class': 'pframe', x: left - 3, y: y - 11, width: w + 6, height: 22, rx: 5, fill: 'none', stroke: WIRE, 'stroke-width': 2.5, opacity: fw }, host);
     var cx = left + 1;
     for (var j = 3; j >= 1; j--) {
-      if (f[j] > 0.01) el('rect', { x: cx, y: y - 7 - (1 - f[j]) * 16, width: 6, height: 14, fill: COLORS[j], opacity: f[j] }, pkt);
+      if (f[j] > 0.01) el('rect', { x: cx, y: y - 7 - (1 - f[j]) * 16, width: 6, height: 14, fill: COLORS[j], opacity: f[j] }, host);
       cx += 7 * f[j];
     }
-    el('rect', { x: cx, y: y - 7, width: 10, height: 14, rx: 2, fill: DATA }, pkt);
+    el('rect', { x: cx, y: y - 7, width: 10, height: 14, rx: 2, fill: DATA }, host);
+    if (m > 0) drawSignal(x, y, m, w);
   }
   function at(d) {
     for (var i = 0; i < segs.length; i++) {
-      if (d <= segs[i]) { var f = segs[i] ? d / segs[i] : 0;
-        return { x: pts[i].x + (pts[i + 1].x - pts[i].x) * f, y: pts[i].y + (pts[i + 1].y - pts[i].y) * f, dir: pts[i + 1].y - pts[i].y }; }
+      if (d <= segs[i]) { var f = segs[i] ? d / segs[i] : 0, along = pts[i].y === pts[i + 1].y;
+        /* along the wire: packet to signal over the first MORPH units, signal back to packet over the last MORPH */
+        var m = along ? clamp(Math.min(d, segs[i] - d) / MORPH) : 0;
+        return { x: pts[i].x + (pts[i + 1].x - pts[i].x) * f, y: pts[i].y + (pts[i + 1].y - pts[i].y) * f, dir: pts[i + 1].y - pts[i].y, m: m }; }
       d -= segs[i];
     }
-    var last = pts[pts.length - 1]; return { x: last.x, y: last.y, dir: -1 };
+    var last = pts[pts.length - 1]; return { x: last.x, y: last.y, dir: -1, m: 0 };
   }
+  var MORPH = 38;
   function show(t) {   /* t = time into the loop: a short rest at each end, then the crossing */
     var d = Math.max(0, Math.min(total, ((t % cycle) - pause / 2) / 1000 * speed));
-    var p = at(d); draw(p.x, p.y, p.dir);
+    var p = at(d); draw(p.x, p.y, p.dir, p.m);
   }
   function frame(now) { anim.elapsed = now - anim.t0; show(anim.elapsed); rafId = requestAnimationFrame(frame); }
   anim.frame = frame; anim.show = show;

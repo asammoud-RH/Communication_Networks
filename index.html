@@ -466,7 +466,7 @@ function drawMap(apps) {
     d.rows.forEach(function (r) {
       var L = LAYERS[r];
       el('rect', { 'class': 'bx L-' + L.id, x: d.x, y: ROW_Y[r], width: d.w, height: ROW_H, rx: 5, fill: L.color, stroke: L.color }, g);
-      el('text', { 'class': 'bt L-' + L.id + (L.darkText ? ' dark' : ''), x: d.x + d.w - 8, y: ROW_Y[r] + 22, 'text-anchor': 'end' }, g, L.name);   /* name on the right; the packet uses the left side */
+      el('text', { 'class': 'bt L-' + L.id + (L.darkText ? ' dark' : ''), x: d.x + 8, y: ROW_Y[r] + 22, 'text-anchor': 'start' }, g, L.name);   /* name on the left; the packet uses the right side */
     });
   });
   var gPacket = el('g', { 'aria-hidden': 'true' }, g);
@@ -637,10 +637,10 @@ function renderList(apps) {
 }
 
 /* the packet: down Host A's stack, across the switch and the router, up Host B's stack, and again.
-   It gains a header on each layer going down and loses them going up. It travels along the left side of
-   each device's boxes (the layer names are on the right side), and it keeps going until Pause is pressed;
+   It gains a header on each layer going down and loses them going up. It travels along the right side of
+   each device's boxes (the layer names are on the left side), and it keeps going until Pause is pressed;
    the choice is remembered. With reduced motion the page starts paused. */
-var ROUTE = [[22, 0], [22, 4], [239, 4], [239, 3], [239, 4], [436, 4], [436, 2], [436, 4], [633, 4], [633, 0]];   /* left side of each device, in the path group */
+var ROUTE = [[110, 0], [110, 4], [307, 4], [307, 3], [307, 4], [504, 4], [504, 2], [504, 4], [721, 4], [721, 0]];   /* right side of each device, in the path group */
 var rafId = 0, packetGroup = null, anim = { paused: false, elapsed: 0, t0: 0, frame: null };
 function startPacket(g) {
   if (g) packetGroup = g;

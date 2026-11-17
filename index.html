@@ -39,25 +39,38 @@ code { font-family: var(--mono); font-size: 0.92em; }
 .mapbar span { opacity: .9; }
 .ghost { border: 1px solid rgba(255,255,255,.7); background: transparent; color: #fff; border-radius: 999px; padding: 2px 12px; font: inherit; font-size: 14px; cursor: pointer; }
 .ghost:hover { background: rgba(255,255,255,.15); }
-.band { fill: rgba(255,255,255,.05); transition: fill .2s; }
-.band.lit { fill: rgba(245,165,36,.22); }
+.band { fill-opacity: .13; transition: fill-opacity .2s; }
+.band.lit { fill-opacity: .34; }
 .ln { fill: #fff; font-size: 15px; font-weight: 700; font-family: var(--font); }
-.ln .lnum { font-family: var(--mono); font-weight: 400; fill: var(--panel); }
+.ln .lnum { font-family: var(--mono); font-weight: 700; }
+.lsw { stroke: #fff; stroke-width: 1; }
 .colhead { fill: #D9EAF2; font-size: 13px; font-family: var(--font); letter-spacing: .04em; text-transform: uppercase; }
-.bx { fill: rgba(255,255,255,.13); stroke: rgba(255,255,255,.55); stroke-width: 1; transition: fill .2s; }
-.bx.lit { fill: var(--amber-soft); stroke: var(--amber); }
-.bt { fill: #fff; font-size: 13px; font-family: var(--font); pointer-events: none; }
-.bt.lit { fill: var(--navy); font-weight: 700; }
+.bx { fill-opacity: .30; stroke-width: 1.4; transition: fill-opacity .2s; }
+.bx.lit { fill-opacity: .92; stroke: #fff; stroke-width: 2; }
+.bt { fill: #fff; font-size: 12px; font-family: var(--font); pointer-events: none; }
+.bt.lit { font-weight: 700; }
+.bt.lit.dark { fill: #3a2600; }
 .dev { fill: #fff; font-size: 15px; font-weight: 700; font-family: var(--font); }
 .wire { stroke: rgba(255,255,255,.85); stroke-width: 4; stroke-linecap: round; }
 .hop { stroke: rgba(255,255,255,.5); stroke-width: 1.5; stroke-dasharray: 5 5; fill: none; }
 .chip { cursor: pointer; }
-.chip rect { fill: var(--amber); stroke: #fff; stroke-width: 1.5; }
-.chip text { fill: #3a2600; font-size: 13.5px; font-weight: 700; font-family: var(--font); pointer-events: none; }
-.chip:hover rect, .chip:focus rect { fill: #FFE2A8; }
-.chip.on rect { fill: #fff; stroke: var(--amber); stroke-width: 3; }
+.chip .ol { fill: none; stroke: #fff; stroke-width: 2; }
+.chip .go { font-weight: 700; }
+.chip:hover .seg { filter: brightness(1.15); }
+/* until a visitor has clicked a label once: the outlines pulse a few times when the page opens */
+#pathsvg.invite .chip .ol { animation: invite 1.4s ease-in-out .8s 3; }
+@keyframes invite { 0%, 100% { stroke-width: 2; stroke-opacity: 1; } 50% { stroke-width: 6; stroke-opacity: .55; } }
+@media (prefers-reduced-motion: reduce) { #pathsvg.invite .chip .ol { animation: none; } }
+.chip text { fill: #fff; font-size: 13.5px; font-weight: 700; font-family: var(--font); pointer-events: none; paint-order: stroke; stroke: rgba(11,61,92,.55); stroke-width: 3px; stroke-linejoin: round; }
+.chip text.dark { fill: #3a2600; stroke: none; }
+.chip text.vtext { font-size: 15px; letter-spacing: .03em; fill: var(--navy); stroke: rgba(255,255,255,.85); stroke-width: 3px; }
+.chip .seg.faded { opacity: .42; }
+.chip.on .seg.faded, .chip:hover .seg.faded { opacity: .55; }
+.chip:hover .ol, .chip:focus .ol { stroke-width: 3; }
+.chip.on .ol { stroke-width: 4.5; }
+.chip.on .seg { filter: brightness(1.12); }
 .chip:focus { outline: none; }
-.chip:focus rect { stroke: var(--navy); stroke-width: 2.5; }
+.chip:focus-visible .ol { stroke: var(--amber); stroke-width: 3.5; }
 
 /* the selected visualizer */
 .detail { margin-top: 14px; }
@@ -92,8 +105,8 @@ details.about summary { cursor: pointer; color: var(--brand-dark); font-size: 14
 .mrow { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,.25); }
 .mrow:last-child { border-bottom: 0; }
 .mlayer { min-width: 96px; font-size: 14px; opacity: .9; }
-.mchip { border: 1.5px solid #fff; background: var(--amber); color: #3a2600; font: inherit; font-size: 15px; font-weight: 700; border-radius: 999px; padding: 3px 12px; cursor: pointer; }
-.mchip[aria-pressed=true] { background: #fff; border-color: var(--amber); }
+.mchip { border: 1.5px solid #fff; background: var(--amber); color: #fff; font: inherit; font-size: 15px; font-weight: 700; border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.mchip[aria-pressed=true] { box-shadow: 0 0 0 3px #fff; }
 footer { text-align: center; color: var(--muted); font-size: 14px; padding: 10px 16px 30px; }
 
 @media (max-width: 760px) {
@@ -106,6 +119,7 @@ footer { text-align: center; color: var(--muted); font-size: 14px; padding: 10px
   .list.loose .mrow { display: flex; }
 }
 @media (prefers-reduced-motion: reduce) { .bx, .band { transition: none; } }
+.kdot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 3px; vertical-align: 0; }
 </style>
 </head>
 <body>
@@ -123,8 +137,8 @@ footer { text-align: center; color: var(--muted); font-size: 14px; padding: 10px
       </div>
     </div>
     <div class="map" id="map">
-      <svg id="pathsvg" viewBox="0 0 1260 236" role="group" aria-label="Map of a network path: Host A, a switch, a router, and Host B, with each layer drawn. Each layer is a row; each visualizer is a label at the right end of the row of the layer it teaches."></svg>
-      <p class="mapbar"><span>A packet crosses from Host A to Host B, gaining and losing a header at each layer.</span><button class="ghost" id="replay" hidden>▶ Replay</button></p>
+      <svg id="pathsvg" viewBox="0 0 1310 236" role="group" aria-label="Map of a network path: Host A, a switch, a router, and Host B, with each layer drawn. Each layer is a row; each visualizer is a label at the right end of the row of the layer it teaches."></svg>
+      <p class="mapbar"><span>A packet crosses from Host A to Host B, gaining and losing a header at each layer.</span><button class="ghost" id="animbtn" aria-pressed="false">❚❚ Pause</button></p>
     </div>
     <div class="list" id="list"></div>
     <div class="detail" id="detail" aria-live="polite"><p class="hint">Loading the visualizers…</p></div>
@@ -152,12 +166,15 @@ var LIST_MAX_AGE_MIN = 60;     // how long a visitor's browser keeps the app lis
 /* ------------------------------------------------------------------------- */
 
 var LAYERS = [
-  { id: 'application', n: 5, name: 'Application', what: 'What programs say to each other' },
-  { id: 'transport', n: 4, name: 'Transport', what: 'Process to process, end to end' },
-  { id: 'network', n: 3, name: 'Network', what: 'Host to host, across routers' },
-  { id: 'link', n: 2, name: 'Link', what: 'One hop, across a switch' },
-  { id: 'physical', n: 1, name: 'Physical', what: 'Bits on the wire' }
+  { id: 'application', n: 5, name: 'Application', what: 'What programs say to each other', color: '#F5A524', darkText: true },
+  { id: 'transport', n: 4, name: 'Transport', what: 'Process to process, end to end', color: '#7B61FF' },
+  { id: 'network', n: 3, name: 'Network', what: 'Host to host, across routers', color: '#13A88A' },
+  { id: 'link', n: 2, name: 'Link', what: 'One hop, across a switch', color: '#00A2D7' },
+  { id: 'physical', n: 1, name: 'Physical', what: 'Bits on the wire', color: '#D6457A' }
 ];
+/* One color per layer, used everywhere a layer appears: its band, its box on each device, its dashed line,
+   its labels, and its part of the moving packet (application = the data, transport/network/link = the
+   headers, physical = the frame around the packet while it is on the wire). */
 var LAYER_INDEX = {}; LAYERS.forEach(function (L, i) { LAYER_INDEX[L.id] = i; });
 var ALIASES = { app: 'application', applications: 'application', 'data-link': 'link', datalink: 'link', 'data link': 'link',
   phy: 'physical', phys: 'physical', ip: 'network', internet: 'network', 'all-layers': 'all', every: 'all' };
@@ -402,14 +419,14 @@ var ROW_Y = [44, 82, 120, 158, 196], ROW_H = 34;
 function rowMid(r) { return ROW_Y[r] + ROW_H / 2; }
 /* The map has three columns: the layer names on the left, the path (inside a group moved right by
    PATH_X), and the visualizers on the right, each label in the row of the layer it teaches. */
-var VB_W = 1260, PATH_X = 150;
+var VB_W = 1310, PATH_X = 150;
 var DEVICES = [
-  { name: 'Host A', x: 0, w: 110, rows: [0, 1, 2, 3, 4] },
-  { name: 'Switch', x: 220, w: 90, rows: [3, 4] },
-  { name: 'Router', x: 420, w: 90, rows: [2, 3, 4] },
-  { name: 'Host B', x: 620, w: 110, rows: [0, 1, 2, 3, 4] }
+  { name: 'Host A', x: 0, w: 132, rows: [0, 1, 2, 3, 4] },
+  { name: 'Switch', x: 217, w: 112, rows: [3, 4] },
+  { name: 'Router', x: 414, w: 112, rows: [2, 3, 4] },
+  { name: 'Host B', x: 611, w: 132, rows: [0, 1, 2, 3, 4] }
 ];
-var APP_COL = { x1: 900, x2: 1112 }, ALL_COL = { x1: 1122, x2: 1254 };
+var APP_COL = { x1: 912, x2: 1250 }, BAR = { w: 36, gap: 8, right: 1304 };   /* all-layers labels: one narrow upright bar each, at the right edge */
 var selected = null, allApps = [];
 
 function shortName(t) { return t.replace(/\s+visualizer$/i, ''); }
@@ -430,34 +447,41 @@ function drawMap(apps) {
   var back = el('g', {}, svg);
   /* one band per layer, across the whole map, with its name on the left */
   LAYERS.forEach(function (L, r) {
-    el('rect', { 'class': 'band L-' + L.id, x: 0, y: ROW_Y[r] - 2, width: VB_W, height: ROW_H + 4, rx: 6 }, back);
-    var t = el('text', { 'class': 'ln L-' + L.id, x: 12, y: ROW_Y[r] + 22 }, back);
-    el('tspan', { 'class': 'lnum' }, t, String(L.n) + '  ');
+    el('rect', { 'class': 'band L-' + L.id, x: 0, y: ROW_Y[r] - 2, width: VB_W, height: ROW_H + 4, rx: 6, fill: L.color }, back);
+    el('rect', { 'class': 'lsw', x: 8, y: ROW_Y[r] + 9, width: 16, height: 16, rx: 4, fill: L.color }, back);
+    var t = el('text', { 'class': 'ln L-' + L.id, x: 32, y: ROW_Y[r] + 22 }, back);
+    el('tspan', { 'class': 'lnum', fill: L.color }, t, String(L.n) + ' ');
     el('tspan', {}, t, L.name);
   });
   el('text', { 'class': 'colhead', x: 12, y: 30 }, back, 'Layer');
-  el('text', { 'class': 'colhead', x: APP_COL.x1, y: 30 }, back, 'Visualizers');
+  el('text', { 'class': 'colhead', x: APP_COL.x1, y: 30 }, back, 'Visualizers · click one to explore');
   var g = el('g', { transform: 'translate(' + PATH_X + ' 0)' }, svg);
   /* network hop by hop; transport and application end to end; link one hop at a time */
-  [[0, 110, 620], [1, 110, 620], [2, 110, 420], [2, 510, 620], [3, 110, 220], [3, 310, 420], [3, 510, 620]].forEach(function (h) {
-    el('line', { 'class': 'hop', x1: h[1], y1: rowMid(h[0]), x2: h[2], y2: rowMid(h[0]) }, g);
+  [[0, 132, 611], [1, 132, 611], [2, 132, 414], [2, 526, 611], [3, 132, 217], [3, 329, 414], [3, 526, 611]].forEach(function (h) {
+    el('line', { 'class': 'hop', x1: h[1], y1: rowMid(h[0]), x2: h[2], y2: rowMid(h[0]), style: 'stroke:' + LAYERS[h[0]].color }, g);
   });
-  [[110, 220], [310, 420], [510, 620]].forEach(function (w) { el('line', { 'class': 'wire', x1: w[0], y1: rowMid(4), x2: w[1], y2: rowMid(4) }, g); });
+  [[132, 217], [329, 414], [526, 611]].forEach(function (w) { el('line', { 'class': 'wire', x1: w[0], y1: rowMid(4), x2: w[1], y2: rowMid(4), style: 'stroke:' + LAYERS[4].color }, g); });
   DEVICES.forEach(function (d) {
     el('text', { 'class': 'dev', x: d.x + d.w / 2, y: 30, 'text-anchor': 'middle' }, g, d.name);
     d.rows.forEach(function (r) {
       var L = LAYERS[r];
-      el('rect', { 'class': 'bx L-' + L.id, x: d.x, y: ROW_Y[r], width: d.w, height: ROW_H, rx: 5 }, g);
-      el('text', { 'class': 'bt L-' + L.id, x: d.x + d.w / 2, y: ROW_Y[r] + 22, 'text-anchor': 'middle' }, g, L.name);
+      el('rect', { 'class': 'bx L-' + L.id, x: d.x, y: ROW_Y[r], width: d.w, height: ROW_H, rx: 5, fill: L.color, stroke: L.color }, g);
+      el('text', { 'class': 'bt L-' + L.id + (L.darkText ? ' dark' : ''), x: d.x + d.w - 8, y: ROW_Y[r] + 22, 'text-anchor': 'end' }, g, L.name);   /* name on the right; the packet uses the left side */
     });
   });
   var gPacket = el('g', { 'aria-hidden': 'true' }, g);
   var gChips = el('g', {}, svg);
   placeChips(gChips, apps);
+  svg.classList.toggle('invite', apps.length > 0 && !store.get('explored', false));
   startPacket(gPacket);
 }
 
 function estWidth(s) { return s.length * 7.6 + 26; }
+var chipN = 0;
+function appColor(app) { var h = homeLayer(app); return h && h !== 'all' ? LAYERS[LAYER_INDEX[h]].color : 'var(--brand)'; }
+function layerDots(app) {
+  return appLayers(app).map(function (id) { return '<span class="kdot" style="background:' + LAYERS[LAYER_INDEX[id]].color + '"></span>'; }).join('');
+}
 /* each visualizer gets one label in the right-hand column, in its layer's row;
    one that spans layers gets a label as tall as those rows; "all layers" ones get a tall label beside every row */
 function placeChips(g, apps) {
@@ -466,45 +490,64 @@ function placeChips(g, apps) {
     var tb = b.layers[0] === 'all' ? 99 : Math.min.apply(null, b.layers.map(function (l) { return LAYER_INDEX[l]; }));
     return ta - tb || a.title.localeCompare(b.title);
   });
-  var cursor = LAYERS.map(function () { return APP_COL.x1; }), over = LAYERS.map(function () { return []; });
   var allApps_ = sorted.filter(function (a) { return a.layers[0] === 'all'; });
+  /* each all-layers visualizer gets its own bar; the bars grow leftward and the row labels get what is left */
+  var barsLeft = BAR.right - allApps_.length * BAR.w - Math.max(0, allApps_.length - 1) * BAR.gap;
+  var rowRight = allApps_.length ? Math.min(APP_COL.x2, barsLeft - 14) : BAR.right;
+  var cursor = LAYERS.map(function () { return APP_COL.x1; }), over = LAYERS.map(function () { return []; });
   sorted.forEach(function (a) {
     if (a.layers[0] === 'all') return;
     var idx = a.layers.map(function (l) { return LAYER_INDEX[l]; }), top = Math.min.apply(null, idx), bot = Math.max.apply(null, idx);
-    var label = shortName(a.title), w = estWidth(label), x = APP_COL.x1;
+    var label = shortName(a.title), w = estWidth(label) + 12, x = APP_COL.x1;
     for (var r = top; r <= bot; r++) x = Math.max(x, cursor[r]);
-    if (x + w > APP_COL.x2) { over[top].push(a); return; }
+    if (x + w > rowRight) { over[top].push(a); return; }
     var y1 = ROW_Y[top] + (top === bot ? 4 : 3), y2 = ROW_Y[bot] + ROW_H - (top === bot ? 4 : 3);
     chip(g, a, label, x, y1, w, y2 - y1);
     for (r = top; r <= bot; r++) cursor[r] = x + w + 8;
   });
   over.forEach(function (list, r) {   /* rows that ran out of room: "+n more" lists the rest */
     if (!list.length) return;
-    var label = '+' + list.length + ' more', w = estWidth(label), x = Math.min(cursor[r], APP_COL.x2 - w);
+    var label = '+' + list.length + ' more', w = estWidth(label), x = Math.min(cursor[r], rowRight - w);
     chip(g, null, label, x, ROW_Y[r] + 4, w, ROW_H - 8, function () { showList(LAYERS[r].id, list.map(function (a) { return { app: a }; })); }, LAYERS[r].id);
   });
-  if (allApps_.length) {
-    var cw = (ALL_COL.x2 - ALL_COL.x1 - 6 * (allApps_.length - 1)) / allApps_.length;
-    allApps_.forEach(function (a, i) {
-      chip(g, a, shortName(a.title), ALL_COL.x1 + i * (cw + 6), ROW_Y[0] + 3, cw, ROW_Y[4] + ROW_H - 3 - (ROW_Y[0] + 3));
-    });
-  }
+  allApps_.forEach(function (a, i) {
+    chip(g, a, shortName(a.title), barsLeft + i * (BAR.w + BAR.gap), ROW_Y[0] + 3, BAR.w, ROW_Y[4] + ROW_H - 3 - (ROW_Y[0] + 3), null, null, true);
+  });
 }
-function chip(g, app, label, x, y, w, h, act, layer) {
+function chip(g, app, label, x, y, w, h, act, layer, vertical) {
   var c = el('g', { 'class': 'chip', tabindex: '0', role: 'button', 'data-layer': app ? homeLayer(app) : layer }, g);
   if (app) { c.setAttribute('data-app', app.folder); c.setAttribute('aria-label', app.title + ', ' + layerWords(app) + '. Show details.'); }
   else c.setAttribute('aria-label', label + ' visualizers on this layer');
-  el('rect', { x: x, y: y, width: w, height: h, rx: 13 }, c);
+  var ids = app ? appLayers(app) : [layer], rows = ids.map(function (id) { return LAYER_INDEX[id]; }).sort(function (a, b) { return a - b; });
+  var clipId = 'clip' + (++chipN);
+  var cp = el('clipPath', { id: clipId }, el('defs', {}, c));
+  el('rect', { x: x, y: y, width: w, height: h, rx: 13 }, cp);
+  var segs = el('g', { 'clip-path': 'url(#' + clipId + ')' }, c);
+  if (vertical) el('rect', { x: x, y: y, width: w, height: h, fill: '#fff' }, segs);   /* faded bars: layer colors over white, so the text stands out */
+  rows.forEach(function (r, i) {   /* each row's share of the chip, in that layer's color */
+    var top = i === 0 ? y : ROW_Y[r] - 2, bot = i === rows.length - 1 ? y + h : ROW_Y[rows[i + 1]] - 2;
+    el('rect', { 'class': 'seg' + (vertical ? ' faded' : ''), x: x, y: top, width: w, height: bot - top, fill: LAYERS[r].color }, segs);
+  });
+  el('rect', { 'class': 'ol', x: x, y: y, width: w, height: h, rx: 13 }, c);
+  el('title', {}, c, app ? app.title + ': click to see what it does and open it' : 'Show the other visualizers on this layer');
+  var dark = rows.length === 1 && LAYERS[rows[0]].darkText;
   /* wrap the label onto more lines when the label is narrow and tall */
+  if (vertical) {   /* text reads upward along the bar, so the label visibly covers every layer */
+    var cx = x + w / 2, cy = y + h / 2;
+    var vt = el('text', { x: cx, y: cy + 5, 'text-anchor': 'middle', transform: 'rotate(-90 ' + cx + ' ' + cy + ')', 'class': 'vtext' }, c, label);
+    el('tspan', { 'class': 'go' }, vt, ' ›');
+  }
   var words = label.split(' '), lines = [label];
-  if (estWidth(label) > w && words.length > 1) {
+  if (!vertical && estWidth(label) + 12 > w && words.length > 1) {
     lines = []; var cur = '';
     words.forEach(function (wd) { var t = cur ? cur + ' ' + wd : wd; if (estWidth(t) > w && cur) { lines.push(cur); cur = wd; } else cur = t; });
     lines.push(cur);
   }
-  var t = el('text', { x: x + w / 2, y: y + h / 2 + 5 - (lines.length - 1) * 8, 'text-anchor': 'middle' }, c);
-  lines.forEach(function (ln, i) { el('tspan', { x: x + w / 2, dy: i ? 16 : 0 }, t, (i ? ' ' : '') + ln); });
-  var layers = app ? appLayers(app) : [layer];
+  var t = vertical ? vt : el('text', { x: x + w / 2, y: y + h / 2 + 5 - (lines.length - 1) * 8, 'text-anchor': 'middle' }, c);
+  if (dark) t.setAttribute('class', 'dark');
+  if (!vertical) lines.forEach(function (ln, i) { el('tspan', { x: x + w / 2, dy: i ? 16 : 0 }, t, (i ? ' ' : '') + ln); });
+  if (!vertical && app) el('tspan', { 'class': 'go' }, t, ' ›');
+  var layers = ids;
   var go = act || function () { select(app, true); };
   c.addEventListener('click', go);
   c.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); go(); } });
@@ -534,6 +577,7 @@ function refreshLit() {
 
 /* the details of one visualizer, under the map */
 function select(app, fromUser) {
+  if (fromUser) { $('#pathsvg').classList.remove('invite'); store.set('explored', true); }
   selected = app;
   renderDetail();
   refreshLit();
@@ -543,15 +587,15 @@ function select(app, fromUser) {
 function renderDetail() {
   var d = $('#detail'), app = selected;
   if (!app) {
-    d.innerHTML = '<p class="hint">Select a visualizer to see what it does and open it.</p>';
+    d.innerHTML = '<p class="hint">↑ Click a visualizer on the map (the colored labels on the right) to see what it does and open it.</p>';
     return;
   }
   var href = encPath(app.htmlFile.path);
   var acts = app.modes.length
     ? app.modes.map(function (m) { return '<a class="btn ' + m.cls + '" href="' + href + '?mode=' + m.mode + '" target="_blank" rel="noopener">' + m.label + '</a>'; }).join('')
     : '<a class="btn" href="' + href + '" target="_blank" rel="noopener">Open</a>';
-  d.innerHTML = '<div class="dcard" data-app="' + esc(app.folder) + '">' +
-    '<p class="kicker">' + esc(layerWords(app)) + '</p>' +
+  d.innerHTML = '<div class="dcard" data-app="' + esc(app.folder) + '" style="border-top-color:' + appColor(app) + ';border-right-color:' + appColor(app) + '">' +
+    '<p class="kicker">' + (app.layers.length ? layerDots(app) + ' ' : '') + esc(layerWords(app)) + '</p>' +
     '<h2><a class="tlink" href="' + href + '?mode=home" target="_blank" rel="noopener" title="Open the app\'s main menu">' + esc(app.title) +
       ' <span class="arr" aria-hidden="true">↗</span></a></h2>' +
     (app.summary ? '<p class="sum">' + esc(app.summary) + '</p>' : '') +
@@ -580,7 +624,9 @@ function renderList(apps) {
   var html = groups.filter(function (g) { return g.apps.length; }).map(function (g) {
     return '<div class="mrow"><span class="mlayer">' + esc(g.name) + '</span>' +
       g.apps.sort(function (a, b) { return a.title.localeCompare(b.title); }).map(function (a) {
-        return '<button class="mchip" data-app="' + esc(a.folder) + '" aria-pressed="false">' + esc(shortName(a.title)) + '</button>';
+        var h = homeLayer(a), L = h && h !== 'all' ? LAYERS[LAYER_INDEX[h]] : null;
+        var st = L ? 'background:' + L.color + ';color:' + (L.darkText ? '#3a2600' : '#fff') : 'background:var(--navy);color:#fff';
+        return '<button class="mchip" style="' + st + '" data-app="' + esc(a.folder) + '" aria-pressed="false">' + esc(shortName(a.title)) + '</button>';
       }).join('') + '</div>';
   }).join('');
   $('#list').innerHTML = html;
@@ -590,11 +636,12 @@ function renderList(apps) {
   $('#list').classList.toggle('loose', loose.length > 0);
 }
 
-/* the packet: down Host A's stack, across the switch and the router, up Host B's stack.
-   It gains a header on each layer going down and loses them going up.
-   It crosses twice, then rests until Replay is pressed. */
-var ROUTE = [[55, 0], [55, 4], [265, 4], [265, 3], [265, 4], [465, 4], [465, 2], [465, 4], [675, 4], [675, 0]];   /* device centres, in the path group */
-var RUNS = 2, rafId = 0, packetGroup = null;
+/* the packet: down Host A's stack, across the switch and the router, up Host B's stack, and again.
+   It gains a header on each layer going down and loses them going up. It travels along the left side of
+   each device's boxes (the layer names are on the right side), and it keeps going until Pause is pressed;
+   the choice is remembered. With reduced motion the page starts paused. */
+var ROUTE = [[22, 0], [22, 4], [239, 4], [239, 3], [239, 4], [436, 4], [436, 2], [436, 4], [633, 4], [633, 0]];   /* left side of each device, in the path group */
+var rafId = 0, packetGroup = null, anim = { paused: false, elapsed: 0, t0: 0, frame: null };
 function startPacket(g) {
   if (g) packetGroup = g;
   g = packetGroup;
@@ -610,7 +657,7 @@ function startPacket(g) {
      Going down a stack, layer k's header slides on as the packet leaves layer k.
      Going up, it slides off as the packet arrives at layer k (a switch takes off and puts back
      the link header; a router does that for the link and network headers). */
-  var COLORS = { 1: '#7B61FF', 2: '#13A88A', 3: '#0081AD' }, EASE = 0.6;
+  var COLORS = { 1: LAYERS[1].color, 2: LAYERS[2].color, 3: LAYERS[3].color }, DATA = LAYERS[0].color, WIRE = LAYERS[4].color, EASE = 0.6;
   function clamp(v) { return Math.max(0, Math.min(1, v)); }
   /* share of header k that is on the packet (0 to 1): it is fully on below row k + EASE,
      so it slides off over the last stretch before row k going up, and back on just after row k going down */
@@ -620,13 +667,15 @@ function startPacket(g) {
     for (var k = 3; k >= 1; k--) { f[k] = headerShare(k, rowPos); w += 7 * f[k]; }
     pkt.innerHTML = '';
     var left = x - w / 2;
+    var fw = clamp((rowPos - 3.4) / EASE);   /* on the physical layer: a frame in the physical color */
     el('rect', { x: left, y: y - 8, width: w, height: 16, rx: 3, fill: '#fff', stroke: '#3a2600', 'stroke-width': 1 }, pkt);
+    if (fw > 0.01) el('rect', { 'class': 'pframe', x: left - 3, y: y - 11, width: w + 6, height: 22, rx: 5, fill: 'none', stroke: WIRE, 'stroke-width': 2.5, opacity: fw }, pkt);
     var cx = left + 1;
     for (var j = 3; j >= 1; j--) {
       if (f[j] > 0.01) el('rect', { x: cx, y: y - 7 - (1 - f[j]) * 16, width: 6, height: 14, fill: COLORS[j], opacity: f[j] }, pkt);
       cx += 7 * f[j];
     }
-    el('rect', { x: cx, y: y - 7, width: 10, height: 14, rx: 2, fill: '#F5A524' }, pkt);
+    el('rect', { x: cx, y: y - 7, width: 10, height: 14, rx: 2, fill: DATA }, pkt);
   }
   function at(d) {
     for (var i = 0; i < segs.length; i++) {
@@ -636,21 +685,33 @@ function startPacket(g) {
     }
     var last = pts[pts.length - 1]; return { x: last.x, y: last.y, dir: -1 };
   }
-  var replay = $('#replay');
-  if (reduceMotion) { var p0 = at(total); draw(p0.x, p0.y, p0.dir); replay.hidden = true; return; }
-  replay.hidden = true;
-  var t0 = performance.now();
-  function frame(now) {
-    var t = now - t0;
-    if (t >= RUNS * cycle - pause / 2) {           /* done: rest at Host B */
-      var pe = at(total); draw(pe.x, pe.y, pe.dir); rafId = 0; replay.hidden = false; return;
-    }
+  function show(t) {   /* t = time into the loop: a short rest at each end, then the crossing */
     var d = Math.max(0, Math.min(total, ((t % cycle) - pause / 2) / 1000 * speed));
     var p = at(d); draw(p.x, p.y, p.dir);
-    rafId = requestAnimationFrame(frame);
   }
-  rafId = requestAnimationFrame(frame);
+  function frame(now) { anim.elapsed = now - anim.t0; show(anim.elapsed); rafId = requestAnimationFrame(frame); }
+  anim.frame = frame; anim.show = show;
+  show(anim.elapsed);
+  if (!anim.paused) { anim.t0 = performance.now() - anim.elapsed; rafId = requestAnimationFrame(frame); }
+  setAnimButton();
 }
+function setAnimButton() {
+  var b = $('#animbtn');
+  b.textContent = anim.paused ? '▶ Play' : '❚❚ Pause';
+  b.setAttribute('aria-pressed', anim.paused ? 'true' : 'false');
+  b.setAttribute('aria-label', anim.paused ? 'Play the packet animation' : 'Pause the packet animation');
+}
+function toggleAnim() {
+  anim.paused = !anim.paused;
+  store.set('anim', anim.paused ? 'paused' : 'playing');
+  if (anim.paused) { if (rafId) cancelAnimationFrame(rafId); rafId = 0; }
+  else if (anim.frame) { anim.t0 = performance.now() - anim.elapsed; rafId = requestAnimationFrame(anim.frame); }
+  setAnimButton();
+}
+(function () {   /* the visitor's last choice; with reduced motion, start paused */
+  var saved = store.get('anim', null);
+  anim.paused = saved ? saved === 'paused' : reduceMotion;
+})();
 
 /* ===================================================== start */
 function fail(msg, r) {
@@ -660,7 +721,7 @@ function fail(msg, r) {
   drawMap([]);
 }
 
-$('#replay').addEventListener('click', function () { startPacket(); });
+$('#animbtn').addEventListener('click', toggleAnim);
 var repo = detectRepo();
 listFiles(repo).then(function (files) {
   var apps = groupApps(files);

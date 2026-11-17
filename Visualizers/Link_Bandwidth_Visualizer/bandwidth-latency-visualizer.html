@@ -70,6 +70,10 @@ input[aria-invalid=true] { border-color: var(--bad); background: var(--bad-soft)
 /* start screen */
 .hero { background: linear-gradient(135deg, var(--navy), #0E6A92 60%, var(--brand)); color: #fff; border-radius: 14px; padding: 28px 26px; display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; align-items: center; }
 .hero h1 { color: #fff; font-size: 32px; margin: 0 0 8px; }
+/* link back to the website's home page with every Network Visualizer */
+.sitelink { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 12px; padding: 5px 14px; border-radius: 999px; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.45); color: #fff; font-weight: 600; font-size: 15px; text-decoration: none; }
+.sitelink:hover { background: rgba(255,255,255,.28); }
+.sitelink:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
 .hero p { font-size: 17px; max-width: 560px; }
 .hero svg { width: 100%; height: auto; max-height: 220px; }
 .modecards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 18px; }
@@ -259,6 +263,7 @@ footer .card { border-top-width: 1px; border-right-width: 1px; }
 <section id="view-home">
   <div class="hero">
     <div>
+      <a class="sitelink" id="sitehome" href="https://asammoud-rh.github.io/Communication_Networks/" target="_top"><span aria-hidden="true">←</span> All Network Visualizers</a>
       <h1>Bandwidth and Latency Visualizer</h1>
       <p>Why does a fast link still feel slow? Watch a packet's bits leave one host and arrive at another. See how bandwidth, distance, and waiting in queues add up to latency, how many bits fill a link, and what throughput a transfer really gets. Then measure it yourself with real commands.</p>
     </div>

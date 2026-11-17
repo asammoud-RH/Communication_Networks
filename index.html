@@ -50,7 +50,13 @@ code { font-family: var(--mono); font-size: 0.92em; }
 .bt { fill: #fff; font-size: 12px; font-family: var(--font); pointer-events: none; }
 .bt.lit { font-weight: 700; }
 .bt.lit.dark { fill: #3a2600; }
-.dev { fill: #fff; font-size: 15px; font-weight: 700; font-family: var(--font); }
+.dev { fill: #fff; fill-opacity: .8; font-size: 15px; font-weight: 700; font-family: var(--font); transition: fill-opacity .25s; }
+.dev.here { fill-opacity: 1; }
+.devframe { fill: rgba(255,255,255,.04); stroke: rgba(255,255,255,.35); stroke-width: 1.2; transition: fill .25s, stroke .25s, stroke-width .25s; }
+.devframe.here { fill: rgba(255,255,255,.12); stroke: #fff; stroke-width: 2.5; }
+.devicon { opacity: .8; transition: opacity .25s; }
+.devicon.here { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .dev, .devframe, .devicon { transition: none; } }
 .wire { stroke: rgba(255,255,255,.85); stroke-width: 4; stroke-linecap: round; }
 .hop { stroke: rgba(255,255,255,.5); stroke-width: 1.5; stroke-dasharray: 5 5; fill: none; }
 .chip { cursor: pointer; }
@@ -421,10 +427,10 @@ function rowMid(r) { return ROW_Y[r] + ROW_H / 2; }
    PATH_X), and the visualizers on the right, each label in the row of the layer it teaches. */
 var VB_W = 1310, PATH_X = 150;
 var DEVICES = [
-  { name: 'Host A', x: 0, w: 132, rows: [0, 1, 2, 3, 4] },
-  { name: 'Switch', x: 217, w: 112, rows: [3, 4] },
-  { name: 'Router', x: 414, w: 112, rows: [2, 3, 4] },
-  { name: 'Host B', x: 611, w: 132, rows: [0, 1, 2, 3, 4] }
+  { name: 'Host A', kind: 'host', x: 0, w: 132, rows: [0, 1, 2, 3, 4] },
+  { name: 'Switch', kind: 'switch', x: 217, w: 112, rows: [3, 4] },
+  { name: 'Router', kind: 'router', x: 414, w: 112, rows: [2, 3, 4] },
+  { name: 'Host B', kind: 'host', x: 611, w: 132, rows: [0, 1, 2, 3, 4] }
 ];
 var APP_COL = { x1: 912, x2: 1250 }, BAR = { w: 36, gap: 8, right: 1304 };   /* all-layers labels: one narrow upright bar each, at the right edge */
 var selected = null, allApps = [];
@@ -456,13 +462,22 @@ function drawMap(apps) {
   el('text', { 'class': 'colhead', x: 12, y: 30 }, back, 'Layer');
   el('text', { 'class': 'colhead', x: APP_COL.x1, y: 30 }, back, 'Visualizers · click one to explore');
   var g = el('g', { transform: 'translate(' + PATH_X + ' 0)' }, svg);
+  /* each device is one unit: a frame around its stack, with an icon and its name on top.
+     The frame of the device the packet is in lights up (see markDevice). */
+  devEls = DEVICES.map(function (d, i) {
+    var fr = el('rect', { 'class': 'devframe', x: d.x - 7, y: 10, width: d.w + 14, height: 224, rx: 10 }, g);
+    var tw = d.name.length * 8.4, ix = d.x + d.w / 2 - tw / 2 - 26;
+    var ic = el('g', { 'class': 'devicon', transform: 'translate(' + ix + ' 15)' }, g);
+    deviceIcon(ic, d.kind);
+    var nm = el('text', { 'class': 'dev', x: d.x + d.w / 2 + 2, y: 30, 'text-anchor': 'middle' }, g, d.name);
+    return { frame: fr, name: nm, icon: ic };
+  });
   /* network hop by hop; transport and application end to end; link one hop at a time */
   [[0, 132, 611], [1, 132, 611], [2, 132, 414], [2, 526, 611], [3, 132, 217], [3, 329, 414], [3, 526, 611]].forEach(function (h) {
     el('line', { 'class': 'hop', x1: h[1], y1: rowMid(h[0]), x2: h[2], y2: rowMid(h[0]), style: 'stroke:' + LAYERS[h[0]].color }, g);
   });
   [[132, 217], [329, 414], [526, 611]].forEach(function (w) { el('line', { 'class': 'wire', x1: w[0], y1: rowMid(4), x2: w[1], y2: rowMid(4), style: 'stroke:' + LAYERS[4].color }, g); });
   DEVICES.forEach(function (d) {
-    el('text', { 'class': 'dev', x: d.x + d.w / 2, y: 30, 'text-anchor': 'middle' }, g, d.name);
     d.rows.forEach(function (r) {
       var L = LAYERS[r];
       el('rect', { 'class': 'bx L-' + L.id, x: d.x, y: ROW_Y[r], width: d.w, height: ROW_H, rx: 5, fill: L.color, stroke: L.color }, g);
@@ -477,6 +492,28 @@ function drawMap(apps) {
 }
 
 function estWidth(s) { return s.length * 7.6 + 26; }
+var devEls = [], devHere = -1;
+/* small line icons, 20 x 18, in the usual network-diagram style */
+function deviceIcon(g, kind) {
+  var a = { fill: 'none', stroke: '#fff', 'stroke-width': 1.6, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' };
+  function at(extra) { var o = {}, k; for (k in a) o[k] = a[k]; for (k in extra) o[k] = extra[k]; return o; }
+  if (kind === 'host') {          /* a computer: screen and stand */
+    el('rect', at({ x: 1, y: 1, width: 18, height: 12, rx: 1.5 }), g);
+    el('path', at({ d: 'M10 13 V16 M6 17 H14' }), g);
+  } else if (kind === 'switch') { /* a flat box with arrows both ways */
+    el('rect', at({ x: 0, y: 3, width: 20, height: 12, rx: 2 }), g);
+    el('path', at({ d: 'M4 7 H15 M12.5 5 L15 7 L12.5 9 M16 11 H5 M7.5 9 L5 11 L7.5 13' }), g);
+  } else {                        /* a router: a round body with arrows in and out */
+    el('circle', at({ cx: 10, cy: 9, r: 8.5 }), g);
+    el('path', at({ d: 'M6 9 H14 M11.5 6.5 L14 9 L11.5 11.5 M10 4.5 V13.5' }), g);
+  }
+}
+/* light the device the packet is in; none while it is a signal on the wire */
+function markDevice(i) {
+  if (i === devHere) return;
+  devHere = i;
+  devEls.forEach(function (e, k) { var on = k === i; e.frame.classList.toggle('here', on); e.name.classList.toggle('here', on); e.icon.classList.toggle('here', on); });
+}
 var chipN = 0;
 function appColor(app) { var h = homeLayer(app); return h && h !== 'all' ? LAYERS[LAYER_INDEX[h]].color : 'var(--brand)'; }
 function layerDots(app) {
@@ -712,6 +749,9 @@ function startPacket(g) {
   function show(t) {   /* t = time into the loop: a short rest at each end, then the crossing */
     var d = Math.max(0, Math.min(total, ((t % cycle) - pause / 2) / 1000 * speed));
     var p = at(d); draw(p.x, p.y, p.dir, p.m);
+    var inside = -1;
+    if (p.m < 0.5) DEVICES.forEach(function (dv, k) { if (p.x >= dv.x - 7 && p.x <= dv.x + dv.w + 7) inside = k; });
+    markDevice(inside);
   }
   function frame(now) { anim.elapsed = now - anim.t0; show(anim.elapsed); rafId = requestAnimationFrame(frame); }
   anim.frame = frame; anim.show = show;

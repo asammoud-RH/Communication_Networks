@@ -83,6 +83,10 @@ code { font-family: var(--mono); font-size: 0.92em; }
 .detail .hint { margin: 0; background: rgba(255,255,255,.12); border: 1px dashed rgba(255,255,255,.6); border-radius: var(--radius); padding: 12px 16px; }
 .detail .hint a { color: #fff; }
 .dcard { background: var(--white); color: var(--ink); border-top: 4px solid var(--amber); border-right: 4px solid var(--amber); border-radius: var(--radius); padding: 14px 18px; }
+.dcard { position: relative; }
+.dclose { position: absolute; top: 10px; right: 12px; border: 1px solid var(--line); background: #fff; color: var(--muted); border-radius: 999px; padding: 2px 10px; font: inherit; font-size: 13px; cursor: pointer; }
+.dclose:hover { color: var(--navy); border-color: var(--brand); background: var(--panel-soft); }
+.dcard h2 { padding-right: 90px; }
 .dcard .kicker { margin: 0; font-size: 13px; color: var(--muted); font-family: var(--mono); }
 .dcard h2 { margin: 2px 0 4px; font-size: 22px; }
 .dcard h2 a.tlink { color: var(--navy); text-decoration: none; }
@@ -615,11 +619,20 @@ function refreshLit() {
 /* the details of one visualizer, under the map */
 function select(app, fromUser) {
   if (fromUser) { $('#pathsvg').classList.remove('invite'); store.set('explored', true); }
+  if (fromUser && selected === app) { deselect(); return; }   /* clicking the selected label again clears it */
   selected = app;
   renderDetail();
   refreshLit();
   try { history.replaceState(null, '', '#' + encodeURIComponent(app.folder)); } catch (e) { /* embeds may block it */ }
   if (fromUser && window.innerWidth <= 760) $('#detail').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
+}
+/* clear the selection: the same label again, the card's Close button, Esc, or an empty part of the map */
+function deselect() {
+  if (!selected) return;
+  selected = null;
+  renderDetail();
+  refreshLit();
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* embeds may block it */ }
 }
 function renderDetail() {
   var d = $('#detail'), app = selected;
@@ -632,6 +645,7 @@ function renderDetail() {
     ? app.modes.map(function (m) { return '<a class="btn ' + m.cls + '" href="' + href + '?mode=' + m.mode + '" target="_blank" rel="noopener">' + m.label + '</a>'; }).join('')
     : '<a class="btn" href="' + href + '" target="_blank" rel="noopener">Open</a>';
   d.innerHTML = '<div class="dcard" data-app="' + esc(app.folder) + '" style="border-top-color:' + appColor(app) + ';border-right-color:' + appColor(app) + '">' +
+    '<button class="dclose" id="dclose" aria-label="Close and clear the selection" title="Close (Esc)">✕ Close</button>' +
     '<p class="kicker">' + (app.layers.length ? layerDots(app) + ' ' : '') + esc(layerWords(app)) + '</p>' +
     '<h2><a class="tlink" href="' + href + '?mode=home" target="_blank" rel="noopener" title="Open the app\'s main menu">' + esc(app.title) +
       ' <span class="arr" aria-hidden="true">↗</span></a></h2>' +
@@ -640,6 +654,7 @@ function renderDetail() {
     '<div class="acts">' + acts + '</div>' +
     (app.aboutHTML ? '<details class="about"><summary>What you can do with it</summary><div class="md">' + app.aboutHTML + '</div></details>' : '') +
     '</div>';
+  var cb = $('#dclose'); if (cb) cb.addEventListener('click', deselect);
 }
 function showList(layer, apps) {
   selected = null; refreshLit();
@@ -786,6 +801,12 @@ function fail(msg, r) {
 }
 
 $('#animbtn').addEventListener('click', toggleAnim);
+document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' || ev.key === 'Esc') deselect(); });
+$('#pathsvg').addEventListener('click', function (ev) {   /* a click on the map that is not on a label clears the selection */
+  var n = ev.target;
+  while (n && n !== this) { if (n.classList && n.classList.contains('chip')) return; n = n.parentNode; }
+  deselect();
+});
 var repo = detectRepo();
 listFiles(repo).then(function (files) {
   var apps = groupApps(files);

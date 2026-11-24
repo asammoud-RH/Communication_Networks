@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <!-- vz-widgets:begin head -->
-<script id="vz-registry">window.VZ_WIDGETS = {"app":"Line Encoding Visualizer","published":"https://asammoud-rh.github.io/Communication_Networks/Visualizers/Line_Encoding_Visualizer/line-encoding-visualizer.html","width":960,"widgets":[{"name":"nrzl","title":"The NRZ-L signal and what the receiver reads","group":"Learn, Lesson 1: Bits become a signal (NRZ-L: Non-Return to Zero, Level)","mode":"learn","lesson":1,"params":[{"key":"bits","label":"Bits (0s and 1s), up to 16","input":"#l1bits","default":"01001100011","pattern":"[01]{1,16}","example":"1010"},{"key":"levels","label":"NRZ-L levels","click":"input[name=l1conv][value=\"{v}\"]","check":"input[name=l1conv][value=\"{v}\"]:checked","default":"1","options":[{"value":"1","label":"0 is high, 1 is low"},{"value":"0","label":"1 is high, 0 is low"}]}]},{"name":"lost-clock","title":"A long run: the receiver loses its clock","group":"Learn, Lesson 2: Long runs, DC (direct current) and baseline wander","mode":"learn","lesson":2,"params":[{"key":"bits","label":"Bits (0s and 1s), up to 24","input":"#l2bits","default":"0100000000000010","pattern":"[01]{1,24}","example":"1010"},{"key":"drift","label":"Receiver's clock error in percent (-12 to 12)","input":"#l2drift","default":8,"min":-12,"max":12}]},{"name":"baseline-wander","title":"A long run through a transformer: baseline wander","group":"Learn, Lesson 2: Long runs, DC (direct current) and baseline wander","mode":"learn","lesson":2,"click":["#l2view [data-v=\"wander\"]"],"params":[{"key":"bits","label":"Bits (0s and 1s), up to 24","input":"#l2bits","default":"0100000000000010","pattern":"[01]{1,24}","example":"1010"},{"key":"code","label":"Send it as","click":"#l2code [data-v=\"{v}\"]","check":"#l2code [data-v=\"{v}\"][aria-pressed=true]","default":"nrzl","options":[{"value":"nrzl","label":"NRZ-L"},{"value":"uni","label":"On-off"},{"value":"manch","label":"Manchester"},{"value":"ami","label":"Bipolar-AMI (Alternate Mark Inversion)"}]}]},{"name":"nrzi","title":"NRZ-L (Non-Return to Zero, Level) and NRZI (Non-Return to Zero, Inverted) for the same bits","group":"Learn, Lesson 3: Differential encoding: NRZI (Non-Return to Zero, Invert on ones)","mode":"learn","lesson":3,"params":[{"key":"bits","label":"Bits (0s and 1s), up to 16","input":"#l3bits","default":"01001100011","pattern":"[01]{1,16}","example":"1010"}]},{"name":"ami","title":"Three-level signals","group":"Learn, Lesson 4: Three levels: AMI and Pseudoternary","mode":"learn","lesson":4,"params":[{"key":"bits","label":"Bits (0s and 1s), up to 16","input":"#l4bits","default":"01001100011","pattern":"[01]{1,16}","example":"1010"},{"key":"pseudo","label":"Show Pseudoternary","input":"#l4ps","default":"1","options":[{"value":"1","label":"yes"},{"value":"0","label":"no"}]}]},{"name":"scrambling","title":"AMI (Alternate Mark Inversion) and its scrambled version","group":"Learn, Lesson 5: Scrambling: B8ZS (Bipolar with 8-Zeros Substitution) and HDB3 (High-Density Bipolar 3-zeros)","mode":"learn","lesson":5,"params":[{"key":"code","label":"Code","click":"#l5code [data-v=\"{v}\"]","check":"#l5code [data-v=\"{v}\"][aria-pressed=true]","default":"b8zs","options":[{"value":"b8zs","label":"B8ZS"},{"value":"hdb3","label":"HDB3"}]},{"key":"bits","label":"Bits (0s and 1s), up to 24","input":"#l5bits","default":"1100000000110000010","pattern":"[01]{1,24}","example":"1010"},{"key":"odd","label":"HDB3: pulses since the last substitution, before these bits","click":"input[name=l5odd][value=\"{v}\"]","check":"input[name=l5odd][value=\"{v}\"]:checked","default":"1","options":[{"value":"1","label":"odd before these bits"},{"value":"0","label":"even before these bits"}]}]},{"name":"manchester","title":"Biphase codes against the clock","group":"Learn, Lesson 6: Manchester and Differential Manchester","mode":"learn","lesson":6,"params":[{"key":"bits","label":"Bits (0s and 1s), up to 16","input":"#l6bits","default":"01001100011","pattern":"[01]{1,16}","example":"1010"},{"key":"compare","label":"Compare with","click":"#l6cmp [data-v=\"{v}\"]","check":"#l6cmp [data-v=\"{v}\"][aria-pressed=true]","default":"none","options":[{"value":"none","label":"Nothing"},{"value":"rz","label":"RZ (Return to Zero)"}]},{"key":"conv","label":"Manchester convention","click":"input[name=l6conv][value=\"{v}\"]","check":"input[name=l6conv][value=\"{v}\"]:checked","default":"1","options":[{"value":"1","label":"1 = low-to-high"},{"value":"0","label":"0 = low-to-high"}]}]},{"name":"block-code","title":"Data through 4B/5B (four data bits sent as five), then NRZI (Non-Return to Zero, Inverted)","group":"Learn, Lesson 7: Block codes: 4B/5B (4 bits sent as 5) with NRZI","mode":"learn","lesson":7,"params":[{"key":"line","label":"Then sent as","click":"#l7how [data-v=\"{v}\"]","check":"#l7how [data-v=\"{v}\"][aria-pressed=true]","default":"nrzi","options":[{"value":"nrzi","label":"NRZI (fiber)"},{"value":"mlt3","label":"MLT-3 (Multi-Level Transmit, 3 levels; copper)"}]},{"key":"bits","label":"Data bits (0s and 1s): 4, 8, 12, or 16 bits","input":"#l7bits","default":"0000000011110001","pattern":"([01]{4}){1,4}","example":"10101100"}]},{"name":"step-by-step","title":"Any code, one step at a time","group":"Learn, Lesson 8: How each code works","mode":"learn","lesson":8,"params":[{"key":"code","label":"Code","input":"#l8code","default":"nrzl","options":[{"value":"nrzl","label":"NRZ-L (Non-Return to Zero, Level)"},{"value":"nrzi","label":"NRZI (Non-Return to Zero, Invert on ones)"},{"value":"rz","label":"RZ (Return to Zero), polar"},{"value":"ami","label":"Bipolar-AMI (Alternate Mark Inversion)"},{"value":"pseudo","label":"Pseudoternary"},{"value":"b8zs","label":"B8ZS (Bipolar with 8-Zeros Substitution)"},{"value":"hdb3","label":"HDB3 (High-Density Bipolar 3-zeros)"},{"value":"manch","label":"Manchester"},{"value":"diffman","label":"Differential Manchester"},{"value":"mlt3","label":"MLT-3 (Multi-Level Transmit, 3 levels)"},{"value":"fourb","label":"4B/5B (4 bits sent as 5) with NRZI"},{"value":"twob1q","label":"2B1Q (2 Binary, 1 Quaternary)"}]},{"key":"bits","label":"Bits (0s and 1s), up to 20; without it, each code shows its own example","input":"#l8bits","default":"01001100011","pattern":"[01]{1,20}","example":"1100"}]},{"name":"all-codes","title":"The same bits in every code","group":"Learn, Lesson 9: Every code side by side","mode":"learn","lesson":9,"params":[{"key":"group","label":"Show","click":"#l9grp [data-v=\"{v}\"]","check":"#l9grp [data-v=\"{v}\"][aria-pressed=true]","default":"all","options":[{"value":"all","label":"All"},{"value":"diff","label":"Differential"},{"value":"two","label":"Two levels"},{"value":"three","label":"Three levels"},{"value":"every","label":"Change in every bit"},{"value":"bip","label":"Bipolar family"}]},{"key":"bits","label":"Bits (0s and 1s), up to 16","input":"#l9bits","default":"10110000000010","pattern":"[01]{1,16}","example":"1010"}]},{"name":"two-codes","title":"Two codes, the same bits","group":"Learn, Lesson 10: Every code at a glance","mode":"learn","lesson":10,"params":[{"key":"filter","label":"Show","click":"#l10f [data-v=\"{v}\"]","check":"#l10f [data-v=\"{v}\"][aria-pressed=true]","default":"all","options":[{"value":"all","label":"All"},{"value":"diff","label":"Differential"},{"value":"bip","label":"Bipolar family"},{"value":"every","label":"Change in every bit"},{"value":"more","label":"More than two levels"}]},{"key":"a","label":"First code","input":"#l10a","default":"nrzl","options":[{"value":"nrzl","label":"NRZ-L (Non-Return to Zero, Level)"},{"value":"nrzi","label":"NRZI (Non-Return to Zero, Invert on ones)"},{"value":"rz","label":"RZ (Return to Zero), polar"},{"value":"ami","label":"Bipolar-AMI (Alternate Mark Inversion)"},{"value":"pseudo","label":"Pseudoternary"},{"value":"b8zs","label":"B8ZS (Bipolar with 8-Zeros Substitution)"},{"value":"hdb3","label":"HDB3 (High-Density Bipolar 3-zeros)"},{"value":"manch","label":"Manchester"},{"value":"diffman","label":"Differential Manchester"},{"value":"mlt3","label":"MLT-3 (Multi-Level Transmit, 3 levels)"},{"value":"twob1q","label":"2B1Q (2 Binary, 1 Quaternary)"}]},{"key":"b","label":"Second code","input":"#l10b","default":"nrzi","options":[{"value":"nrzl","label":"NRZ-L (Non-Return to Zero, Level)"},{"value":"nrzi","label":"NRZI (Non-Return to Zero, Invert on ones)"},{"value":"rz","label":"RZ (Return to Zero), polar"},{"value":"ami","label":"Bipolar-AMI (Alternate Mark Inversion)"},{"value":"pseudo","label":"Pseudoternary"},{"value":"b8zs","label":"B8ZS (Bipolar with 8-Zeros Substitution)"},{"value":"hdb3","label":"HDB3 (High-Density Bipolar 3-zeros)"},{"value":"manch","label":"Manchester"},{"value":"diffman","label":"Differential Manchester"},{"value":"mlt3","label":"MLT-3 (Multi-Level Transmit, 3 levels)"},{"value":"twob1q","label":"2B1Q (2 Binary, 1 Quaternary)"}]}],"keep":["@controls","#l10svg << .card"]},{"name":"code-cards","title":"Every code at a glance: one card per code","group":"Learn, Lesson 10: Every code at a glance","mode":"learn","lesson":10,"width":1280,"keep":["#l10f << .row","#l10cards << .card"],"params":[{"key":"filter","label":"Show","click":"#l10f [data-v=\"{v}\"]","check":"#l10f [data-v=\"{v}\"][aria-pressed=true]","default":"all","options":[{"value":"all","label":"All"},{"value":"diff","label":"Differential"},{"value":"bip","label":"Bipolar family"},{"value":"every","label":"Change in every bit"},{"value":"more","label":"More than two levels"}]},{"key":"a","label":"First code (shown first)","input":"#l10a","default":"nrzl","options":[{"value":"nrzl","label":"NRZ-L (Non-Return to Zero, Level)"},{"value":"nrzi","label":"NRZI (Non-Return to Zero, Invert on ones)"},{"value":"rz","label":"RZ (Return to Zero), polar"},{"value":"ami","label":"Bipolar-AMI (Alternate Mark Inversion)"},{"value":"pseudo","label":"Pseudoternary"},{"value":"b8zs","label":"B8ZS (Bipolar with 8-Zeros Substitution)"},{"value":"hdb3","label":"HDB3 (High-Density Bipolar 3-zeros)"},{"value":"manch","label":"Manchester"},{"value":"diffman","label":"Differential Manchester"},{"value":"mlt3","label":"MLT-3 (Multi-Level Transmit, 3 levels)"},{"value":"twob1q","label":"2B1Q (2 Binary, 1 Quaternary)"}]},{"key":"b","label":"Second code (shown second)","input":"#l10b","default":"nrzi","options":[{"value":"nrzl","label":"NRZ-L (Non-Return to Zero, Level)"},{"value":"nrzi","label":"NRZI (Non-Return to Zero, Invert on ones)"},{"value":"rz","label":"RZ (Return to Zero), polar"},{"value":"ami","label":"Bipolar-AMI (Alternate Mark Inversion)"},{"value":"pseudo","label":"Pseudoternary"},{"value":"b8zs","label":"B8ZS (Bipolar with 8-Zeros Substitution)"},{"value":"hdb3","label":"HDB3 (High-Density Bipolar 3-zeros)"},{"value":"manch","label":"Manchester"},{"value":"diffman","label":"Differential Manchester"},{"value":"mlt3","label":"MLT-3 (Multi-Level Transmit, 3 levels)"},{"value":"twob1q","label":"2B1Q (2 Binary, 1 Quaternary)"}]}]},{"name":"rates","title":"Bit rate and baud rate: counting signal elements","group":"Key ideas: Rates","mode":"learn","lesson":11,"click":["#kitopic [data-v=\"rates\"]"],"params":[{"key":"code","label":"Code","click":"#kiview [data-v=\"{v}\"]","check":"#kiview [data-v=\"{v}\"][aria-pressed=true]","default":"nrzl","options":[{"value":"nrzl","label":"NRZ-L"},{"value":"manch","label":"Manchester"},{"value":"fourb","label":"4B/5B"},{"value":"twob1q","label":"2B1Q (2 binary, 1 quaternary)"}]},{"key":"rate","label":"Bit rate in Mbps (megabits per second)","input":"#kirate","default":10,"min":0.001,"max":100000,"integer":false}]},{"name":"spectrum","title":"Where each code puts its power","group":"Key ideas: Spectrum and DC","mode":"learn","lesson":11,"click":["#kitopic [data-v=\"spec\"]"],"params":[{"key":"rate","label":"Bit rate in Mbps","input":"#kirate","default":10,"min":0.001,"max":100000,"integer":false}]},{"name":"noise","title":"Bit errors against noise","group":"Key ideas: Noise and errors","mode":"learn","lesson":11,"click":["#kitopic [data-v=\"noise\"]"],"params":[{"key":"ebn0","label":"Eb/N0 (energy per bit over noise density) in dB (decibels), 0 to 14","input":"#kiebn","default":2,"min":0,"max":14},{"key":"code","label":"Code","click":"#kiscode [data-v=\"{v}\"]","check":"#kiscode [data-v=\"{v}\"][aria-pressed=true]","default":"nrzl","options":[{"value":"nrzl","label":"NRZ-L"},{"value":"ami","label":"Bipolar-AMI"}]},{"key":"rate","label":"Bit rate in Mbps","input":"#kirate","default":10,"min":0.001,"max":100000,"integer":false}]},{"name":"real-links","title":"What real links use: from block code to signal","group":"Real links","mode":"learn","lesson":12,"width":760,"params":[{"key":"medium","label":"Medium","click":"#rlg [data-v=\"{v}\"]","check":"#rlg [data-v=\"{v}\"][aria-pressed=true]","default":"copper","options":[{"value":"copper","label":"Twisted pair"},{"value":"coax","label":"Coaxial cable"},{"value":"fiber","label":"Fiber"}]}]},{"name":"calc-signals","title":"The signals","group":"Calculator","mode":"calc","keep":["#c_in << .card","#c_figcard"],"hide":["#view-calc > .card:first-child > h2","#view-calc > .card:first-child > h2 + p","#c_conv"],"params":[{"key":"bits","label":"Bits to send (0s and 1s), up to 32","default":"01001100011","pattern":"[01]{1,32}"},{"key":"codes","label":"Codes to draw, joined by commas (nrzl, nrzi, rz, ami, pseudo, b8zs, hdb3, manch, diffman, mlt3, fourb)","default":"nrzl,nrzi,ami,manch","pattern":"(nrzl|nrzi|rz|ami|pseudo|b8zs|hdb3|manch|diffman|mlt3|fourb)(,(nrzl|nrzi|rz|ami|pseudo|b8zs|hdb3|manch|diffman|mlt3|fourb)){0,10}"},{"key":"rate","label":"Bit rate in Mbps (megabits per second)","default":10,"min":0.001,"max":100000,"integer":false}]},{"name":"calc-receiver","title":"Receiver test: a drifting clock (NRZ-L)","group":"Calculator","mode":"calc","keep":["#c_in << .row","#c_rx"],"open":["#c_rx"],"params":[{"key":"bits","label":"Bits to send (0s and 1s), up to 32","default":"01001100011","pattern":"[01]{1,32}"},{"key":"drift","label":"Receiver's clock error in percent (-12 to 12)","input":"#c_drift","default":8,"min":-12,"max":12}]},{"name":"calc-decoder","title":"Decoder: from a signal back to bits","group":"Calculator","mode":"calc","keep":["#c_decbox"],"open":["#c_decbox"],"hide":["#c_decbox > p.note"],"params":[{"key":"code","label":"Code","input":"#c_dec","default":"manch","options":[{"value":"nrzl","label":"Non-Return to Zero, Level"},{"value":"nrzi","label":"Non-Return to Zero, Invert on ones"},{"value":"rz","label":"RZ (Return to Zero), polar"},{"value":"ami","label":"Bipolar Alternate Mark Inversion"},{"value":"pseudo","label":"Pseudoternary"},{"value":"b8zs","label":"Bipolar with 8-Zeros Substitution"},{"value":"hdb3","label":"High-Density Bipolar 3-zeros"},{"value":"manch","label":"Manchester"},{"value":"diffman","label":"Differential Manchester"},{"value":"mlt3","label":"Multi-Level Transmit, 3 levels"},{"value":"fourb","label":"4B/5B, sent with NRZI"}]},{"key":"levels","label":"Levels: H or + for high, L or - for low, 0 for zero","input":"#c_decin","default":"HL LH HL HL LH","pattern":"[HhLl+0 ,\\-]{1,80}","example":"LH HL"}]}]};</script>
+<script id="vz-registry">window.VZ_WIDGETS = {"app":"Line Encoding Visualizer","published":"https://asammoud-rh.github.io/Communication_Networks/Visualizers/Line_Encoding_Visualizer/line-encoding-visualizer.html","width":960,"widgets":[{"name":"nrzl","title":"The NRZ-L signal and what the receiver reads","group":"Learn, Lesson 1: Bits become a signal (NRZ-L: Non-Return to Zero, Level)","mode":"learn","lesson":1,"params":[{"key":"bits","label":"Bits (0s and 1s), up to 16","input":"#l1bits","default":"01001100011","pattern":"[01]{1,16}","example":"1010"},{"key":"levels","label":"NRZ-L levels","click":"input[name=l1conv][value=\"{v}\"]","check":"input[name=l1conv][value=\"{v}\"]:checked","default":"1","options":[{"value":"1","label":"0 is high, 1 is low"},{"value":"0","label":"1 is high, 0 is low"}]}]},{"name":"lost-clock","title":"A long run: the receiver loses its clock","group":"Learn, Lesson 2: Long runs, DC (direct current) and baseline wander","mode":"learn","lesson":2,"params":[{"key":"bits","label":"Bits (0s and 1s), up to 24","input":"#l2bits","default":"0100000000000010","pattern":"[01]{1,24}","example":"1010"},{"key":"drift","label":"Receiver's clock error in percent (-12 to 12)","input":"#l2drift","default":8,"min":-12,"max":12}]},{"name":"baseline-wander","title":"A long run through a transformer: baseline wander","group":"Learn, Lesson 2: Long runs, DC (direct current) and baseline wander","mode":"learn","lesson":2,"click":["#l2view [data-v=\"wander\"]"],"params":[{"key":"bits","label":"Bits (0s and 1s), up to 24","input":"#l2bits","default":"0100000000000010","pattern":"[01]{1,24}","example":"1010"},{"key":"code","label":"Send it as","click":"#l2code [data-v=\"{v}\"]","check":"#l2code [data-v=\"{v}\"][aria-pressed=true]","default":"nrzl","options":[{"value":"nrzl","label":"NRZ-L"},{"value":"uni","label":"On-off"},{"value":"manch","label":"Manchester"},{"value":"ami","label":"Bipolar-AMI (Alternate Mark Inversion)"}]}]},{"name":"nrzi","title":"NRZ-L (Non-Return to Zero, Level) and NRZI (Non-Return to Zero, Inverted) for the same bits","group":"Learn, Lesson 3: Differential encoding: NRZI (Non-Return to Zero, Invert on ones)","mode":"learn","lesson":3,"params":[{"key":"bits","label":"Bits (0s and 1s), up to 16","input":"#l3bits","default":"01001100011","pattern":"[01]{1,16}","example":"1010"}]},{"name":"ami","title":"Three-level signals","group":"Learn, Lesson 4: Three levels: AMI and Pseudoternary","mode":"learn","lesson":4,"params":[{"key":"bits","label":"Bits (0s and 1s), up to 16","input":"#l4bits","default":"01001100011","pattern":"[01]{1,16}","example":"1010"},{"key":"pseudo","label":"Show Pseudoternary","input":"#l4ps","default":"1","options":[{"value":"1","label":"yes"},{"value":"0","label":"no"}]}]},{"name":"scrambling","title":"AMI (Alternate Mark Inversion) and its scrambled version","group":"Learn, Lesson 5: Scrambling: B8ZS (Bipolar with 8-Zeros Substitution) and HDB3 (High-Density Bipolar 3-zeros)","mode":"learn","lesson":5,"params":[{"key":"code","label":"Code","click":"#l5code [data-v=\"{v}\"]","check":"#l5code [data-v=\"{v}\"][aria-pressed=true]","default":"b8zs","options":[{"value":"b8zs","label":"B8ZS"},{"value":"hdb3","label":"HDB3"}]},{"key":"bits","label":"Bits (0s and 1s), up to 24","input":"#l5bits","default":"1100000000110000010","pattern":"[01]{1,24}","example":"1010"},{"key":"odd","label":"HDB3: pulses since the last substitution, before these bits","click":"input[name=l5odd][value=\"{v}\"]","check":"input[name=l5odd][value=\"{v}\"]:checked","default":"1","options":[{"value":"1","label":"odd before these bits"},{"value":"0","label":"even before these bits"}]}]},{"name":"manchester","title":"Biphase codes against the clock","group":"Learn, Lesson 6: Manchester and Differential Manchester","mode":"learn","lesson":6,"params":[{"key":"bits","label":"Bits (0s and 1s), up to 16","input":"#l6bits","default":"01001100011","pattern":"[01]{1,16}","example":"1010"},{"key":"compare","label":"Compare with","click":"#l6cmp [data-v=\"{v}\"]","check":"#l6cmp [data-v=\"{v}\"][aria-pressed=true]","default":"none","options":[{"value":"none","label":"Nothing"},{"value":"rz","label":"RZ (Return to Zero)"}]},{"key":"conv","label":"Manchester convention","click":"input[name=l6conv][value=\"{v}\"]","check":"input[name=l6conv][value=\"{v}\"]:checked","default":"1","options":[{"value":"1","label":"1 = low-to-high"},{"value":"0","label":"0 = low-to-high"}]}]},{"name":"block-code","title":"Data through 4B/5B (four data bits sent as five), then NRZI (Non-Return to Zero, Inverted)","group":"Learn, Lesson 7: Block codes: 4B/5B (4 bits sent as 5) with NRZI","mode":"learn","lesson":7,"params":[{"key":"line","label":"Then sent as","click":"#l7how [data-v=\"{v}\"]","check":"#l7how [data-v=\"{v}\"][aria-pressed=true]","default":"nrzi","options":[{"value":"nrzi","label":"NRZI (fiber)"},{"value":"mlt3","label":"MLT-3 (Multi-Level Transmit, 3 levels; copper)"}]},{"key":"bits","label":"Data bits (0s and 1s): 4, 8, 12, or 16 bits","input":"#l7bits","default":"0000000011110001","pattern":"([01]{4}){1,4}","example":"10101100"}]},{"name":"step-by-step","title":"Any code, one step at a time","group":"Learn, Lesson 8: How each code works","mode":"learn","lesson":8,"params":[{"key":"code","label":"Code","input":"#l8code","default":"nrzl","options":[{"value":"nrzl","label":"NRZ-L (Non-Return to Zero, Level)"},{"value":"nrzi","label":"NRZI (Non-Return to Zero, Invert on ones)"},{"value":"rz","label":"RZ (Return to Zero), polar"},{"value":"ami","label":"Bipolar-AMI (Alternate Mark Inversion)"},{"value":"pseudo","label":"Pseudoternary"},{"value":"b8zs","label":"B8ZS (Bipolar with 8-Zeros Substitution)"},{"value":"hdb3","label":"HDB3 (High-Density Bipolar 3-zeros)"},{"value":"manch","label":"Manchester"},{"value":"diffman","label":"Differential Manchester"},{"value":"mlt3","label":"MLT-3 (Multi-Level Transmit, 3 levels)"},{"value":"fourb","label":"4B/5B (4 bits sent as 5) with NRZI"},{"value":"twob1q","label":"2B1Q (2 Binary, 1 Quaternary)"}]},{"key":"bits","label":"Bits (0s and 1s), up to 20; without it, each code shows its own example","input":"#l8bits","default":"01001100011","pattern":"[01]{1,20}","example":"1100"}]},{"name":"all-codes","title":"The same bits in every code","group":"Learn, Lesson 9: Every code side by side","mode":"learn","lesson":9,"params":[{"key":"group","label":"Show","click":"#l9grp [data-v=\"{v}\"]","check":"#l9grp [data-v=\"{v}\"][aria-pressed=true]","default":"all","options":[{"value":"all","label":"All"},{"value":"diff","label":"Differential"},{"value":"two","label":"Two levels"},{"value":"three","label":"Three levels"},{"value":"every","label":"Change in every bit"},{"value":"bip","label":"Bipolar family"}]},{"key":"bits","label":"Bits (0s and 1s), up to 16","input":"#l9bits","default":"10110000000010","pattern":"[01]{1,16}","example":"1010"}]},{"name":"two-codes","title":"Two codes, the same bits","group":"Learn, Lesson 10: Every code at a glance","mode":"learn","lesson":10,"params":[{"key":"filter","label":"Show","click":"#l10f [data-v=\"{v}\"]","check":"#l10f [data-v=\"{v}\"][aria-pressed=true]","default":"all","options":[{"value":"all","label":"All"},{"value":"diff","label":"Differential"},{"value":"bip","label":"Bipolar family"},{"value":"every","label":"Change in every bit"},{"value":"more","label":"More than two levels"}]},{"key":"a","label":"First code","input":"#l10a","default":"nrzl","options":[{"value":"nrzl","label":"NRZ-L (Non-Return to Zero, Level)"},{"value":"nrzi","label":"NRZI (Non-Return to Zero, Invert on ones)"},{"value":"rz","label":"RZ (Return to Zero), polar"},{"value":"ami","label":"Bipolar-AMI (Alternate Mark Inversion)"},{"value":"pseudo","label":"Pseudoternary"},{"value":"b8zs","label":"B8ZS (Bipolar with 8-Zeros Substitution)"},{"value":"hdb3","label":"HDB3 (High-Density Bipolar 3-zeros)"},{"value":"manch","label":"Manchester"},{"value":"diffman","label":"Differential Manchester"},{"value":"mlt3","label":"MLT-3 (Multi-Level Transmit, 3 levels)"},{"value":"twob1q","label":"2B1Q (2 Binary, 1 Quaternary)"}]},{"key":"b","label":"Second code","input":"#l10b","default":"nrzi","options":[{"value":"nrzl","label":"NRZ-L (Non-Return to Zero, Level)"},{"value":"nrzi","label":"NRZI (Non-Return to Zero, Invert on ones)"},{"value":"rz","label":"RZ (Return to Zero), polar"},{"value":"ami","label":"Bipolar-AMI (Alternate Mark Inversion)"},{"value":"pseudo","label":"Pseudoternary"},{"value":"b8zs","label":"B8ZS (Bipolar with 8-Zeros Substitution)"},{"value":"hdb3","label":"HDB3 (High-Density Bipolar 3-zeros)"},{"value":"manch","label":"Manchester"},{"value":"diffman","label":"Differential Manchester"},{"value":"mlt3","label":"MLT-3 (Multi-Level Transmit, 3 levels)"},{"value":"twob1q","label":"2B1Q (2 Binary, 1 Quaternary)"}]}],"keep":["#l10svg << .card"]},{"name":"code-cards","title":"Every code at a glance: one card per code","group":"Learn, Lesson 10: Every code at a glance","mode":"learn","lesson":10,"width":1280,"keep":["#l10cards << .card"],"params":[{"key":"filter","label":"Show","click":"#l10f [data-v=\"{v}\"]","check":"#l10f [data-v=\"{v}\"][aria-pressed=true]","default":"all","options":[{"value":"all","label":"All"},{"value":"diff","label":"Differential"},{"value":"bip","label":"Bipolar family"},{"value":"every","label":"Change in every bit"},{"value":"more","label":"More than two levels"}]},{"key":"a","label":"First code (shown first)","input":"#l10a","default":"nrzl","options":[{"value":"nrzl","label":"NRZ-L (Non-Return to Zero, Level)"},{"value":"nrzi","label":"NRZI (Non-Return to Zero, Invert on ones)"},{"value":"rz","label":"RZ (Return to Zero), polar"},{"value":"ami","label":"Bipolar-AMI (Alternate Mark Inversion)"},{"value":"pseudo","label":"Pseudoternary"},{"value":"b8zs","label":"B8ZS (Bipolar with 8-Zeros Substitution)"},{"value":"hdb3","label":"HDB3 (High-Density Bipolar 3-zeros)"},{"value":"manch","label":"Manchester"},{"value":"diffman","label":"Differential Manchester"},{"value":"mlt3","label":"MLT-3 (Multi-Level Transmit, 3 levels)"},{"value":"twob1q","label":"2B1Q (2 Binary, 1 Quaternary)"}]},{"key":"b","label":"Second code (shown second)","input":"#l10b","default":"nrzi","options":[{"value":"nrzl","label":"NRZ-L (Non-Return to Zero, Level)"},{"value":"nrzi","label":"NRZI (Non-Return to Zero, Invert on ones)"},{"value":"rz","label":"RZ (Return to Zero), polar"},{"value":"ami","label":"Bipolar-AMI (Alternate Mark Inversion)"},{"value":"pseudo","label":"Pseudoternary"},{"value":"b8zs","label":"B8ZS (Bipolar with 8-Zeros Substitution)"},{"value":"hdb3","label":"HDB3 (High-Density Bipolar 3-zeros)"},{"value":"manch","label":"Manchester"},{"value":"diffman","label":"Differential Manchester"},{"value":"mlt3","label":"MLT-3 (Multi-Level Transmit, 3 levels)"},{"value":"twob1q","label":"2B1Q (2 Binary, 1 Quaternary)"}]}],"hide":[".relate"]},{"name":"rates","title":"Bit rate and baud rate: counting signal elements","group":"Key ideas: Rates","mode":"learn","lesson":11,"click":["#kitopic [data-v=\"rates\"]"],"params":[{"key":"code","label":"Code","click":"#kiview [data-v=\"{v}\"]","check":"#kiview [data-v=\"{v}\"][aria-pressed=true]","default":"nrzl","options":[{"value":"nrzl","label":"NRZ-L"},{"value":"manch","label":"Manchester"},{"value":"fourb","label":"4B/5B"},{"value":"twob1q","label":"2B1Q (2 binary, 1 quaternary)"}]},{"key":"rate","label":"Bit rate in Mbps (megabits per second)","input":"#kirate","default":10,"min":0.001,"max":100000,"integer":false}]},{"name":"spectrum","title":"Where each code puts its power","group":"Key ideas: Spectrum and DC","mode":"learn","lesson":11,"click":["#kitopic [data-v=\"spec\"]"],"params":[{"key":"rate","label":"Bit rate in Mbps","input":"#kirate","default":10,"min":0.001,"max":100000,"integer":false}]},{"name":"noise","title":"Bit errors against noise","group":"Key ideas: Noise and errors","mode":"learn","lesson":11,"click":["#kitopic [data-v=\"noise\"]"],"params":[{"key":"ebn0","label":"Eb/N0 (energy per bit over noise density) in dB (decibels), 0 to 14","input":"#kiebn","default":2,"min":0,"max":14},{"key":"rate","label":"Bit rate in Mbps","input":"#kirate","default":10,"min":0.001,"max":100000,"integer":false}],"keep":["#kisvg << .card"]},{"name":"noise-bits","title":"The same noise on real bits","group":"Key ideas: Noise and errors","mode":"learn","lesson":11,"click":["#kitopic [data-v=\"noise\"]"],"keep":["#kiebn << .row","#kisvg2 << .card"],"hide":[".relate"],"params":[{"key":"ebn0","label":"Eb/N0 (energy per bit over noise density) in dB (decibels), 0 to 14","input":"#kiebn","default":2,"min":0,"max":14},{"key":"code","label":"Code","click":"#kiscode [data-v=\"{v}\"]","check":"#kiscode [data-v=\"{v}\"][aria-pressed=true]","default":"nrzl","options":[{"value":"nrzl","label":"NRZ-L"},{"value":"ami","label":"Bipolar-AMI"}]}]},{"name":"real-links","title":"What real links use: from block code to signal","group":"Real links","mode":"learn","lesson":12,"width":760,"params":[{"key":"medium","label":"Medium","click":"#rlg [data-v=\"{v}\"]","check":"#rlg [data-v=\"{v}\"][aria-pressed=true]","default":"copper","options":[{"value":"copper","label":"Twisted pair"},{"value":"coax","label":"Coaxial cable"},{"value":"fiber","label":"Fiber"}]}],"hide":["#rlsigt","#rlrel","#rlsigbox"]},{"name":"real-links-signal","title":"The signal on the medium","group":"Real links","mode":"learn","lesson":12,"width":960,"params":[{"key":"medium","label":"Medium","click":"#rlg [data-v=\"{v}\"]","check":"#rlg [data-v=\"{v}\"][aria-pressed=true]","default":"copper","options":[{"value":"copper","label":"Twisted pair"},{"value":"coax","label":"Coaxial cable"},{"value":"fiber","label":"Fiber"}]}],"hide":["#rlsigt","#rlrel"],"keep":["#rlg << .figctls","#rltitle","#rlsigbox","#rlst"]},{"name":"calc-signals","title":"The signals","group":"Calculator","mode":"calc","keep":["#c_in << .card","#c_figcard"],"hide":["#view-calc > .card:first-child > h2","#view-calc > .card:first-child > h2 + p","#c_conv"],"params":[{"key":"bits","label":"Bits to send (0s and 1s), up to 32","default":"01001100011","pattern":"[01]{1,32}"},{"key":"codes","label":"Codes to draw, joined by commas (nrzl, nrzi, rz, ami, pseudo, b8zs, hdb3, manch, diffman, mlt3, fourb)","default":"nrzl,nrzi,ami,manch","pattern":"(nrzl|nrzi|rz|ami|pseudo|b8zs|hdb3|manch|diffman|mlt3|fourb)(,(nrzl|nrzi|rz|ami|pseudo|b8zs|hdb3|manch|diffman|mlt3|fourb)){0,10}"},{"key":"rate","label":"Bit rate in Mbps (megabits per second)","default":10,"min":0.001,"max":100000,"integer":false}]},{"name":"calc-receiver","title":"Receiver test: a drifting clock (NRZ-L)","group":"Calculator","mode":"calc","keep":["#c_in << .row","#c_rx"],"open":["#c_rx"],"params":[{"key":"bits","label":"Bits to send (0s and 1s), up to 32","default":"01001100011","pattern":"[01]{1,32}"},{"key":"drift","label":"Receiver's clock error in percent (-12 to 12)","input":"#c_drift","default":8,"min":-12,"max":12}]},{"name":"calc-decoder","title":"Decoder: from a signal back to bits","group":"Calculator","mode":"calc","keep":["#c_decbox"],"open":["#c_decbox"],"hide":["#c_decbox > p.note"],"params":[{"key":"code","label":"Code","input":"#c_dec","default":"manch","options":[{"value":"nrzl","label":"Non-Return to Zero, Level"},{"value":"nrzi","label":"Non-Return to Zero, Invert on ones"},{"value":"rz","label":"RZ (Return to Zero), polar"},{"value":"ami","label":"Bipolar Alternate Mark Inversion"},{"value":"pseudo","label":"Pseudoternary"},{"value":"b8zs","label":"Bipolar with 8-Zeros Substitution"},{"value":"hdb3","label":"High-Density Bipolar 3-zeros"},{"value":"manch","label":"Manchester"},{"value":"diffman","label":"Differential Manchester"},{"value":"mlt3","label":"Multi-Level Transmit, 3 levels"},{"value":"fourb","label":"4B/5B, sent with NRZI"}]},{"key":"levels","label":"Levels: H or + for high, L or - for low, 0 for zero","input":"#c_decin","default":"HL LH HL HL LH","pattern":"[HhLl+0 ,\\-]{1,80}","example":"LH HL"}]}]};</script>
 <script id="vz-guard">
 /* Slide widgets, part 1 of 2 (runs first, in <head>, right after the widget list).
    With ?widget=<name> it opens the widget's mode and lesson through the app's own link
@@ -158,6 +158,8 @@ input.bits.badin { border-color: var(--bad); background: var(--bad-soft); }
 .lintro { grid-area: intro; }
 .lfigarea { grid-area: fig; }
 .ltry { grid-area: try; }
+.lgrid.wide { grid-template-columns: minmax(0, 900px); grid-template-areas: "intro" "try"; }
+.lgrid.wide > #lfig { display: none; }
 @media (max-width: 980px) { .lgrid { grid-template-columns: 1fr; grid-template-areas: "intro" "fig" "try"; grid-template-rows: none; } }
 .kicker { font-family: var(--mono); color: var(--muted); margin: 0; font-size: 14px; }
 .tryit { border-left: 5px solid var(--amber); background: var(--amber-soft); border-radius: 8px; padding: 10px 14px; }
@@ -212,6 +214,24 @@ details.card > summary { font-size: 17px; }
 .fig svg { display: block; width: 100%; height: auto; min-width: 520px; }
 .fig.fit svg { min-width: 0; }
 .figtitle { font-weight: 600; color: var(--navy); margin: 4px 0; }
+.stepno { display: inline-flex; align-items: center; justify-content: center; min-width: 1.45em; height: 1.45em; border-radius: 999px; background: var(--navy); color: #fff; font-weight: 700; font-size: .85em; margin-right: 6px; vertical-align: .08em; }
+.srt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.gl { border-bottom: 1.5px dotted var(--brand); cursor: help; }
+.gl:focus { outline: 2px solid var(--amber); outline-offset: 1px; border-radius: 2px; }
+#gpop { position: fixed; z-index: 50; max-width: min(340px, 92vw); background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--brand); border-radius: 8px; padding: 8px 10px; box-shadow: 0 6px 20px rgba(0,0,0,.14); font-size: .92rem; line-height: 1.4; color: var(--ink, #111); }
+#gpop b { display: block; color: var(--navy); margin-bottom: 2px; }
+#gpop[hidden] { display: none; }
+.glink { margin: 14px 0 0; }
+.glossary .glist { margin: 6px 0 14px; }
+.glossary .gitem { font-weight: 700; color: var(--navy); margin-top: 8px; }
+.glossary .gdef { margin: 2px 0 0 0; }
+.glossary .letter { margin-top: 14px; font-weight: 800; color: var(--brand); border-bottom: 1px solid var(--line); }
+.glossary [hidden] { display: none; }
+.figctls { background: var(--panel-soft); border: 1px solid var(--line); border-radius: 10px; padding: 4px 12px; margin: 6px 0 10px; }
+.figctls > .row { margin: 6px 0; }
+.figctls > .cmdnote { margin: -2px 0 6px; }
+.relate { margin: 0 0 8px; color: var(--navy); font-size: .95rem; }
+.card.second { margin-top: 12px; }
 .figctl { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 4px 0 8px; }
 .speed { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--muted); }
 .speed input[type=range] { accent-color: var(--brand); width: 110px; }
@@ -446,6 +466,8 @@ Fig.prototype.text = function (x, y, s, o) {   // centered on y; no dominant-bas
   if (o.rot) t.setAttribute('transform', 'rotate(' + o.rot + ' ' + this.X(x) + ' ' + yc + ')');   // o.rot: degrees, for a vertical axis label
   return t;
 };
+/* an axis name: drawn like text, and marked so a test can check that every figure names both of its axes */
+Fig.prototype.ax = function (which, x, y, s, o) { var t = this.text(x, y, s, o); t.setAttribute('data-axis', which); return t; };
 Fig.prototype.tw = function (s, fs) { return String(s).length * (fs * this.k / 72) * 0.55; };
 
 /*ENGINE-START*/
@@ -815,7 +837,7 @@ function bindSpeed(root) {
 /* ===================================================== step player: play, step, and reset from the initial state (step 0)
    The wait between steps is read at every step, so a speed change applies mid-run. */
 var players = [];
-function stopPlayers() { players.forEach(function (p) { p.stop(); }); players = []; }
+function stopPlayers() { players.forEach(function (p) { p.stop(); p.cancelAuto(); }); players = []; }
 function Player(o) {   // o: { id, max, render(i), ms (wait at 1x) }
   var p = { i: 0, timer: null, o: o };
   p.controls = function () {
@@ -831,9 +853,31 @@ function Player(o) {   // o: { id, max, render(i), ms (wait at 1x) }
     $('#' + o.id + 'play').textContent = '❚❚ Pause';
     (function tick() { p.timer = setTimeout(function () { p.step(); if (p.timer && p.i < p.o.max) tick(); }, (reduceMotion ? 0.6 : 1) * (o.ms || 700) / speed()); })();
   };
+  /* Animations start at the beginning (Nov 23 rule): a figure plays once by itself, from its first frame, when at least half of it (or a third of the
+     screen) is in view; after the student changes one of its options it resets and plays once again (restart). Reset only resets; Play replays.
+     Using a control first cancels the pending play. Off when the computer asks for reduced motion, and under test automation unless
+     window.__LEV_AUTO is set (the tests drive each figure from its first frame themselves). */
+  p.autoOK = function () { return !reduceMotion && !/[?&]widget=/.test(location.search) && !(navigator.webdriver && !window.__LEV_AUTO); };   // a slide widget waits at its first frame for the presenter
+  p.cancelAuto = function () { if (p.autoT) clearTimeout(p.autoT); p.autoT = null; if (p.io) { p.io.disconnect(); p.io = null; } };
+  function auto(wait) { p.autoT = setTimeout(function () { p.autoT = null; if (p.io) { p.io.disconnect(); p.io = null; } if (players.indexOf(p) >= 0 && !p.timer) { p.i = 0; p.show(); p.play(); } }, wait); }
+  p.restart = function (wait) { p.cancelAuto(); p.reset(); if (p.ready && p.autoOK()) auto(wait || 300); };
+  p.arm = function () {
+    var svg = $('#' + o.id + 'play'); svg = svg && svg.closest ? svg.closest('.card') : null; svg = svg ? svg.querySelector('.fig svg') || svg.querySelector('svg[role=img]') : null;
+    if (!svg || !p.autoOK() || !window.IntersectionObserver) return;
+    p.io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        var seen = e.isIntersecting && (e.intersectionRatio >= 0.5 || e.intersectionRect.height >= window.innerHeight * 0.3);
+        if (seen && !p.autoT) auto(400); else if (!seen && p.autoT) { clearTimeout(p.autoT); p.autoT = null; }
+      });
+    }, { threshold: [0, 0.25, 0.5, 0.75, 1] });
+    p.io.observe(svg);
+  };
   p.bind = function () {
-    $('#' + o.id + 'play').onclick = p.play; $('#' + o.id + 'step').onclick = function () { p.stop(); p.step(); }; $('#' + o.id + 'reset').onclick = p.reset;
+    $('#' + o.id + 'play').onclick = function () { p.cancelAuto(); p.play(); };
+    $('#' + o.id + 'step').onclick = function () { p.cancelAuto(); p.stop(); p.step(); };
+    $('#' + o.id + 'reset').onclick = function () { p.cancelAuto(); p.reset(); };
     bindSpeed($('#' + o.id + 'play').parentNode); p.show();
+    p.ready = false; setTimeout(function () { p.ready = true; p.arm(); }, 0);
   };
   players.push(p);
   return p;
@@ -869,7 +913,9 @@ function waveFig(svg, spec) {
     if (spec.samples && spec.samples.row === ri) { lay.push({ kind: 'samples', top: d, h: 0.36, ri: ri, S: spec.samples }); d += 0.36; }
     else if (r.read) { lay.push({ kind: 'samples', top: d, h: 0.36, ri: ri, S: r.read }); d += 0.36; }
   });
+  var axTop = d; if (spec.axes !== false) d += 0.3;   // a strip under the rows that names the axes: time across, voltage up
   var H = d + 0.08, f = new Fig(svg, 0, W, 0, H, spec.k || 1.25), geo = [];
+  var gEnd = spec.axes !== false ? axTop + 0.02 : H - 0.06;   // the bit columns' shading stops above the axis names
   if (spec.fit && px) { svg.style.minWidth = box.classList.contains('fit') ? '' : Math.ceil(W * 66) + 'px'; svg.style.maxWidth = Math.round(W * 96) + 'px'; }   // never larger than about 96 pixels per inch on a wide screen
   function Y(dd) { return H - dd; }
   function X(i) { return LW + i * bw; }
@@ -881,9 +927,9 @@ function waveFig(svg, spec) {
     if (L.ri % 2 === 0) f.rect(0, Y(bot), W, bot - L.top, { fill: '#E9EEF3', stroke: 'none', lw: 0 });
     if (L.ri > 0) f.line(0, Y(L.top), W, Y(L.top), { color: C.grid, lw: 0.8 });
   });
-  for (var i = 0; i < n; i++) if (i % 2) f.rect(X(i), Y(H - 0.06), bw, H - 0.06 - gridTop, { fill: C.shade, stroke: C.shade, lw: 0.1, opacity: spec.band ? 0.45 : 1 });
-  if (spec.hl) f.rect(X(spec.hl[0]), Y(H - 0.06), (spec.hl[1] - spec.hl[0] + 1) * bw, H - 0.06 - gridTop, { fill: C.amber, opacity: 0.16, stroke: C.amber, lw: 0.6 });
-  for (i = 0; i <= n; i++) f.line(X(i), Y(gridTop - (spec.bits ? 0.04 : 0)), X(i), Y(H - 0.06), { color: C.grid, lw: 0.6, dash: [2, 2] });
+  for (var i = 0; i < n; i++) if (i % 2) f.rect(X(i), Y(gEnd), bw, gEnd - gridTop, { fill: C.shade, stroke: C.shade, lw: 0.1, opacity: spec.band ? 0.45 : 1 });
+  if (spec.hl) f.rect(X(spec.hl[0]), Y(gEnd), (spec.hl[1] - spec.hl[0] + 1) * bw, gEnd - gridTop, { fill: C.amber, opacity: 0.16, stroke: C.amber, lw: 0.6 });
+  for (i = 0; i <= n; i++) f.line(X(i), Y(gridTop - (spec.bits ? 0.04 : 0)), X(i), Y(gEnd), { color: C.grid, lw: 0.6, dash: [2, 2] });
   if (spec.bits) for (i = 0; i < spec.bits.length; i++) f.text(X(i) + bw / 2, Y(top + 0.17), spec.bits[i], { fs: 10.5, bold: true, color: C.navy, mono: true });
   /* name the bits row, so it does not read as part of the clock or the first signal: "Bits to send", or "Bit number" when the row only numbers the bits;
      spec.bitsLabel overrides (for example "Line bits" after 4B/5B) */
@@ -957,6 +1003,15 @@ function waveFig(svg, spec) {
       }
     }
   });
+  /* the axis names: across, time (each column one bit time); up, the voltage of each row's signal */
+  if (spec.axes !== false) {
+    var ay = Y(axTop + 0.17), xl = spec.xLabel || (spec.bitsLabel === 'Line bits' ? 'time → (one column per line bit)' : 'time → (one column per bit time)'), yl = '↑ ' + (spec.yLabel || 'voltage');
+    var yw = f.tw(yl, 8.5), x0 = Math.max(X(0) + 0.04, 0.1 + yw + 0.15);   // the x name starts after the y name when the label column is narrow
+    if (x0 + f.tw(xl, 8.5) > X(n) - 0.02) xl = spec.xShort || 'time →';
+    f.ax('y', 0.1, ay, yl, { fs: 8.5, ha: 'left', color: C.muted, italic: true });
+    if (x0 + f.tw(xl, 8.5) > X(n) - 0.02) f.ax('x', X(n) - 0.02, ay, xl, { fs: 8.5, ha: 'right', color: C.muted, italic: true });
+    else f.ax('x', x0, ay, xl, { fs: 8.5, ha: 'left', color: C.muted, italic: true });
+  }
   return { W: W, H: H, X: X, Y: Y, bw: bw, LW: LW, fig: f, amp: amp, rows: geo, n: n };
 }
 
@@ -1036,12 +1091,15 @@ var LESSONS = [null,
   { t: 'Every code side by side', part: 3, map: 'Send the same bits in every code at once, then swap the wires to see which codes survive.' },
   { t: 'Every code at a glance', part: 3, map: 'Compare any two codes side by side, with a summary card for each of the twelve codes: the same eight points every time.' }
 ];
-var NL = LESSONS.length - 1, IDEAS = NL + 1, RLP = NL + 2;   // IDEAS: the Key ideas page, reached from the map and the lesson bar
+var NL = LESSONS.length - 1, IDEAS = NL + 1, RLP = NL + 2, GLP = NL + 3;   // GLP: the Glossary page;   // IDEAS: the Key ideas page, reached from the map and the lesson bar
 var lessonI = store.get('lesson', 0);
-if (!(lessonI >= 0 && lessonI <= RLP)) lessonI = 0;
+if (!(lessonI >= 0 && lessonI <= GLP)) lessonI = 0;
 
 function kicker(i) { return i === RLP ? '<p class="kicker">Real links · for reference at any time</p>' : i === IDEAS ? '<p class="kicker">Key ideas · for reference at any time</p>' : '<p class="kicker">Lesson ' + i + ' of ' + NL + ' · ' + PARTS[LESSONS[i].part].t + '</p>'; }
-function terms(list) { return '<details><summary>Terms in this lesson</summary><ul class="terms">' + list.map(function (t) { return '<li><b>' + t[0] + '</b>: ' + t[1] + '</li>'; }).join('') + '</ul></details>'; }
+function terms(list) {   // the lesson's own list of terms; each definition comes from the one glossary (03b-glossary.js), so the wording is the same everywhere
+  return '<details class="termsbox"><summary>Terms in this lesson</summary><ul class="terms">' + list.map(function (t) { return '<li><b>' + t[0] + '</b>: ' + termDef(t[0], t[1]) + '</li>'; }).join('') +
+    '</ul><p class="noglo">Every term in the app: ' + '<a href="?mode=learn&amp;lesson=glossary" class="glinkin">Glossary</a>.</p></details>';
+}
 function setURL(params) {
   try { var ks = Object.keys(params).filter(function (k) { return params[k] !== undefined && params[k] !== null; }), u = location.pathname + (ks.length ? '?' : '') + ks.map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&'); history.replaceState(null, '', u); } catch (e) { /* some embeds block history */ }
 }
@@ -1049,7 +1107,8 @@ function setURL(params) {
 function renderBar() {
   var h = '<button class="mapb"' + (lessonI === 0 ? ' aria-current="step"' : '') + ' data-l="0" aria-label="Lesson map"><span class="lw">Lesson </span>map</button>' +
     '<button class="mapb refp"' + (lessonI === IDEAS ? ' aria-current="step"' : '') + ' data-l="' + IDEAS + '" aria-label="Key ideas"><span class="lw">Key </span>ideas</button>' +
-    '<button class="mapb refp"' + (lessonI === RLP ? ' aria-current="step"' : '') + ' data-l="' + RLP + '" aria-label="Real links"><span class="lw">Real </span>links</button>';
+    '<button class="mapb refp"' + (lessonI === RLP ? ' aria-current="step"' : '') + ' data-l="' + RLP + '" aria-label="Real links"><span class="lw">Real </span>links</button>' +
+    '<button class="mapb refp"' + (lessonI === GLP ? ' aria-current="step"' : '') + ' data-l="' + GLP + '" aria-label="Glossary">Glossary</button>';
   for (var i = 1; i <= NL; i++) h += '<button data-l="' + i + '" class="' + (progress.lessons[i] ? 'done' : '') + '"' + (i === lessonI ? ' aria-current="step"' : '') + ' aria-label="Lesson ' + i + ': ' + esc(LESSONS[i].t) + '"><span class="num">' + (progress.lessons[i] ? '✓' : i) + '</span><span class="ttl">' + esc(LESSONS[i].t) + '</span></button>';
   $('#lbar').innerHTML = h;
   $$('#lbar [data-l]').forEach(function (b) { b.onclick = function () { openLesson(+b.getAttribute('data-l')); }; });
@@ -1070,28 +1129,63 @@ function renderMap() {
     }).join('') +
     '<div class="soft" style="margin-top:14px"><b>Key ideas</b>: bit rate, baud rate, signal elements, bandwidth, efficiency, and the other terms every lesson uses, on one page. <button class="btn alt small" id="mapideas">Open Key ideas</button></div>' +
     '<div class="soft" style="margin-top:10px"><b>Real links</b>: what Ethernet over copper and fiber actually uses, from the block code to the signal on the wire or the fiber. <button class="btn alt small" id="maplinks">Open Real links</button></div>' +
+    '<div class="soft" style="margin-top:10px"><b>Glossary</b>: every term and symbol in the app with its definition, the same one you see when you point at an underlined word. <button class="btn alt small" id="mapgloss">Open the Glossary</button></div>' +
     '<div class="row" style="margin-top:14px"><button class="btn" id="mapgo">Start Lesson ' + next + ' →</button></div></div>';
   $$('#lmap [data-open]').forEach(function (b) { b.onclick = function () { openLesson(+b.getAttribute('data-open')); }; });
   $('#mapgo').onclick = function () { openLesson(next); };
   $('#mapideas').onclick = function () { openLesson(IDEAS); };
   $('#maplinks').onclick = function () { openLesson(RLP); };
+  $('#mapgloss').onclick = function () { openLesson(GLP); };
 }
 
 function openLesson(i) {
   stopPlayers(); onResize = null;
-  lessonI = Math.max(0, Math.min(RLP, i)); store.set('lesson', lessonI); renderBar();
-  setURL({ mode: 'learn', lesson: lessonI === IDEAS ? 'ideas' : lessonI === RLP ? 'links' : lessonI });
+  if (i === GLP && lessonI !== GLP) {   // remember where the student came from, and the terms of that page
+    glossFrom = $('#lview').hidden ? 0 : lessonI; glossUsed = {};
+    if (glossFrom) {
+      $$('#lview .gl[data-g]').forEach(function (e) { glossUsed[e.getAttribute('data-g')] = true; });
+      $$('#lview ul.terms li > b').forEach(function (e) { var k = termKey(e.textContent); if (k) glossUsed[k] = true; });
+    }
+  }
+  lessonI = Math.max(0, Math.min(GLP, i)); store.set('lesson', lessonI); renderBar();
+  setURL({ mode: 'learn', lesson: lessonI === IDEAS ? 'ideas' : lessonI === RLP ? 'links' : lessonI === GLP ? 'glossary' : lessonI });
   var isMap = lessonI === 0;
   $('#lmap').hidden = !isMap; $('#lview').hidden = isMap;
   if (isMap) { renderMap(); window.scrollTo(0, 0); return; }
   $('#ltext').innerHTML = ''; $('#lfig').innerHTML = ''; $('#ltry').innerHTML = '';
+  var grid = $('#ltext').parentNode; if (grid.classList) grid.classList.toggle('wide', lessonI === GLP);
   (SETUP[lessonI] || placeholder)(lessonI);
-  bindKeyFolds();
+  pullControls(); bindKeyFolds();
   var last = lessonI === NL, ref = lessonI > NL;
-  $('#ltry').insertAdjacentHTML('beforeend', '<div class="navrow"><button class="btn alt" id="lprev">← ' + (ref ? 'Lesson map' : 'Back') + '</button><button class="btn' + (last ? ' amber' : '') + '" id="lnext">' + (lessonI === IDEAS ? 'Real links →' : lessonI === RLP ? 'Take the challenge →' : last ? 'Take the challenge →' : 'Next lesson →') + '</button></div>');
+  if (lessonI === GLP) {
+    var bk = glossFrom, bn = bk === IDEAS ? 'Key ideas' : bk === RLP ? 'Real links' : bk ? 'Lesson ' + bk : 'Lesson map';
+    $('#ltry').insertAdjacentHTML('beforeend', '<div class="navrow"><button class="btn alt" id="lprev">← Back to ' + bn + '</button><button class="btn" id="lnext">Lesson map</button></div>');
+    $('#lprev').onclick = function () { openLesson(bk); }; $('#lnext').onclick = function () { openLesson(0); };
+    window.scrollTo(0, 0); return;
+  }
+  $('#ltry').insertAdjacentHTML('beforeend', '<div class="navrow"><button class="btn alt" id="lprev">← ' + (ref ? 'Lesson map' : 'Back') + '</button><button class="btn' + (last ? ' amber' : '') + '" id="lnext">' + (lessonI === IDEAS ? 'Real links →' : lessonI === RLP ? 'Take the challenge →' : last ? 'Take the challenge →' : 'Next lesson →') + '</button></div>' + glossLink());
+  wireGlossLink(); $$('#lview .glinkin').forEach(function (a) { a.onclick = function (e) { e.preventDefault(); openLesson(GLP); }; });
   $('#lprev').onclick = function () { openLesson(ref ? 0 : lessonI - 1); };
   $('#lnext').onclick = function () { if (lessonI === IDEAS) openLesson(RLP); else if (lessonI === RLP || last) go('challenge'); else openLesson(lessonI + 1); };
   window.scrollTo(0, 0);
+}
+/* controls sit on top of the figure they change (Nov 20 rule): every control row of the lesson text (sliders, choices, bit inputs and the
+   note under them, technology chips) moves into a light panel at the top of its figure card, under the card's title (and its linking sentence).
+   A row marked data-card="k" goes to the k-th card; data-stay keeps a row in the text (the Key ideas topic switch, which changes the whole page). */
+function pullControls() {
+  var cards = $$('#lfig > .card'); if (!cards.length) return;
+  $$('#ltext > .row:not([data-stay]), #ltext > .chipset').forEach(function (r) {
+    var note = r.nextElementSibling, card = cards[+(r.getAttribute('data-card') || 0)] || cards[0], panel = null;
+    for (var c = card.firstElementChild; c; c = c.nextElementSibling) if (c.classList.contains('figctls')) panel = c;
+    if (!panel) {
+      panel = document.createElement('div'); panel.className = 'figctls';
+      var after = card.querySelector('.figtitle'), rel = after && after.nextElementSibling;   // under the card's first title, and its linking sentence if it has one
+      if (rel && rel.classList.contains('relate')) after = rel;
+      if (after && after.parentNode === card) card.insertBefore(panel, after.nextSibling); else card.insertBefore(panel, card.firstChild);
+    }
+    panel.appendChild(r);
+    if (note && note.classList.contains('cmdnote')) panel.appendChild(note);
+  });
 }
 function lessonDone(fb, msg) {
   fb.className = 'feedback ok pop'; fb.innerHTML = '✓ ' + msg + (progress.lessons[lessonI] ? '' : ' <b>+20 points</b>');
@@ -1157,7 +1251,7 @@ SETUP[1] = function (n) {
     else if (i < bits.length) st.textContent = 'Bit ' + i + ': the level is ' + (e.cells[i - 1][1] > 0 ? 'high' : 'low') + ', so the receiver reads ' + dec[i - 1] + '.';
     else st.textContent = 'Done: the receiver read ' + dec.join('') + ', the same bits that were sent.';
   }
-  function setBits() { var b = readBits($('#l1bits'), 16); if (b) { bits = b; P.o.max = bits.length; P.reset(); } }
+  function setBits() { var b = readBits($('#l1bits'), 16); if (b) { bits = b; P.o.max = bits.length; P.restart(600); } }
   $('#l1rule').textContent = rule();
   $$('input[name=l1conv]').forEach(function (r) {
     r.checked = (r.value === '1') === OPT.nrzlZeroHigh;
@@ -1232,8 +1326,8 @@ SETUP[2] = function (n) {
   var DCN = { nrzl: 'NRZ-L', uni: 'On-off', manch: 'Manchester', ami: 'Bipolar-AMI' };
   $('#ltext').innerHTML = kicker(n) + '<h2>Long runs, DC and baseline wander</h2>' +
     '<p>NRZ (Non-Return to Zero) codes hold each bit at one level, one voltage, for its whole bit time. During a long <b>run</b> of the same bit, such as twelve 0s in a row, the voltage on the wire never changes, and two things go wrong.</p>' +
-    '<p><b>1. Lost clock.</b> The receiver\'s clock never runs at exactly the same speed as the sender\'s. At every <b>transition</b> (a change from one level to another) the receiver sees where a bit time starts and corrects its clock. During a long run there are no transitions, so the small error adds up until the receiver samples one bit too many or one too few.</p>' +
-    '<p><b>2. DC and baseline wander.</b> The average voltage of a signal is called its <b>DC (direct current) level</b>. Most wired links pass the signal through a transformer, which passes changes of voltage but blocks a voltage that stays the same. During a long run the voltage stays the same, so what arrives drifts back toward 0 V until the receiver cannot tell high from low. This drift is called <b>baseline wander</b>.</p>' +
+    '<p><span class="stepno" aria-hidden="true">1</span><span class="srt">Problem 1: </span><b>Lost clock.</b> The receiver\'s clock never runs at exactly the same speed as the sender\'s. At every <b>transition</b> (a change from one level to another) the receiver sees where a bit time starts and corrects its clock. During a long run there are no transitions, so the small error adds up until the receiver samples one bit too many or one too few.</p>' +
+    '<p><span class="stepno" aria-hidden="true">2</span><span class="srt">Problem 2: </span><b>DC and baseline wander.</b> The average voltage of a signal is called its <b>DC (direct current) level</b>. Most wired links pass the signal through a transformer, which passes changes of voltage but blocks a voltage that stays the same. During a long run the voltage stays the same, so what arrives drifts back toward 0 V until the receiver cannot tell high from low. This drift is called <b>baseline wander</b>.</p>' +
     '<div class="row">' + seg('l2view', 'What goes wrong', [['clock', 'Lost clock'], ['wander', 'DC and baseline wander']], view) + '</div>' +
     '<div class="row"><label>Bits <input type="text" class="bits" id="l2bits" value="' + bits + '" size="18" maxlength="24" spellcheck="false" autocomplete="off"></label></div>' +
     '<div class="row" id="l2prow"><label for="l2drift">Receiver\'s clock</label><input type="range" id="l2drift" min="-12" max="12" step="1" value="' + p + '"><output id="l2po" for="l2drift"></output></div>' +
@@ -1327,7 +1421,7 @@ SETUP[2] = function (n) {
     }
     P.o.max = nb;
   }
-  function redo() { P.o.max = view === 'clock' ? ENC.drift(bits, p, OPT).at.length : bits.length; P.reset(); }
+  function redo() { P.o.max = view === 'clock' ? ENC.drift(bits, p, OPT).at.length : bits.length; P.restart(600); }
   bindSeg('l2view', function (v) { view = v; $('#l2prow').hidden = v !== 'clock'; $('#l2crow').hidden = v === 'clock'; redo(); newQ(); });
   bindSeg('l2code', function (v) { code = v; redo(); });
   $('#l2po').textContent = pctText();
@@ -1421,7 +1515,7 @@ SETUP[3] = function (n) {
   }
   $('#l3swap').onclick = function () { swapped = !swapped; this.setAttribute('aria-pressed', String(swapped)); if (P.i < P.o.max) { P.stop(); P.i = P.o.max; } P.show(); };
   $('#l3run').onclick = function () { $('#l3bits').value = '0111111110000000'; $('#l3bits').oninput(); };
-  $('#l3bits').oninput = function () { var v = readBits($('#l3bits'), 16); if (v) { bits = v; P.o.max = bits.length; P.reset(); } };
+  $('#l3bits').oninput = function () { var v = readBits($('#l3bits'), 16); if (v) { bits = v; P.o.max = bits.length; P.restart(600); } };
   P.bind(); onResize = P.show;
 
   /* Try it: decode an NRZI signal */
@@ -1508,7 +1602,7 @@ SETUP[4] = function (n) {
   };
   $('#l4clr').onclick = function () { noise = -1; this.disabled = true; P.show(); };
   $('#l4ps').onchange = function () { showPs = this.checked; P.show(); };
-  $('#l4bits').oninput = function () { var v = readBits(this, 16); if (v) { bits = v; noise = -1; $('#l4clr').disabled = true; P.o.max = bits.length; P.reset(); } };
+  $('#l4bits').oninput = function () { var v = readBits(this, 16); if (v) { bits = v; noise = -1; $('#l4clr').disabled = true; P.o.max = bits.length; P.restart(600); } };
   P.bind();
 
   /* Try it: find the bipolar violation */
@@ -1589,9 +1683,9 @@ SETUP[5] = function (n) {
     else if (!done) st.textContent = 'Bit ' + i + ' is ' + bits[i - 1] + ': ' + (bits[i - 1] === '1' ? 'a pulse of the opposite polarity to the last one, so ' + pol(sc.cells[i - 1][0]) + ' (' + sym(sc.cells[i - 1][0]) + '), as in AMI.' : '0 V, as in AMI (this run of 0s is too short to replace).');
     else st.textContent = 'Done. Longest stretch at 0 V: AMI ' + longestZero(ami.cells) + ' bit times, ' + nm() + ' ' + longestZero(sc.cells) + '. The receiver finds each pattern by its violations, puts the 0s back, and reads every bit.';
   }
-  bindSeg('l5code', function (v) { code = v; P.reset(); });
+  bindSeg('l5code', function (v) { code = v; P.restart(); });
   $$('input[name=l5odd]').forEach(function (r) { r.checked = (r.value === '1') === OPT.hdb3Odd; r.onchange = function () { OPT.hdb3Odd = r.value === '1'; saveOpt(); P.show(); }; });
-  $('#l5bits').oninput = function () { var v = readBits(this, 24); if (v) { bits = v; P.o.max = bits.length; P.reset(); } };
+  $('#l5bits').oninput = function () { var v = readBits(this, 24); if (v) { bits = v; P.o.max = bits.length; P.restart(600); } };
   P.bind(); onResize = P.show;
 
   /* Try it: draw a substitution */
@@ -1668,8 +1762,8 @@ SETUP[6] = function (n) {
   }
   $('#l6rule').textContent = rule();
   $$('input[name=l6conv]').forEach(function (r) { r.checked = (r.value === '1') === OPT.manchOneLowHigh; r.onchange = function () { OPT.manchOneLowHigh = r.value === '1'; saveOpt(); $('#l6rule').textContent = rule(); P.show(); newQ(true); }; });
-  bindSeg('l6cmp', function (v) { cmp = v; P.reset(); });
-  $('#l6bits').oninput = function () { var v = readBits(this, 16); if (v) { bits = v; P.o.max = bits.length; P.reset(); } };
+  bindSeg('l6cmp', function (v) { cmp = v; P.restart(); });
+  $('#l6bits').oninput = function () { var v = readBits(this, 16); if (v) { bits = v; P.o.max = bits.length; P.restart(600); } };
   P.bind(); onResize = P.show;
 
   /* Try it: draw Manchester */
@@ -1771,10 +1865,10 @@ SETUP[7] = function (n) {
       st.textContent = 'Done: ' + e.bits.length + ' data bits became ' + e.line.length + ' line bits. Longest time without a transition: plain NRZI ' + plain + ' bit times, 4B/5B then NRZI ' + coded + '.' + (how === 'mlt3' ? ' MLT-3 has the same transitions as NRZI, but its fastest pattern (all 1s: 0, +, 0, −) repeats only every 4 bit times instead of every 2, so at 125 Mbaud its main frequency is about 31 MHz (megahertz) instead of 62.5 MHz. That is what lets 100 Mbps fit on Category 5 cable.' : '');
     }
   }
-  bindSeg('l7how', function (v) { how = v; $('#l7title') && ($('#l7title').textContent = v === 'mlt3' ? 'Data through 4B/5B, then MLT-3' : 'Data through 4B/5B, then NRZI'); P.reset(); });
+  bindSeg('l7how', function (v) { how = v; $('#l7title') && ($('#l7title').textContent = v === 'mlt3' ? 'Data through 4B/5B, then MLT-3' : 'Data through 4B/5B, then NRZI'); P.restart(); });
   $('#l7bits').oninput = function () {
     var v = readBits(this, 16); if (v && v.length % 4) { this.classList.add('badin'); v = null; }
-    if (v) { bits = v; P.o.max = bits.length / 4; P.reset(); }
+    if (v) { bits = v; P.o.max = bits.length / 4; P.restart(600); }
   };
   P.bind(); onResize = P.show;
 
@@ -1887,7 +1981,7 @@ SETUP[8] = function (n) {
   function ruleBox() { $('#l8rule').innerHTML = '<h3>The rule: ' + CI[code].full + '</h3><ol>' + CI[code].rule().map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ol><p class="memline"><b>Differential?</b> ' + CI[code].dif + '</p>'; }
   function redo() {
     X = ENC.explain(code, bits, OPT); P.o.max = X.steps.length;
-    $('#l8title').textContent = CI[code].n + ', one step at a time'; ruleBox(); P.reset();
+    $('#l8title').textContent = CI[code].n + ', one step at a time'; ruleBox(); P.restart();
   }
   function draw(i) {
     var cut = i ? X.steps[i - 1].b + 1 : 0, cells = partial(X.cells, cut), s = i ? X.steps[i - 1] : null, groups = null, marks = null;
@@ -1995,9 +2089,9 @@ SETUP[9] = function (n) {
       }
     }
   }
-  bindSeg('l9grp', function (v) { grp = v; P.reset(); });
-  $('#l9swap').onclick = function () { swp = !swp; this.setAttribute('aria-pressed', String(swp)); P.reset(); };
-  $('#l9bits').oninput = function () { var v = readBits(this, 16); if (v) { bits = v; P.o.max = bits.length; P.reset(); } };
+  bindSeg('l9grp', function (v) { grp = v; P.restart(); });
+  $('#l9swap').onclick = function () { swp = !swp; this.setAttribute('aria-pressed', String(swp)); P.restart(); };
+  $('#l9bits').oninput = function () { var v = readBits(this, 16); if (v) { bits = v; P.o.max = bits.length; P.restart(600); } };
   P.o.max = bits.length; P.bind(); P.reset(); onResize = P.show;
 
   /* Try it: name the code */
@@ -2053,7 +2147,7 @@ SETUP[10] = function (n) {
       '<li><b>Cost and complexity</b>: the extra signal rate the code needs, and the circuits to encode and decode it.</li></ul>' +
     '</details>' +
     '<div class="row"><label>Compare</label>' + pairSel('l10a', ca) + '<span>with</span>' + pairSel('l10b', cb) + '</div>' +
-    '<div class="row">' + seg('l10f', 'Cards', [['all', 'All'], ['diff', 'Differential'], ['bip', 'Bipolar family'], ['every', 'Change in every bit'], ['more', 'More than two levels']], flt) + '</div>' +
+    '<div class="row" data-card="1">' + seg('l10f', 'Cards', [['all', 'All'], ['diff', 'Differential'], ['bip', 'Bipolar family'], ['every', 'Change in every bit'], ['more', 'More than two levels']], flt) + '</div>' +
     '<details><summary>Show more</summary>' +
       '<p><b>Reading the cards.</b> Every card answers the same eight questions in the same order, so you can read across cards point by point: for example, compare the Clocking lines of NRZI (Non-Return to Zero, Invert on ones) and Manchester, or the DC lines of NRZ-L (Non-Return to Zero, Level) and Bipolar-AMI (Alternate Mark Inversion).</p>' +
       '<p>4B/5B (4 bits sent as 5) has a card but cannot be drawn on this time axis, because it sends 5 line bits for every 4 data bits (see Lesson 7).</p>' +
@@ -2061,7 +2155,7 @@ SETUP[10] = function (n) {
     terms([['Signal elements per bit', 'how many pieces of signal each bit needs; more than 1 means the baud rate is higher than the bit rate.'],
            ['Differential', 'the bit is in a change of level, so swapped wires do no harm (Lesson 3).']]);
   var P = Player({ id: 'l10a_', max: bits.length, ms: 700, render: draw });
-  $('#lfig').innerHTML = figCard('l10', 'Two codes, the same bits', P, '') + '<div class="card" style="margin-top:12px"><p class="figtitle" id="l10ct">All twelve codes</p><div class="codecards" id="l10cards"></div></div>';
+  $('#lfig').innerHTML = figCard('l10', 'Two codes, the same bits', P, '') + '<div class="card second"><p class="figtitle" id="l10ct">All twelve codes</p><p class="relate">Not a signal: a summary card for every code, the same eight points on each. The two codes compared in the figure above come first.</p><div class="codecards" id="l10cards"></div></div>';
   function cellsFor(c) { return c === 'twob1q' ? ENC.twoB1Q(bits).cells.slice(0, bits.length) : ENC.encode(c, bits, OPT).cells; }
   function draw(i) {
     var rows = [ca, cb].map(function (c) { var e = c === 'twob1q' ? null : ENC.encode(c, bits, OPT); return codeRow(c, partial(cellsFor(c), i), e ? e.marks.map(function (m, k) { return k < i ? m : ''; }) : null); });
@@ -2077,8 +2171,8 @@ SETUP[10] = function (n) {
     $('#l10ct').textContent = { all: 'All twelve codes (the two you compare first)', diff: 'Differential codes', bip: 'The bipolar family', every: 'A change in every bit', more: 'More than two levels' }[flt];
     $('#l10cards').innerHTML = list.map(codeCard).join('');
   }
-  $('#l10a').onchange = function () { ca = this.value; P.reset(); cards(); };
-  $('#l10b').onchange = function () { cb = this.value; P.reset(); cards(); };
+  $('#l10a').onchange = function () { ca = this.value; P.restart(); cards(); };
+  $('#l10b').onchange = function () { cb = this.value; P.restart(); cards(); };
   bindSeg('l10f', function (v) { flt = v; cards(); });
   P.bind(); cards(); onResize = P.show;
 
@@ -2151,7 +2245,7 @@ SETUP[IDEAS] = function (n) {
         '<li>The noise power N is spread evenly over the bandwidth B, so each hertz holds <b>N0 = N ÷ B</b>.</li>' +
         '<li>Dividing the two: <b>Eb/N0 = (S ÷ R) ÷ (N ÷ B) = (S ÷ N) × (B ÷ R)</b>, the SNR times bandwidth ÷ bit rate.</li></ul>' +
         '<p>Engineers compare codes with Eb/N0 rather than the SNR because it compares them at the same energy per bit, whatever their bit rates and bandwidths.</p>' +
-        '<p>The figure has two parts. Part 1 plots the BER of each code as Eb/N0 rises. Part 2 sends a few bits with the amount of noise set by the slider, in the code you choose, so you can watch errors happen.</p>',
+        '<p>Two figures, one under the other. The first plots the BER of each code as Eb/N0 rises. The second uses the same Eb/N0 (the slider on the first figure) to send a few bits with noise, in the code you choose, so you can watch errors happen.</p>',
       terms: [['Noise', 'random voltage added to the signal on its way.'],
         ['BER (bit error rate)', 'the share of bits that arrive wrong; Ethernet links aim for 10⁻¹² or better.'],
         ['SNR (signal-to-noise ratio)', 'signal power ÷ noise power, usually in dB.'],
@@ -2164,7 +2258,7 @@ SETUP[IDEAS] = function (n) {
   };
   $('#ltext').innerHTML = kicker(n) + '<h2>Key ideas</h2>' +
     '<p>Three ideas the lessons rely on. Pick one: each has a short explanation, one figure, its terms, and a Try it.</p>' +
-    '<div class="row">' + seg('kitopic', 'Topic', [['rates', 'Rates'], ['spec', 'Spectrum and DC'], ['noise', 'Noise and errors']], topic) + '</div>' +
+    '<div class="row" data-stay>' + seg('kitopic', 'Topic', [['rates', 'Rates'], ['spec', 'Spectrum and DC'], ['noise', 'Noise and errors']], topic) + '</div>' +
     '<div id="kibody"></div>' +
     '<details><summary>All other terms</summary><ul class="terms">' +
       item('Transition', 'a change of level. Receivers use transitions to find the edges of bit times.') +
@@ -2196,11 +2290,13 @@ SETUP[IDEAS] = function (n) {
     var ctl = topic === 'rates' ? '<div class="row">' + seg('kiview', 'Code', [['nrzl', 'NRZ-L'], ['manch', 'Manchester'], ['fourb', '4B/5B'], ['twob1q', '2B1Q']], view) + '</div>' +
         '<div class="row"><label>Bit rate <input type="number" id="kirate" min="0.001" step="any" value="' + rate + '"> Mbps</label></div>' :
       topic === 'noise' ? '<div class="row"><label for="kiebn">Eb/N0</label><input type="range" id="kiebn" min="0" max="14" step="1" value="' + ebn + '"><output id="kiebo" for="kiebn"></output></div>' +
-        '<div class="row">' + seg('kiscode', 'Bits in part 2', [['nrzl', 'NRZ-L'], ['ami', 'Bipolar-AMI']], scode) + '<button class="btn alt small" id="kinoise">New noise</button></div>' +
         '<div class="row"><label>Bit rate <input type="number" id="kirate" min="0.001" step="any" value="' + rate + '"> Mbps</label></div>' :
       '<div class="row"><label>Bit rate <input type="number" id="kirate" min="0.001" step="any" value="' + rate + '"> Mbps</label></div>';
-    $('#lfig').innerHTML = '<div class="card"><p class="figtitle" id="kititle">' + title + '</p>' + ctl +
-      '<div class="fig"><svg id="kisvg" role="img" aria-label="' + title + '"></svg></div><p class="status" id="kist" aria-live="polite"></p></div>';
+    $('#lfig').innerHTML = '<div class="card"><p class="figtitle" id="kititle">' + title + '</p><div class="figctls">' + ctl + '</div>' +
+      '<div class="fig"><svg id="kisvg" role="img" aria-label="' + title + '"></svg></div><p class="status" id="kist" aria-live="polite"></p></div>' +
+      (topic === 'noise' ? '<div class="card second"><p class="figtitle">The same noise on real bits</p><p class="relate">A second figure, tied to the first: it uses the Eb/N0 set on the first figure (its dashed line) and sends a few bits through that much noise.</p>' +
+        '<div class="figctls"><div class="row">' + seg('kiscode', 'Code', [['nrzl', 'NRZ-L'], ['ami', 'Bipolar-AMI']], scode) + '<button class="btn alt small" id="kinoise">New noise</button></div></div>' +
+        '<div class="fig"><svg id="kisvg2" role="img" aria-label="A few bits sent with noise"></svg></div><p class="status" id="kist2" aria-live="polite"></p></div>' : '');
     if (topic === 'rates') bindSeg('kiview', function (v) { view = v; draw(); });
     if (topic === 'noise') { $('#kiebn').oninput = function () { ebn = +this.value; draw(); }; $('#kinoise').onclick = function () { seed++; draw(); }; bindSeg('kiscode', function (v) { scode = v; draw(); }); }
     if ($('#kirate')) $('#kirate').oninput = function () { var r = +this.value; if (r > 0) { rate = r; draw(); } };
@@ -2209,12 +2305,12 @@ SETUP[IDEAS] = function (n) {
 
   function draw() {
     if (topic === 'noise') {
-      var r = berFig($('#kisvg'), ebn, seed, scode), b2 = ENC.ber('nrzl', ebn), b3 = ENC.ber('ami', ebn), sn = scode === 'ami' ? 'Bipolar-AMI' : 'NRZ-L';
+      berFig($('#kisvg'), ebn); var r = noiseFig($('#kisvg2'), ebn, seed, scode), b2 = ENC.ber('nrzl', ebn), b3 = ENC.ber('ami', ebn), sn = scode === 'ami' ? 'Bipolar-AMI' : 'NRZ-L';
       $('#kiebo').textContent = ebn + ' dB';
-      $('#kist').innerHTML = '<b>Part 1, at Eb/N0 = ' + ebn + ' dB</b> (the dashed line):<br>' +
+      $('#kist').innerHTML = '<b>At Eb/N0 = ' + ebn + ' dB</b> (the dashed line):<br>' +
         '• NRZ-L and Manchester: ' + oneIn(b2) + ' (BER ' + sci(b2) + '). At ' + rate + ' Mbps that is one wrong bit ' + every(b2) + '.<br>' +
-        '• Bipolar-AMI: ' + oneIn(b3) + ' (BER ' + sci(b3) + '). Its three levels sit closer together, so for the same BER it needs about 3 dB more: twice the signal power.<br>' +
-        '<b>Part 2:</b> ' + r.n + ' bits in ' + sn + ' with this much noise. The grey dashed line is the voltage that was sent and the dark line the voltage that arrived, noise included; the receiver averages the voltage over each bit time (amber dot) and compares that average with ' +
+        '• Bipolar-AMI: ' + oneIn(b3) + ' (BER ' + sci(b3) + '). Its three levels sit closer together, so for the same BER it needs about 3 dB more: twice the signal power.';
+      $('#kist2').innerHTML = r.n + ' bits in ' + sn + ' with noise at Eb/N0 = ' + ebn + ' dB. The grey dashed line is the voltage that was sent and the dark line the voltage that arrived, noise included; the receiver averages the voltage over each bit time (amber dot) and compares that average with ' +
         (scode === 'ami' ? 'two thresholds, halfway up and halfway down (the dotted lines): above the top one or below the bottom one it reads a pulse, a 1; in between it reads 0. ' : 'one threshold at 0 V (the dotted line): above it, it reads high; below it, low. ') +
         (r.errs ? '<b>' + r.errs + ' of ' + r.n + ' bits came out wrong</b> (shaded red).' : 'No bit came out wrong this time. Press New noise, or lower Eb/N0.');
       return;
@@ -2278,10 +2374,10 @@ SETUP[IDEAS] = function (n) {
         ['Which code has the most power near 0 Hz, the part a transformer blocks?', 'NRZ-L', ['Bipolar-AMI', 'Manchester'], 'its long runs at one level are power at very low frequencies.'],
         ['Which code spreads its power out to about twice the bit rate?', 'Manchester', ['NRZ-L', 'Bipolar-AMI'], 'a transition in every bit means more changes per second, so higher frequencies.'],
         ['Which code has no power at 0 Hz and most of its power below the bit rate?', 'Bipolar-AMI', ['NRZ-L', 'Manchester'], 'alternating pulses cancel at 0 Hz, and a 0 adds no transitions.']] : [
-        ['In part 1, read the NRZ-L curve at Eb/N0 = 4 dB. About what is the BER?', '10⁻²', ['10⁻⁴', '10⁻⁶', '10⁻⁸'], 'at 4 dB about 1 bit in 80 is wrong, close to 10⁻².'],
-        ['In part 1, read the NRZ-L curve at Eb/N0 = 8 dB. About what is the BER?', '10⁻⁴', ['10⁻²', '10⁻⁶', '10⁻⁸'], 'at 8 dB about 2 bits in 10,000 are wrong, close to 10⁻⁴.'],
-        ['In part 1, read the NRZ-L curve at Eb/N0 = 10.5 dB. About what is the BER?', '10⁻⁶', ['10⁻²', '10⁻⁴', '10⁻⁸'], 'at 10.5 dB about 1 bit in a million is wrong.'],
-        ['In part 1, read the NRZ-L curve at Eb/N0 = 12 dB. About what is the BER?', '10⁻⁸', ['10⁻⁴', '10⁻⁶', '10⁻²'], 'at 12 dB about 1 bit in 100 million is wrong.'],
+        ['In the error-rate figure, read the NRZ-L curve at Eb/N0 = 4 dB. About what is the BER?', '10⁻²', ['10⁻⁴', '10⁻⁶', '10⁻⁸'], 'at 4 dB about 1 bit in 80 is wrong, close to 10⁻².'],
+        ['In the error-rate figure, read the NRZ-L curve at Eb/N0 = 8 dB. About what is the BER?', '10⁻⁴', ['10⁻²', '10⁻⁶', '10⁻⁸'], 'at 8 dB about 2 bits in 10,000 are wrong, close to 10⁻⁴.'],
+        ['In the error-rate figure, read the NRZ-L curve at Eb/N0 = 10.5 dB. About what is the BER?', '10⁻⁶', ['10⁻²', '10⁻⁴', '10⁻⁸'], 'at 10.5 dB about 1 bit in a million is wrong.'],
+        ['In the error-rate figure, read the NRZ-L curve at Eb/N0 = 12 dB. About what is the BER?', '10⁻⁸', ['10⁻⁴', '10⁻⁶', '10⁻²'], 'at 12 dB about 1 bit in 100 million is wrong.'],
         ['For the same BER, about how much more signal power does Bipolar-AMI need than NRZ-L?', 'About 3 dB (twice the power)', ['About 1 dB', 'About 10 dB (ten times)', 'None'], 'its three levels sit closer together, so it needs about twice the power.']];
     $('#kitry').innerHTML = box + '<div class="choices" id="kich"></div><div class="row"><button class="btn alt small" id="kinew">New question</button></div>' + tail;
     var q2 = function () {
@@ -2344,24 +2440,19 @@ var TECH = {
   ]
 };
 
-/* bit error rate against Eb/N0 for two-level (NRZ-L, Manchester) and three-level (Bipolar-AMI) signals (part 1), and a strip of bits in the
-   chosen code with noise at the chosen Eb/N0 (part 2): 8 noisy samples per bit, the receiver averages them and compares the average with its
-   threshold(s), so the strip's errors follow the curve. Noise per bit: NRZ-L ±1, σ = 1/√(2x); AMI +1/0/−1 with thresholds ±½, σ = 1/(2√x)
-   (only the 1s carry energy), which gives BER = Q(√(2x)) and 1.5·Q(√x). x = Eb/N0 as a plain ratio. */
-function berFig(svg, dB, seed, code) {
-  code = code === 'ami' ? 'ami' : 'nrzl';
+/* bit error rate against Eb/N0 for two-level (NRZ-L, Manchester) and three-level (Bipolar-AMI) signals; the dashed line marks the chosen Eb/N0 */
+function berFig(svg, dB) {
   var px = svg.parentNode && svg.parentNode.clientWidth, narrow = px && px < 560;
-  var W = narrow ? 4.4 : 6.2, H = 5.75, x0 = 0.8, x1 = W - 0.2, y0 = 3.15, y1 = 5.3, f = new Fig(svg, 0, W, 0, H, 1.25);
+  var W = narrow ? 4.4 : 6.2, H = 2.75, x0 = 0.8, x1 = W - 0.2, y0 = 0.6, y1 = 2.65, f = new Fig(svg, 0, W, 0, H, 1.25);
   function X(d) { return x0 + d / 14 * (x1 - x0); } function Y(b) { var l = Math.max(-10, Math.log(b) / Math.LN10); return y0 + (l + 10) / 10 * (y1 - y0); }
-  f.text(0.1, H - 0.15, '1. Error rate of each code', { fs: 9.5, bold: true, color: C.navy, ha: 'left' });
   for (var e = -10; e <= 0; e++) f.line(x0, y0 + (e + 10) / 10 * (y1 - y0), x1, y0 + (e + 10) / 10 * (y1 - y0), { color: C.grid, lw: e % 2 ? 0.5 : 1 });
   [-10, -8, -6, -4, -2].forEach(function (e) { f.text(x0 - 0.08, y0 + (e + 10) / 10 * (y1 - y0), '10' + ['⁻¹⁰', '', '⁻⁸', '', '⁻⁶', '', '⁻⁴', '', '⁻²'][e + 10], { fs: 8.2, ha: 'right', color: C.muted }); });
   f.line(x0, y0, x1, y0, { color: C.ink, lw: 1 }); f.line(x0, y0, x0, y1, { color: C.ink, lw: 1 });
   for (var d = 0; d <= 14; d += 2) { f.line(X(d), y0, X(d), y0 - 0.05, { color: C.ink, lw: 1 }); f.text(X(d), y0 - 0.16, String(d), { fs: 8.2, color: C.muted }); }
-  f.text((x0 + x1) / 2, y0 - 0.36, 'Eb/N0 in dB: more signal energy per bit →', { fs: 8.8, color: C.muted });
-  f.text(0.16, (y0 + y1) / 2, 'Bit error rate', { fs: 8.8, color: C.muted, rot: -90 });
+  f.ax('x', (x0 + x1) / 2, y0 - 0.38, 'Eb/N0 in dB: more signal energy per bit →', { fs: 8.8, color: C.muted, italic: true });
+  f.ax('y', 0.16, (y0 + y1) / 2, 'bit error rate (BER)', { fs: 8.8, color: C.muted, rot: -90, italic: true });
   var cur = [['nrzl', C.navy, 'NRZ-L, Manchester'], ['ami', C.ok, 'Bipolar-AMI']];
-  cur.forEach(function (c, j) {
+  cur.forEach(function (c) {
     var pts = []; for (var q = 0; q <= 140; q++) { var dd = q / 10, b = ENC.ber(c[0], dd); if (b >= 1e-10) pts.push([X(dd), Y(b)]); }
     f.poly(pts, { color: c[1], lw: 2 });
   });
@@ -2370,10 +2461,17 @@ function berFig(svg, dB, seed, code) {
   var lx = X(0.35); f.rect(lx - 0.08, y0 + 0.06, 2.0, 0.52, { fill: '#fff', stroke: C.grid, lw: 0.6, rx: 0.05 });
   cur.forEach(function (c, j) { var ly = y0 + 0.44 - j * 0.24; f.line(lx, ly, lx + 0.32, ly, { color: c[1], lw: 2.4 }); f.text(lx + 0.42, ly, c[2], { fs: 9, bold: true, color: c[1], ha: 'left' }); });
   cur.forEach(function (c) { var bb = ENC.ber(c[0], dB); if (bb >= 1e-10) f.dot(X(dB), Y(bb), 0.055, { fill: c[1], stroke: '#fff', lw: 1 }); });
-  /* part 2: the noisy strip */
+  svg.style.maxWidth = Math.round(W * 96) + 'px'; svg.style.minWidth = '0px';   // these figures size themselves; no sideways scrolling
+}
+/* a strip of bits in the chosen code with noise at the chosen Eb/N0: 8 noisy samples per bit; the receiver averages them and compares the
+   average with its threshold(s), so the strip's errors follow the curve. Noise per bit: NRZ-L ±1, σ = 1/√(2x); AMI +1/0/−1 with thresholds ±½,
+   σ = 1/(2√x) (only the 1s carry energy), which gives BER = Q(√(2x)) and 1.5·Q(√x). x = Eb/N0 as a plain ratio. */
+function noiseFig(svg, dB, seed, code) {
+  code = code === 'ami' ? 'ami' : 'nrzl';
+  var px = svg.parentNode && svg.parentNode.clientWidth, narrow = px && px < 560;
+  var W = narrow ? 4.4 : 6.2, H = 2.12, x0 = 0.8, x1 = W - 0.2, f = new Fig(svg, 0, W, -0.3, H, 1.25);
   var x = Math.pow(10, dB / 10), n = narrow ? 12 : 16, sx0 = x0, bw = (x1 - sx0) / n, mid = 1.0, A = 0.27, ns = 8;
   var sig = Math.sqrt(ns) * (code === 'ami' ? 1 / (2 * Math.sqrt(x)) : 1 / Math.sqrt(2 * x));
-  f.text(0.1, 2.38, '2. ' + n + ' bits in ' + (code === 'ami' ? 'Bipolar-AMI' : 'NRZ-L') + ', with noise at ' + dB + ' dB', { fs: 9.5, bold: true, color: C.navy, ha: 'left' });
   var st = seed >>> 0 || 1;
   function rnd() { st = (st + 0x6D2B79F5) >>> 0; var t = st; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }
   function gauss() { var u = rnd() || 1e-9, v = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
@@ -2401,7 +2499,9 @@ function berFig(svg, dB, seed, code) {
   f.poly(sent, { color: C.muted, lw: 1, dash: [3, 2] });
   f.poly(rx, { color: C.navy, lw: 1.1 });
   f.text(sx0 - 0.08, 1.9, 'Sent', { fs: 8, ha: 'right', color: C.muted }); f.text(sx0 - 0.08, 0.2, 'Read', { fs: 8, ha: 'right', color: C.muted });
-  svg.style.maxWidth = Math.round(W * 96) + 'px'; svg.style.minWidth = '0px';   // these figures size themselves; no sideways scrolling
+  f.ax('x', sx0 + 0.04, -0.14, 'time → (one column per bit time)', { fs: 8.5, ha: 'left', color: C.muted, italic: true });
+  f.ax('y', 0.16, mid, 'voltage', { fs: 8.5, color: C.muted, rot: -90, italic: true });
+  svg.style.maxWidth = Math.round(W * 96) + 'px'; svg.style.minWidth = '0px';
   return { errs: errs, n: n };
 }
 /* power spectra for random bits (each curve relative to NRZ-L's peak); q = frequency ÷ bit rate:
@@ -2422,8 +2522,8 @@ function specFig(svg, rate) {
   f.text(X(1) + 0.05, y1 - 0.08, 'bit rate', { fs: 8, color: C.muted, ha: 'left' });
   f.line(x0, y0, x1, y0, { color: C.ink, lw: 1 }); f.line(x0, y0, x0, y1, { color: C.ink, lw: 1 });
   [0, 0.5, 1, 1.5, 2].forEach(function (q) { f.line(X(q), y0, X(q), y0 - 0.05, { color: C.ink, lw: 1 }); f.text(X(q), y0 - 0.17, num(q * rate), { fs: 8.5, color: C.muted }); });
-  f.text((x0 + x1) / 2, y0 - 0.42, 'Frequency in ' + unit[0] + ' (bit rate ' + rate + ' Mbps)', { fs: 8.8, color: C.muted });
-  f.text(0.2, (y0 + y1) / 2, 'Power', { fs: 8.8, color: C.muted, rot: -90 });
+  f.ax('x', (x0 + x1) / 2, y0 - 0.42, 'frequency in ' + unit[0] + ' (bit rate ' + rate + ' Mbps) →', { fs: 8.8, color: C.muted, italic: true });
+  f.ax('y', 0.2, (y0 + y1) / 2, 'power at that frequency', { fs: 8.8, color: C.muted, rot: -90, italic: true });
   var cols = { nrz: C.navy, ami: C.ok, man: C.brand }, names = { nrz: 'NRZ-L', ami: 'Bipolar-AMI', man: 'Manchester' }, lx = X(narrow ? 1.05 : 1.3);
   ['nrz', 'ami', 'man'].forEach(function (k, j) {
     var pts = []; for (var i = 0; i <= 220; i++) { var q = i / 100; pts.push([X(q), Y(S[k](q))]); }
@@ -2435,8 +2535,10 @@ function specFig(svg, rate) {
   f.rect(lx, by - 0.08, 0.32, 0.16, { fill: C.amber, opacity: 0.35, stroke: C.amber, lw: 0.1 }); f.text(lx + 0.42, by, narrow ? 'Transformer blocks' : 'Blocked by a transformer', { fs: 9, color: C.amberDark, ha: 'left' });
   svg.style.maxWidth = Math.round(W * 96) + 'px'; svg.style.minWidth = '0px';   // these figures size themselves; no sideways scrolling
 }
-function pipeFig(svg, T) {
+function pipeFig(svg, T) {   // a chain of steps, not a graph: down is the order of the steps (named on the figure); across has no meaning
   var n = T.st.length, bh = 0.72, gap = 0.5, W = 4.6, H = n * bh + (n - 1) * gap + 0.72, f = new Fig(svg, 0, W, 0, H, 1.25);
+  f.ax('y', 4.4, H - 0.06 - (n * bh + (n - 1) * gap) / 2, 'each step feeds the next →', { fs: 8.5, color: C.muted, rot: 90, italic: true });
+  svg.setAttribute('data-xaxis', 'none: a chain of steps; down is their order');
   T.st.forEach(function (s, i) {
     var y = H - 0.06 - (i + 1) * bh - i * gap, last = i === n - 1;
     f.slab(0.06, y, 3.2, bh, { fill: last ? C.panel : '#fff' });
@@ -2450,7 +2552,7 @@ function pipeFig(svg, T) {
 }
 /* a carrier whose amplitude and phase change every symbol time, as QAM (Quadrature Amplitude Modulation) does */
 function carrierFig(svg) {
-  var W = 4.9, H = 1.3, x0 = 1.0, f = new Fig(svg, 0, W, 0, H, 1.25), mid = 0.65, syms = [[1, 0], [0.45, 90], [0.8, 180], [0.45, 270], [1, 90], [0.8, 0]], sw = (W - x0 - 0.1) / syms.length;
+  var W = 4.9, H = 1.3, x0 = 1.0, f = new Fig(svg, 0, W, -0.3, H, 1.25), mid = 0.65, syms = [[1, 0], [0.45, 90], [0.8, 180], [0.45, 270], [1, 90], [0.8, 0]], sw = (W - x0 - 0.1) / syms.length;
   f.text(0.1, mid, 'QAM', { fs: 9.5, ha: 'left', bold: true, color: C.navy });
   f.line(x0, mid, W - 0.1, mid, { color: C.grid, lw: 0.6 });
   syms.forEach(function (sy, k) {
@@ -2459,6 +2561,8 @@ function carrierFig(svg) {
     f.poly(pts, { color: C.navy, lw: 1.6 });
     if (k) f.line(x0 + k * sw, 0.12, x0 + k * sw, 1.18, { color: C.grid, lw: 0.6, dash: [2, 2] });
   });
+  f.ax('x', x0 + 0.04, -0.12, 'time → (one column per symbol)', { fs: 8.5, ha: 'left', color: C.muted, italic: true });
+  f.ax('y', 0.1, -0.12, '↑ voltage', { fs: 8.5, ha: 'left', color: C.muted, italic: true });
   svg.style.maxWidth = Math.round(W * 96) + 'px'; svg.style.minWidth = '0px';   // these figures size themselves; no sideways scrolling
 }
 function sigFig(svg, kind) {
@@ -2479,14 +2583,14 @@ function sigFig(svg, kind) {
     var L = { pam4: 4, pam5: 5, pam16: 16 }[kind], step = { pam4: 3, pam5: 2, pam16: 7 }[kind]; cells = [];   // a varied walk over every level
     for (var j = 0; j < 12; j++) { var v = ((j * step + 3) % L) / (L - 1) * 2 - 1; cells.push([v, v]); }
   }
-  waveFig(svg, { rows: [{ name: { manch: 'Manchester', nrz: 'NRZ', dsss: 'Chips', mlt3: 'MLT-3', hdb3: 'HDB3', b3zs: 'B3ZS', pam4: 'PAM4', pam5: 'PAM-5', pam16: 'PAM-16' }[kind], cells: cells, three: kind === 'mlt3' || kind === 'hdb3' || kind === 'b3zs' }], axis: kind === 'mlt3' || kind === 'nrz' || kind === 'manch', fit: true });
+  waveFig(svg, { xLabel: kind === 'manch' || kind === 'nrz' ? 'time → (one column per bit time)' : kind === 'dsss' ? 'time → (one column per chip)' : 'time → (one column per symbol)', rows: [{ name: { manch: 'Manchester', nrz: 'NRZ', dsss: 'Chips', mlt3: 'MLT-3', hdb3: 'HDB3', b3zs: 'B3ZS', pam4: 'PAM4', pam5: 'PAM-5', pam16: 'PAM-16' }[kind], cells: cells, three: kind === 'mlt3' || kind === 'hdb3' || kind === 'b3zs' }], axis: kind === 'mlt3' || kind === 'nrz' || kind === 'manch', fit: true });
 }
 
 SETUP[RLP] = function (n) {
   var grp = 'copper', tid = '100tx';
   function list(g) { return '<ul class="list">' + TECH[g].map(function (T) { return '<li><b>' + T.n + '</b> (' + T.sp + '): ' + T.st.slice(1).map(function (s) { return s[0]; }).join(', then ') + '; ' + T.ar[T.ar.length - 1] + '.</li>'; }).join('') + '</ul>'; }
   $('#ltext').innerHTML = '<p class="kicker">Real links · for reference at any time</p><h2>What real links use</h2>' +
-    '<p>Every link stacks the same ideas: a <b>block code</b> such as 4B/5B or 64b/66b sends each group of bits as a slightly longer code word, for transitions and control (Lesson 7 explains block codes), fast links add an <b>error-correcting code</b> (extra bits that let the receiver repair some wrong bits), and a <b>line code</b> (as in Lessons 1 to 7) or a <b>modulation</b> (changing a carrier wave) puts the result on the medium, the cable or fiber. On this page a <b>symbol</b> means a signal element, so the symbol rate is the baud rate.</p>' +
+    '<p>Every link stacks the same ideas: a <b>block code</b> such as 4B/5B (4 bits sent as 5) or 64b/66b sends each group of bits as a slightly longer code word, for transitions and control (Lesson 7 explains block codes), fast links add an <b>error-correcting code</b> (extra bits that let the receiver repair some wrong bits), and a <b>line code</b> (as in Lessons 1 to 7) or a <b>modulation</b> (changing a carrier wave) puts the result on the medium, the cable or fiber. On this page a <b>symbol</b> means a signal element, so the symbol rate is the baud rate.</p>' +
     '<p><b>Coaxial cable</b> (coax) has one center conductor inside a cylindrical shield, so it carries high frequencies far with little interference. The first Ethernets shared one coax with Manchester; telephone carriers run T3 and E3 on it with bipolar codes, B3ZS (Bipolar with 3-Zeros Substitution) and HDB3 (High-Density Bipolar 3-zeros); cable TV (television) and cable internet modulate carriers on it with QAM (Quadrature Amplitude Modulation).</p>' +
     '<p>Pick a technology to see its chain, the rate after each step, and a sketch of its signal. Wi-Fi and the longest-distance fiber links modulate a carrier instead; the Modulation Visualizer covers them.</p>' +
     '<div class="row">' + seg('rlg', 'Medium', [['copper', 'Twisted pair'], ['coax', 'Coaxial cable'], ['fiber', 'Fiber']], grp) + '</div>' +
@@ -2498,12 +2602,13 @@ SETUP[RLP] = function (n) {
            ['Coaxial cable (coax)', 'a center conductor inside a cylindrical shield, separated by insulation; 50-ohm coax for early Ethernet, 75-ohm for T3, E3, and cable TV.'],
            ['Lane', 'one of several parallel signals (pairs, fibers, or colors of light) that together carry one link.'],
            ['GBd (gigabaud)', 'a billion symbols per second.'],
-           ['NRZ (Non-Return to Zero) and NRZI (Non-Return to Zero, Invert on ones)', 'two-level line codes: a level per bit, or a change for each 1.'],
+           ['NRZ (Non-Return to Zero)', ''],
+           ['NRZI (Non-Return to Zero, Invert on ones)', ''],
            ['MLT-3 (Multi-Level Transmit, 3 levels)', 'a three-level code that steps 0, +, 0, − for each 1.'],
            ['PAM-n (Pulse Amplitude Modulation, n levels)', 'pulses with n amplitude levels, written PAM-5, PAM-16, or PAM4.'],
            ['RS-FEC (Reed-Solomon forward error correction)', 'the error-correcting code used on fast fiber Ethernet.']]);
   $('#lfig').innerHTML = '<div class="card"><p class="figtitle" id="rltitle"></p><div style="max-width:470px"><svg id="rlsvg" role="img" aria-label="The chain from data to the signal on the medium" style="display:block;width:100%;height:auto"></svg></div>' +
-    '<p class="figtitle" style="margin-top:10px">The signal on the medium</p><div class="fig" style="max-width:470px"><svg id="rlsig" role="img" aria-label="A sketch of the signal this technology sends"></svg></div>' +
+    '<p class="figtitle" id="rlsigt" style="margin-top:10px">The signal on the medium</p><p class="relate" id="rlrel">The same link, closer in: a sketch of the signal its last step puts on the medium.</p><div class="fig" id="rlsigbox" style="max-width:470px"><svg id="rlsig" role="img" aria-label="A sketch of the signal this technology sends"></svg></div>' +
     '<p class="status" id="rlst"></p></div>';
   function chips() {
     $('#rlt').innerHTML = TECH[grp].map(function (T) { return '<button type="button" class="chipbtn" data-t="' + T.id + '" aria-pressed="' + (T.id === tid) + '">' + T.n.replace(/ \(.*\)$/, '') + '</button>'; }).join('');
@@ -2538,6 +2643,248 @@ SETUP[RLP] = function (n) {
     else wrong(fb, 'Not quite. Apply each step in turn: first the block code\'s extra bits, then divide by the bits each symbol carries (and by the number of pairs or lanes).');
   };
   newQ();
+};
+
+/* ===================================================== GLOSSARY
+   One glossary for the whole app (Nov 23 rule). Every term and symbol in the student-facing text of the start screen, the lessons, the
+   reference pages, and the Calculator shows its definition in a popup (pointing, tap, or keyboard focus); the "Terms in this lesson" lists
+   and the Glossary page use the same wording. The text is marked automatically: the first use of each term in every card (and in every
+   controls panel, fold, Try it, and feedback) gets a dotted underline. Longer names come first, so they win (NRZ-L before NRZ).
+   The Challenge is left unmarked, so a definition never gives an answer away.
+   Each entry: [name, definition, how it is written in the text (a regular expression; default: the name as written), kind]
+   kind 's' puts it with the symbols and units at the top of the Glossary page. */
+var TERMS = [
+  /* symbols and units */
+  ['+V, −V', 'the two voltages of a two-level code: high (+V, positive) and low (−V, negative). V stands for a voltage, such as 2.5 volts.', '[+−]V', 's'],
+  ['0 V', 'zero volts: no voltage on the line. Three-level codes use it as their middle level.', '0 V', 's'],
+  ['H, L', 'high and low: the two levels of a two-level signal, marked at the left of each row of a figure.', null, 's'],
+  ['bps', 'bits per second. kbps is a thousand, Mbps (megabits per second) a million, and Gbps (gigabits per second) a billion bits per second.', 'bps|[kMG]bps', 's'],
+  ['Baud (Bd)', 'signal elements per second, the unit of the baud rate. Mbaud (megabaud) is a million and GBd (gigabaud) a billion per second.', '[Mk]?baud|GBd|Mbd', 's'],
+  ['Hz (hertz)', 'repeats per second, the unit of frequency. kHz is a thousand, MHz (megahertz) a million, and GHz (gigahertz) a billion per second.', '[kMG]?Hz', 's'],
+  ['ns, µs, ms', 'nanosecond (a billionth of a second), microsecond (a millionth), and millisecond (a thousandth).', 'ns|µs|ms', 's'],
+  ['dB (decibel)', '10 × log₁₀ of a power ratio: 3 dB is about 2 times, 10 dB is 10 times, and 20 dB is 100 times.', 'dB', 's'],
+  ['Eb', 'the signal energy carried by one bit: the signal power S times the time of one bit, 1 ÷ R, so Eb = S ÷ R.', 'Eb', 's'],
+  ['N0', 'the noise density: the noise power in each 1 Hz (hertz) slice of the bandwidth, N0 = N ÷ B.', 'N0', 's'],
+  ['Eb/N0', 'energy per bit to noise density: the SNR (signal-to-noise ratio) for one bit, Eb/N0 = SNR × B ÷ R. Usually given in dB (decibels).', 'Eb/N0', 's'],
+  ['S, N', 'in the Eb/N0 formulas: S is the signal power and N the noise power that reaches the receiver.', '[SN](?= (?:÷|is|and))', 's'],
+  ['B', 'in the Eb/N0 formulas: the bandwidth, in Hz (hertz).', 'B(?= (?:÷|is|in))', 's'],
+  ['R', 'in the Eb/N0 formulas: the bit rate, in bits per second.', 'R(?= (?:÷|is|seconds))', 's'],
+  ['L (levels)', 'the number of levels a code uses. One signal element can carry up to log₂ L bits.', 'L(?= levels)', 's'],
+  ['log₂, log₁₀', 'logarithms: log₂ L is the power of 2 that gives L (log₂ 4 = 2); log₁₀ is the power of 10 (log₁₀ 100 = 2).', 'log[₂₁₀]+', 's'],
+  ['m, n (block codes)', 'in mB/nB: each group of m data bits is sent as an n-bit code word, n larger than m. 4B/5B has m = 4 and n = 5.', 'mB/nB', 's'],
+  ['10⁻⁶ (powers of ten)', 'a negative power of ten is a fraction: 10⁻⁶ is one millionth, 10⁻¹² one in a million million.', null, 's'],
+
+  /* terms, A to Z */
+  ['4B/5B', '4B/5B (4 bits sent as 5): a block code that sends each group of 4 data bits as one of 16 chosen 5-bit code words, so the line never has more than three 0s in a row. 25% extra bits: 80% efficient.', '4B/5B'],
+  ['8b/10b', 'a block code that sends 8 bits as 10, chosen to keep the numbers of 1s and 0s balanced (no DC) and to give transitions. 25% extra.', '8b/10b'],
+  ['64b/66b', 'a block code that sends 64 bits as 66: a 2-bit header gives a transition every 66 bits and marks each block\'s start, and a scrambler mixes the rest. About 3% extra.', '64b/66b'],
+  ['128b/130b', 'the same idea as 64b/66b with longer blocks: 130 bits for 128, about 1.5% extra.', '128b/130b'],
+  ['256b/257b', 'a block code that sends 256 bits as 257, about 0.4% extra, used under the error-correcting code on the fastest Ethernet links.', '256b/257b'],
+  ['2B1Q', 'two binary, one quaternary: a four-level code where each pair of bits sets one of four levels.', '2B1Q'],
+  ['AC', 'alternating current: a voltage that keeps changing direction, as opposed to DC (direct current).', 'AC(?! coupling| \\(alternating current\\) coupling)'],
+  ['AC coupling', 'alternating current coupling: a transformer or capacitor in the path that passes changes of voltage but blocks a steady level.', 'AC (?:\\(alternating current\\) )?coupling|AC coupling'],
+  ['AMI', 'Alternate Mark Inversion: see Bipolar-AMI. "Mark" is an old name for 1, so the 1s alternate.', 'AMI'],
+  ['Bandwidth', 'the range of frequencies a cable passes well, or that a signal needs. A signal needs more bandwidth when its baud rate is higher.', '[Bb]andwidth'],
+  ['Baseline wander', 'the received signal slowly drifting toward 0 V during a long run, because the transformer removes its average, until high and low look alike.', '[Bb]aseline wander'],
+  ['Baud rate', 'signal elements per second (also called the signal rate or modulation rate), in baud: bit rate × signal elements per bit.', '[Bb]aud rate|[Ss]ignal rate'],
+  ['BER', 'bit error rate: the share of bits that arrive wrong. A BER of 10⁻⁶ means about one wrong bit in every million.', 'BER'],
+  ['B (bipolar pulse)', 'in B8ZS and HDB3 patterns: a normal pulse, with the opposite polarity of the pulse before it.', null],
+  ['B3ZS', 'Bipolar with 3-Zeros Substitution: Bipolar-AMI, with each run of three 0s replaced by a pattern with a violation, used on T3 lines.', 'B3ZS'],
+  ['B8ZS', 'Bipolar with 8-Zeros Substitution: Bipolar-AMI, with each run of eight 0s sent as 000VB0VB.', 'B8ZS'],
+  ['Biphase', 'a code with a transition in the middle of every bit, such as Manchester and Differential Manchester.', '[Bb]iphase'],
+  ['Bipolar', 'three levels, with pulses that alternate between positive and negative, as in Bipolar-AMI.', '[Bb]ipolar(?![- ]AMI| violation| family)'],
+  ['Bipolar family', 'the codes built on Bipolar-AMI: alternating pulses and 0 V (Pseudoternary, B8ZS, HDB3).', '[Bb]ipolar family'],
+  ['Bipolar violation', 'two pulses in a row with the same polarity. Bipolar-AMI never sends one, so an unexpected one reveals an error.', '[Bb]ipolar violations?'],
+  ['Bipolar-AMI', 'Bipolar Alternate Mark Inversion: a three-level code where 0 is sent as 0 V and each 1 as a pulse whose polarity alternates.', 'Bipolar-AMI'],
+  ['Bit rate', 'bits sent per second (also called the data rate), in bps (bits per second). One bit time is 1 ÷ bit rate.', '[Bb]it rates?|[Dd]ata rate'],
+  ['Bit time', 'the slot of time for one bit: 1 ÷ bit rate, such as 100 ns (nanoseconds) at 10 Mbps. The clock ticks once per bit time.', '[Bb]it times?'],
+  ['Block code', 'a code that sends each group of m data bits as a slightly longer n-bit code word (mB/nB), chosen to add transitions and control codes.', '[Bb]lock codes?'],
+  ['Clock', 'the regular tick that marks the bit times at the sender and at the receiver.', '[Cc]locks?'],
+  ['Clock drift', 'a clock running slightly slow or fast, so its samples slide away from the middle of each bit time.', '[Cc]lock drift'],
+  ['Clock recovery', 'the receiver keeping its clock in step with the sender\'s, using the transitions it sees.', '[Cc]lock recovery'],
+  ['Clocking', 'enough transitions, whatever the bits, for the receiver to keep its clock in step without a separate clock wire.', '[Cc]locking'],
+  ['Coaxial cable', 'coax: a center conductor inside a cylindrical shield, separated by insulation. 50-ohm coax was used for early Ethernet, 75-ohm for T3, E3, and cable TV (television).', '[Cc]oaxial cable|[Cc]oax'],
+  ['Cost and complexity', 'the extra signal rate a code needs, and the circuits it takes to encode and decode it.', '[Cc]ost and complexity'],
+  ['DOCSIS', 'Data Over Cable Service Interface Specification: the standard for internet service over cable TV (television) coax, using QAM.', 'DOCSIS'],
+  ['Code word', 'one of the n-bit words a block code is allowed to send.', '[Cc]ode words?'],
+  ['DC', 'direct current: a steady voltage. The DC level (or DC component) of a signal is its average voltage, its part at 0 Hz (hertz). Long runs of one level create it.', 'DC(?: (?:level|component))?'],
+  ['DC-balanced code', 'a code whose average level stays at 0 over any short stretch, whatever the bits, such as Manchester, Bipolar-AMI, and 8b/10b.', 'DC-balanced(?: codes?)?'],
+  ['Differential encoding', 'carrying each bit in whether the level changes, not in the level itself, so swapped wires do no harm. A code that does this is a differential code: NRZI (Non-Return to Zero, Invert on ones), Differential Manchester, and MLT-3 (Multi-Level Transmit, 3 levels).', '[Dd]ifferential(?! Manchester)(?: encoding| codes?)?'],
+  ['Differential Manchester', 'a code with a transition in the middle of every bit, plus one at the start of each 0.', 'Differential Manchester'],
+  ['Efficiency', 'the share of the signal elements that carries data: 100% for NRZ (Non-Return to Zero), 80% for 4B/5B (4 bits sent as 5), 50% for Manchester.', '[Ee]fficiency|[Ee]fficient'],
+  ['Encoder', 'the part of the sender that turns bits into levels on the wire.', '[Ee]ncoders?'],
+  ['Encoder state', 'what the encoder remembers between bits, such as the current level or the last pulse\'s polarity.', '[Ee]ncoder state'],
+  ['Error detection by the code', 'patterns the code never sends (a bipolar violation, a missing mid-bit transition, an unused 4B/5B (4 bits sent as 5) code word), so a broken rule shows the receiver an error at once.', '[Ee]rror detection'],
+  ['Ethernet names (BASE)', 'Ethernet links are named speed, BASE (baseband: the signal goes straight on the medium), then the medium: 100BASE-TX is 100 Mbps on twisted pair (T); F or X marks fiber; SR and LR are short and long reach; a 4 at the end means 4 lanes.', '\\d+G?BASE-[A-Z0-9]+'],
+  ['Ethernet', 'the family of wired network links used in most offices and homes, named by speed and medium, such as 10BASE-T and 100BASE-TX.', 'Ethernet'],
+  ['XOR', 'exclusive OR: 1 when its two inputs differ, 0 when they are the same. Manchester is the XOR of each bit with the clock.', 'XOR|exclusive OR'],
+  ['FEC', 'forward error correction: extra bits that let the receiver fix errors without a resend. RS (Reed-Solomon) and LDPC (Low-Density Parity-Check) codes are kinds of FEC.', 'FEC'],
+  ['Frequency', 'how many times per second something repeats, in Hz (hertz). A signal\'s level changes have frequencies: many changes per second is a high frequency, a level that never changes is 0 Hz.', '[Ff]requenc(?:y|ies)'],
+  ['HDB3', 'High-Density Bipolar 3-zeros: Bipolar-AMI, with each run of four 0s sent as 000V or B00V, chosen by the number of pulses since the last substitution.', 'HDB3'],
+  ['Levels and errors', 'a code with more levels in the same voltage range has them closer together, so a smaller noise voltage crosses a threshold.', '[Ll]evels and errors'],
+  ['Lane', 'one of several parallel signals (pairs, fibers, or colors of light) that together carry one link.', '[Ll]anes?'],
+  ['Level', 'one of the voltages a code puts on the wire, such as +V (high), 0 V, or −V (low).', '[Ll]evels?'],
+  ['Level (absolute) encoding', 'carrying each bit in the level itself, as NRZ-L (Non-Return to Zero, Level) does.', '[Ll]evel encoding|[Aa]bsolute encoding'],
+  ['Line code', 'the rule that turns bits into a signal on the medium, such as NRZI (Non-Return to Zero, Invert on ones), MLT-3 (Multi-Level Transmit, 3 levels), or Manchester.', '[Ll]ine codes?|[Ll]ine encoding'],
+  ['Long run', 'see Run.', null],
+  ['Look-up table', 'a fixed list that turns each group of bits into a code word, as in 4B/5B.', '[Ll]ook-up tables?'],
+  ['Manchester', 'a code where the direction of the transition in the middle of each bit gives its value.', 'Manchester'],
+  ['Mark and space', 'old names for 1 and 0 from telegraph days; "mark inversion" means the 1s alternate.', '[Mm]ark and space'],
+  ['MLT-3', 'Multi-Level Transmit, 3 levels: a code that steps through 0, +, 0, − in turn, one step for each 1, and stays put for each 0.', 'MLT-3'],
+  ['Modulation', 'changing a carrier wave\'s amplitude, frequency, or phase to carry bits, as radio links and long-distance fiber do, instead of sending levels straight on the wire.', '[Mm]odulation(?! rate)'],
+  ['Noise', 'random voltage added to the signal on its way.', '[Nn]oise'],
+  ['Noise immunity', 'how well a code resists noise: levels far apart are easy to tell apart, so two levels beat three, and a change is easier to spot than a level.', '[Nn]oise immunity'],
+  ['NRZ', 'Non-Return to Zero: the family of codes that hold one level for a whole bit time, such as NRZ-L (Non-Return to Zero, Level) and NRZI (Non-Return to Zero, Invert on ones).', 'NRZ'],
+  ['NRZ-L', 'Non-Return to Zero, Level: a code that sends each bit as one level held for its whole bit time.', 'NRZ-L'],
+  ['NRZI', 'Non-Return to Zero, Invert on ones: a code where a 1 changes the level at the start of its bit time and a 0 keeps it.', 'NRZI'],
+  ['On-off (unipolar) signalling', '0 V for 0 and a positive voltage for 1.', '[Oo]n-off'],
+  ['Overhead', 'the extra bits a code adds, as a share of the data: (n − m) ÷ m.', '[Oo]verhead'],
+  ['PAM', 'Pulse Amplitude Modulation: pulses with several amplitude levels, written PAM-n with n levels, such as PAM-5, PAM-16, or PAM4.', 'PAM-?(?:\\d+|n)|PAM'],
+  ['PCI Express', 'Peripheral Component Interconnect Express: the fast link inside a computer between the processor and cards such as graphics and network cards.', 'PCI Express|PCIe'],
+  ['Polar', 'a positive and a negative level, as in NRZ-L (Non-Return to Zero, Level) and Manchester.', '[Pp]olar(?!ity)'],
+  ['Polarity', 'whether a pulse or level is positive or negative. Swapping a pair\'s two wires reverses it, so high arrives as low.', '[Pp]olarity'],
+  ['Pseudoternary', 'the opposite of Bipolar-AMI: 1 is sent as 0 V, and each 0 as a pulse whose polarity alternates.', 'Pseudoternary'],
+  ['Pulse', 'a stretch at +V or −V, as opposed to 0 V: a positive or a negative pulse.', '[Pp]ulses?'],
+  ['Receiver', 'the device at the far end that measures the signal and turns it back into bits.', '[Rr]eceivers?'],
+  ['RS-FEC', 'Reed-Solomon forward error correction: the error-correcting code used on fast fiber Ethernet.', 'RS-FEC'],
+  ['RZ', 'Return to Zero: a code that sends a 1 as a pulse for the first half of its bit time, then returns to 0 V.', 'RZ'],
+  ['QAM', 'Quadrature Amplitude Modulation: a carrier wave whose amplitude and phase both change, so each symbol carries several bits. Used on cable TV coax and radio.', 'QAM'],
+  ['Rule', 'what the encoder sends for a bit (or a group of bits).', null],
+  ['Run', 'a stretch of the same bit, such as twelve 0s in a row. A long run gives the receiver no transitions.', '(?:[Ll]ong )?runs?'],
+  ['Running disparity', 'in 8b/10b, the count of 1s sent minus 0s sent, kept near 0 to avoid DC.', '[Rr]unning disparity'],
+  ['SATA', 'Serial ATA (Advanced Technology Attachment): the link between a computer and its disk drives.', 'SATA'],
+  ['Sample', 'the receiver\'s measurement of the voltage, taken in the middle of each bit time.', '[Ss]amples?'],
+  ['Scrambling', 'changing the bits so long runs become rare, and undoing it at the receiver: B8ZS (Bipolar with 8-Zeros Substitution) and HDB3 (High-Density Bipolar 3-zeros) replace runs of 0s with marked patterns; fast links mix the bits with a known pseudo-random pattern.', '[Ss]crambl(?:ing|er|ed)'],
+  ['Self-clocking', 'a code whose signal carries the clock (a transition in every bit, as in Manchester), so the receiver never loses step.', '[Ss]elf-clocking'],
+  ['Sender', 'the device that turns bits into a signal and puts it on the medium.', '[Ss]enders?'],
+  ['Signal elements per bit', 'how many signal elements each bit needs: 1 for NRZ (Non-Return to Zero), 2 for Manchester, ⁵⁄₄ for 4B/5B (4 bits sent as 5), ½ for 2B1Q (two binary, one quaternary). Its inverse is the bits per signal element.', '[Ss]ignal elements per bit|[Bb]its per signal element'],
+  ['Signal element', 'one stretch of time at one level, the smallest piece the receiver measures. NRZ (Non-Return to Zero) uses one per bit; Manchester uses two (the two halves).', '[Ss]ignal elements?'],
+  ['SNR', 'signal-to-noise ratio: signal power ÷ noise power, usually in dB (decibels). 10 dB means 10 times more signal than noise, and every 3 dB doubles the power.', 'SNR'],
+  ['Spectrum', 'how a signal\'s power is spread over frequency.', '(?:[Ss]ignal )?[Ss]pectr(?:um|a)'],
+  ['T1, E1', 'digital telephone lines: T1 in North America (1.544 Mbps, Bipolar-AMI or B8ZS) and E1 in Europe (2.048 Mbps, HDB3).', 'T1|E1'],
+  ['T3, E3 (DS3)', 'faster digital telephone lines: T3, also called DS3 (Digital Signal 3), at 44.736 Mbps with B3ZS, and E3 at 34.368 Mbps with HDB3.', 'T3|E3|DS3'],
+  ['Threshold', 'the voltage the receiver compares each sample with: 0 V for NRZ-L; halfway up (+½) and halfway down (−½) for Bipolar-AMI.', '[Tt]hresholds?'],
+  ['Transformer', 'a coil pair at each end of most copper links that passes changes of voltage but blocks a steady one (DC).', '[Tt]ransformers?'],
+  ['Transition', 'a change of level on the line, from high to low or from low to high. Receivers use transitions to find the edges of bit times.', '[Tt]ransitions?'],
+  ['Twisted pair', 'two insulated copper wires twisted together; Ethernet cables hold four pairs.', '[Tt]wisted[- ]pairs?'],
+  ['Unipolar', 'one polarity: 0 V and a positive level.', '[Uu]nipolar'],
+  ['V (violation)', 'in B8ZS and HDB3: a pulse with the same polarity as the pulse before it, put there on purpose so the receiver can spot the substitution.', null],
+  ['Violation', 'a pulse with the same polarity as the pulse before it. Bipolar-AMI never sends one; B8ZS and HDB3 send them on purpose.', '[Vv]iolations?'],
+  ['Waterfall', 'the shape of a BER curve: the BER falls faster and faster as Eb/N0 rises, so a few dB more signal can cut errors a thousandfold.', '(?:[Tt]he )?[Ww]aterfall']
+];
+var TERM = {}; TERMS.forEach(function (t) { TERM[t[0]] = t[1]; });
+var GLOSS = TERMS.filter(function (t) { return t[2] !== null; })
+  .map(function (t) { return { k: t[0], d: t[1], re: t[2] || t[0].replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&') }; })
+  .sort(function (a, b) { return b.re.length - a.re.length; });   // longer patterns first (NRZ-L and NRZI before NRZ, Bipolar-AMI before Bipolar)
+var GLOSS_BY = {}; TERMS.forEach(function (t) { GLOSS_BY[t[0]] = { k: t[0], d: t[1] }; });
+GLOSS.forEach(function (g) { g.rx = new RegExp('^(?:' + g.re + ')$'); });
+var GLOSS_RE = new RegExp(GLOSS.map(function (g) { return '(?:' + g.re + ')'; }).join('|'), 'g');
+var GLOSS_SKIP = 'h1, h2, h3, h4, .kicker, .figtitle, .stat .k, svg, script, style, input, select, option, textarea, button, code, pre, .mono, .gl, summary, ul.terms li > b, #gpop, .topbar, #lbar, .figctl, .noglo, #view-challenge, .glossary';
+var GLOSS_BLOCK = '.feedback, .tryit, .figctls, .legend, details, .card, .hero, .modecard, .soft, .codecard, section, footer';   // a term is marked at its first use in each of these
+function glossKey(m) { for (var i = 0; i < GLOSS.length; i++) if (GLOSS[i].rx.test(m)) return GLOSS[i].k; return null; }
+function isWordCh(c) { return !!c && /[A-Za-z0-9_\-\/]/.test(c); }
+function inSpelledOut(txt, a) {   // inside the brackets that spell out an acronym, as in "NRZI (Non-Return to Zero, Invert on ones)"
+  var o = txt.lastIndexOf('(', a); if (o < 0 || txt.lastIndexOf(')', a) > o) return false;
+  return /(?:[A-Z0-9][A-Z0-9\-\/]*[A-Z0-9]|dB|[kMG]?Hz|[kMG]?bps)\s*$/.test(txt.slice(Math.max(0, o - 14), o).replace(/\s+$/, ' '));
+}
+function glossText(node) {
+  var txt = node.nodeValue; if (!txt || !/\S/.test(txt)) return;
+  var par = node.parentNode; if (!par || par.nodeType !== 1 || par.closest(GLOSS_SKIP)) return;
+  var blk = par.closest(GLOSS_BLOCK) || par, out = null, last = 0, m;
+  var ps = node.previousSibling, pre = ps ? String(ps.textContent || '').slice(-24) : '';   // the acronym before a bracket may already be underlined
+  GLOSS_RE.lastIndex = 0;
+  while ((m = GLOSS_RE.exec(txt))) {
+    var w = m[0], a = m.index, b = a + w.length;
+    if (!w) { GLOSS_RE.lastIndex++; continue; }
+    var k = glossKey(w);
+    if (!k || isWordCh(txt.charAt(a - 1)) || isWordCh(txt.charAt(b)) || inSpelledOut(pre + txt, pre.length + a)) continue;
+    if (/^ Visualizer/.test(txt.slice(b))) continue;   // an app's own name
+    if (blk.querySelector('.gl[data-g="' + k + '"]') || (out && out.keys[k])) continue;   // first use in each card
+    out = out || { frag: document.createDocumentFragment(), keys: {} };
+    out.frag.appendChild(document.createTextNode(txt.slice(last, a)));
+    var s = document.createElement('span'); s.className = 'gl'; s.setAttribute('data-g', k); s.tabIndex = 0; s.textContent = w;
+    out.frag.appendChild(s); out.keys[k] = true; last = b;
+  }
+  if (!out) return;
+  out.frag.appendChild(document.createTextNode(txt.slice(last)));
+  par.replaceChild(out.frag, node);
+}
+function gloss(root) {
+  if (!root || root.nodeType !== 1 || root.closest(GLOSS_SKIP)) return;
+  var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false), list = [], n;
+  while ((n = walker.nextNode())) list.push(n);
+  list.forEach(glossText);
+}
+/* the popup */
+var gpopFor = null;
+function gpopShow(t) {
+  var g = GLOSS_BY[t.getAttribute('data-g')], pop = $('#gpop'); if (!g || !pop) return;
+  pop.innerHTML = '<b>' + esc(g.k) + '</b>' + esc(g.d.charAt(0).toUpperCase() + g.d.slice(1)); pop.hidden = false; gpopFor = t;
+  t.setAttribute('aria-describedby', 'gpop');
+  var r = t.getBoundingClientRect(), pw = pop.offsetWidth, ph = pop.offsetHeight, vw = document.documentElement.clientWidth;
+  var x = Math.max(8, Math.min(vw - pw - 8, r.left + r.width / 2 - pw / 2)), y = r.bottom + 6;
+  if (y + ph > window.innerHeight - 4 && r.top - ph - 6 > 0) y = r.top - ph - 6;
+  pop.style.left = x + 'px'; pop.style.top = y + 'px';
+}
+function gpopHide() { var pop = $('#gpop'); if (pop) pop.hidden = true; if (gpopFor) gpopFor.removeAttribute('aria-describedby'); gpopFor = null; }
+function glossInit() {
+  if (/[?&]widget=/.test(location.search)) return;   // a slide widget: no underlines and no popups
+  if (!$('#gpop')) { var d = document.createElement('div'); d.id = 'gpop'; d.setAttribute('role', 'tooltip'); d.hidden = true; document.body.appendChild(d); }
+  document.addEventListener('mouseover', function (e) { var t = e.target.closest && e.target.closest('.gl'); if (t) gpopShow(t); });
+  document.addEventListener('mouseout', function (e) { var t = e.target.closest && e.target.closest('.gl'); if (t && t === gpopFor && document.activeElement !== t) gpopHide(); });
+  document.addEventListener('focusin', function (e) { if (e.target.classList && e.target.classList.contains('gl')) gpopShow(e.target); });
+  document.addEventListener('focusout', function (e) { if (e.target === gpopFor) gpopHide(); });
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest && e.target.closest('.gl');
+    if (t) { e.preventDefault(); gpopShow(t); return; }   // preventDefault: a term inside a label does not tick its box
+    if (gpopFor) gpopHide();
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && gpopFor) gpopHide(); });
+  window.addEventListener('scroll', function () { if (gpopFor) gpopShow(gpopFor); }, { passive: true });
+  ['#view-home', '#view-learn', '#view-calc'].forEach(function (sel) {
+    var r = $(sel); if (!r) return; gloss(r);
+    if (window.MutationObserver) new MutationObserver(function (recs) {
+      recs.forEach(function (rec) { Array.prototype.forEach.call(rec.addedNodes, function (n) { if (n.nodeType === 1) gloss(n); else if (n.nodeType === 3) glossText(n); }); });
+    }).observe(r, { childList: true, subtree: true });
+  });
+}
+/* the definition for a "Terms in this lesson" entry: the glossary's own wording, found from the name the lesson lists */
+function termKey(name) { return TERM[name] ? name : glossKey(name.replace(/\s*\([^)]*\)/g, '')) || glossKey(name); }
+function termDef(name, fallback) { var k = termKey(name); return k ? TERM[k] : fallback; }
+/* the Glossary page (Learn mode, ?mode=learn&lesson=glossary): symbols and units first, then every term A to Z, with Find and a
+   "Terms in Lesson N / All terms" switch */
+function glossLink() { return '<p class="glink noglo">📖 <a href="?mode=learn&amp;lesson=glossary" id="glink">Glossary: every term and symbol in this app</a></p>'; }
+function wireGlossLink() { var a = $('#glink'); if (a) a.onclick = function (e) { e.preventDefault(); openLesson(GLP); }; }
+var glossFrom = 0;   // the lesson the student came from, for "Terms in Lesson N" and the Back button
+var glossUsed = {};   // the terms of the page the student came from: its "Terms in this lesson" list and every term underlined on it
+SETUP[GLP] = function () {
+  var from = glossFrom, used = glossUsed;
+  var syms = TERMS.filter(function (t) { return t[3] === 's'; }), words = TERMS.filter(function (t) { return t[3] !== 's'; })
+    .sort(function (a, b) { return a[0].toLowerCase().localeCompare(b[0].toLowerCase()); }), cur = '';
+  function item(t) { return '<dt class="gitem" data-k="' + esc(t[0]) + '">' + esc(t[0]) + '</dt><dd class="gdef">' + esc(t[1].charAt(0).toUpperCase() + t[1].slice(1)) + '</dd>'; }
+  var fromName = from === IDEAS ? 'Key ideas' : from === RLP ? 'Real links' : 'Lesson ' + from;
+  $('#ltext').innerHTML = '<div class="glossary"><p class="kicker">Appendix · for reference at any time</p><h2>Glossary</h2>' +
+    '<p>Every term and symbol used in this app. In the lessons, the reference pages, and the Calculator, a dotted underline marks a term: point at it, tap it, or move to it with the Tab key to see the same definition.</p>' +
+    '<div class="row"><label>Find <input type="text" id="gfind" size="20" spellcheck="false" placeholder="for example NRZI"></label>' +
+    (from > 0 ? seg('gwhich', 'Show', [['all', 'All terms'], ['lesson', 'Terms in ' + fromName]], 'all') : '') + '<span class="count" id="gcount"></span></div>' +
+    '<h3>Symbols and units</h3><dl id="gsyms" class="glist">' + syms.map(item).join('') + '</dl>' +
+    '<h3>Terms, A to Z</h3><dl id="glist" class="glist">' + words.map(function (t) {
+      var L = t[0].charAt(0).toUpperCase(); if (/[0-9]/.test(L)) L = '0–9';
+      var head = L !== cur ? '<dt class="letter" aria-hidden="true">' + L + '</dt>' : ''; cur = L; return head + item(t);
+    }).join('') + '</dl></div>';
+  var which = 'all';
+  function filter() {
+    var q = $('#gfind').value.trim().toLowerCase(), n = 0;
+    $$('.glist .gitem').forEach(function (dt) {
+      var dd = dt.nextElementSibling, on = (!q || (dt.textContent + ' ' + dd.textContent).toLowerCase().indexOf(q) >= 0) && (which === 'all' || used[dt.getAttribute('data-k')]);
+      dt.hidden = dd.hidden = !on; if (on) n++;
+    });
+    $$('#glist .letter').forEach(function (h) { var e = h.nextElementSibling, any = false; while (e && !e.classList.contains('letter')) { if (e.classList.contains('gitem') && !e.hidden) any = true; e = e.nextElementSibling; } h.hidden = !any; });
+    $('#gcount').textContent = n + ' of ' + TERMS.length + ' shown';
+  }
+  $('#gfind').oninput = filter;
+  if ($('#gwhich')) bindSeg('gwhich', function (v) { which = v; filter(); });
+  filter();
 };
 
 /* ===================================================== CALCULATOR: any bits, any codes, the numbers that matter */
@@ -3017,11 +3364,13 @@ function heroFig() {
   f.text(0.15, 2.35, 'Two levels', { fs: 11.5, ha: 'left', color: '#fff', bold: true });
   f.text(0.15, 1.0, 'Manchester', { fs: 11.5, ha: 'left', color: '#fff', bold: true });
   wave(e1.cells, 2.35); wave(e2.cells, 1.0);
+  f.ax('x', x0 + 0.04, 0.12, 'time → (one column per bit time)', { fs: 10, ha: 'left', color: '#fff', italic: true });
+  f.ax('y', 0.15, 0.12, '↑ voltage', { fs: 10, ha: 'left', color: '#fff', italic: true });
 }
 
 function init() {
   var mode = null, q = null;
-  try { q = new URLSearchParams(location.search); mode = q.get('mode'); if (q.get('lesson') !== null) { var L = q.get('lesson') === 'ideas' ? IDEAS : q.get('lesson') === 'links' ? RLP : parseInt(q.get('lesson'), 10); if (L >= 0 && L <= RLP) lessonI = L; } } catch (e) { /* ignore */ }   // link parameters: ?mode=learn&lesson=2 (0 = lesson map)
+  try { q = new URLSearchParams(location.search); mode = q.get('mode'); if (q.get('lesson') !== null) { var L = q.get('lesson') === 'ideas' ? IDEAS : q.get('lesson') === 'links' ? RLP : q.get('lesson') === 'glossary' ? GLP : parseInt(q.get('lesson'), 10); if (L >= 0 && L <= GLP) lessonI = L; } } catch (e) { /* ignore */ }   // link parameters: ?mode=learn&lesson=2 (0 = lesson map)
   calcParams(q);
   try { if (q && /^[EMH]$/.test(q.get('level') || '')) chLevel = q.get('level'); } catch (e) { /* ignore */ }
   $('#xp').textContent = '★ ' + progress.xp + ' points';
@@ -3031,11 +3380,12 @@ function init() {
   $('#home').onclick = function () { go('home'); };
   $('#verifyBtn').onclick = function () { $('#verifyOut').innerHTML = checkCode($('#verifyIn').value) ? '<span class="yes">Valid code.</span>' : '<span class="no">Not a valid code.</span>'; };
   go(VIEWS.indexOf(mode) >= 0 ? mode : 'home');
+  glossInit();
 }
 
 /* test hook (used by the logic and click-through tests) */
-window.LineEncodingVisualizer = { lessonDone: lessonDone, ENC: ENC, OPT: function () { return OPT; }, openLesson: function (i) { go('learn'); openLesson(i); }, go: go, code: code, checkCode: checkCode,
-  gen: function (L, n) { var out = []; for (var i = 0; i < n; i++) { var g = GEN[L][i % GEN[L].length](); out.push({ input: g.input, answer: g.answer, choices: g.choices, tag: g.tag, data: g.data, text: g.text }); } return out; }, current: function () { return game ? game.qs[game.i] : null; }, game: function () { return game; }, version: '1.12' };
+window.LineEncodingVisualizer = { TERM: TERM, glossKey: glossKey, termKey: termKey, lessonDone: lessonDone, ENC: ENC, OPT: function () { return OPT; }, openLesson: function (i) { go('learn'); openLesson(i); }, go: go, code: code, checkCode: checkCode,
+  gen: function (L, n) { var out = []; for (var i = 0; i < n; i++) { var g = GEN[L][i % GEN[L].length](); out.push({ input: g.input, answer: g.answer, choices: g.choices, tag: g.tag, data: g.data, text: g.text }); } return out; }, current: function () { return game ? game.qs[game.i] : null; }, game: function () { return game; }, version: '1.13' };
 
 init();
 })();

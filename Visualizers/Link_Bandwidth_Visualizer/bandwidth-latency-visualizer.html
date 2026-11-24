@@ -2,6 +2,52 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<!-- vz-widgets:begin head -->
+<script id="vz-registry">window.VZ_WIDGETS = {"app":"Bandwidth and Latency Visualizer","published":"https://asammoud-rh.github.io/Communication_Networks/Visualizers/Link_Bandwidth_Visualizer/bandwidth-latency-visualizer.html","width":960,"widgets":[{"name":"bits-time","title":"Eight bits at two bandwidths, on the same time axis","group":"Learn, Lesson 1: A bit is a slice of time","mode":"learn","lesson":1,"keep":["#lctl","#l1ptime","#l1stats"],"click":["#l1vtime"],"params":[{"key":"rate","label":"Bandwidth","input":"#l1rate","default":"1000000","options":[{"value":"1000","label":"1 kbps (kilobit per second)"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps (megabit per second)"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps (gigabit per second)"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"mult","label":"Compare with a link this many times faster","input":"#l1mult","default":"2","options":[{"value":"2","label":"2 times faster"},{"value":"4","label":"4 times faster"},{"value":"10","label":"10 times faster"}]},{"key":"medium","label":"Medium","input":"#l1med","default":"copper","options":[{"value":"fiber","label":"Fiber (2.0 × 10⁸ m/s)"},{"value":"copper","label":"Copper (2.3 × 10⁸ m/s)"},{"value":"radio","label":"Radio or vacuum (3.0 × 10⁸ m/s)"}]}],"hide":["#lctl > .segs",".relates"]},{"name":"bits-wire","title":"The same bits on the wire, in meters","group":"Learn, Lesson 1: A bit is a slice of time","mode":"learn","lesson":1,"keep":["#lctl","#l1pwire","#l1stats"],"click":["#l1vwire"],"params":[{"key":"rate","label":"Bandwidth","input":"#l1rate","default":"1000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"mult","label":"Compare with a link this many times faster","input":"#l1mult","default":"2","options":[{"value":"2","label":"2 times faster"},{"value":"4","label":"4 times faster"},{"value":"10","label":"10 times faster"}]},{"key":"medium","label":"Medium","input":"#l1med","default":"copper","options":[{"value":"fiber","label":"Fiber (2.0 × 10⁸ m/s)"},{"value":"copper","label":"Copper (2.3 × 10⁸ m/s)"},{"value":"radio","label":"Radio or vacuum (3.0 × 10⁸ m/s)"}]}],"hide":["#lctl > .segs",".relates"]},{"name":"units","title":"Unit converter: bits, bytes, KB (kilobytes) and KiB (kibibytes)","group":"Learn, Lesson 1: A bit is a slice of time","mode":"learn","lesson":1,"keep":["#l1cv << details"],"open":["#l1cv << details"],"params":[{"key":"value","label":"Size","input":"#l1cv","default":1,"min":0,"max":1000000000000000.0,"integer":false},{"key":"unit","label":"Unit","input":"#l1cu","default":"MB","options":[{"value":"b","label":"bits"},{"value":"B","label":"bytes"},{"value":"KB","label":"KB (1,000 bytes)"},{"value":"MB","label":"MB (10⁶ bytes)"},{"value":"GB","label":"GB (10⁹ bytes)"},{"value":"KiB","label":"KiB (1,024 bytes)"},{"value":"MiB","label":"MiB (2²⁰ bytes)"},{"value":"GiB","label":"GiB (2³⁰ bytes)"}]}],"hide":["#lfig > details > summary",".relates"]},{"name":"journey","title":"The packet travels from Host A to Host B","group":"Learn, Lesson 2: Three parts of latency","mode":"learn","lesson":2,"keep":["#lctl","#l2jour << .card"],"params":[{"key":"size","label":"Size in bytes","input":"#l2s","default":1500,"min":1,"max":1000000000000.0},{"key":"bw","label":"Bandwidth","input":"#l2bw","default":"10000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"dist","label":"Distance in km (kilometers)","input":"#l2d","default":1000,"min":0,"max":10000000.0,"integer":false},{"key":"medium","label":"Medium","input":"#l2m","default":"fiber","options":[{"value":"fiber","label":"Fiber (2.0 × 10⁸ m/s)"},{"value":"copper","label":"Copper (2.3 × 10⁸ m/s)"},{"value":"radio","label":"Radio or vacuum (3.0 × 10⁸ m/s)"}]},{"key":"queue","label":"Queuing delay in ms (milliseconds)","input":"#l2q","default":1,"min":0,"max":1000000.0,"integer":false}],"hide":["#lfig > .card p.figtitle","#l2ev",".relates"]},{"name":"journey-time","title":"The same journey on a time diagram (time runs down)","group":"Learn, Lesson 2: Three parts of latency","mode":"learn","lesson":2,"keep":["#lctl","#l2st << details"],"open":["#l2st << details"],"params":[{"key":"size","label":"Size in bytes","input":"#l2s","default":1500,"min":1,"max":1000000000000.0},{"key":"bw","label":"Bandwidth","input":"#l2bw","default":"10000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"dist","label":"Distance in km (kilometers)","input":"#l2d","default":1000,"min":0,"max":10000000.0,"integer":false},{"key":"medium","label":"Medium","input":"#l2m","default":"fiber","options":[{"value":"fiber","label":"Fiber (2.0 × 10⁸ m/s)"},{"value":"copper","label":"Copper (2.3 × 10⁸ m/s)"},{"value":"radio","label":"Radio or vacuum (3.0 × 10⁸ m/s)"}]},{"key":"queue","label":"Queuing delay in ms (milliseconds)","input":"#l2q","default":1,"min":0,"max":1000000.0,"integer":false}],"hide":["#lfig > details:nth-of-type(1) > summary",".relates"]},{"name":"latency-parts","title":"Where the latency comes from: queue, transmit, and propagation","group":"Learn, Lesson 2: Three parts of latency","mode":"learn","lesson":2,"keep":["#lctl","#l2bar << details"],"open":["#l2bar << details"],"params":[{"key":"size","label":"Size in bytes","input":"#l2s","default":1500,"min":1,"max":1000000000000.0},{"key":"bw","label":"Bandwidth","input":"#l2bw","default":"10000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"dist","label":"Distance in km (kilometers)","input":"#l2d","default":1000,"min":0,"max":10000000.0,"integer":false},{"key":"medium","label":"Medium","input":"#l2m","default":"fiber","options":[{"value":"fiber","label":"Fiber (2.0 × 10⁸ m/s)"},{"value":"copper","label":"Copper (2.3 × 10⁸ m/s)"},{"value":"radio","label":"Radio or vacuum (3.0 × 10⁸ m/s)"}]},{"key":"queue","label":"Queuing delay in ms (milliseconds)","input":"#l2q","default":1,"min":0,"max":1000000.0,"integer":false}],"hide":["#lfig > details:nth-of-type(2) > summary",".relates"]},{"name":"dominates","title":"Latency for each message size","group":"Learn, Lesson 3: Which part dominates?","mode":"learn","lesson":3,"params":[{"key":"bw1","label":"Link 1 bandwidth","input":"#l3ba","default":"100000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"delay1","label":"Link 1 one-way delay in ms (milliseconds)","input":"#l3da","default":250,"min":0,"max":1000000.0,"integer":false},{"key":"bw2","label":"Link 2 bandwidth","input":"#l3bb","default":"10000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"delay2","label":"Link 2 one-way delay in ms","input":"#l3db","default":10,"min":0,"max":1000000.0,"integer":false},{"key":"size","label":"Message size, as a power of 10 bytes (2 to 9)","input":"#l3sz","default":5,"min":2,"max":9,"integer":false}],"keep":["#lctl","#lfig"],"hide":[".relates"]},{"name":"pipe","title":"The link as a pipe","group":"Learn, Lesson 4: The pipe: delay × bandwidth","mode":"learn","lesson":4,"keep":["#lctl","#l4svg << .card"],"params":[{"key":"delay","label":"One-way delay in ms (milliseconds)","input":"#l4d","default":50,"min":0.001,"max":1000000.0,"integer":false},{"key":"bw","label":"Bandwidth","input":"#l4bw","default":"45000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"msg","label":"Message size","input":"#l4m","default":1,"min":0,"max":1000000000000.0,"integer":false},{"key":"unit","label":"Message size unit","input":"#l4mu","default":"MB","options":[{"value":"b","label":"bits"},{"value":"B","label":"bytes"},{"value":"KB","label":"KB (1,000 bytes)"},{"value":"MB","label":"MB (10⁶ bytes)"},{"value":"GB","label":"GB (10⁹ bytes)"},{"value":"KiB","label":"KiB (1,024 bytes)"},{"value":"MiB","label":"MiB (2²⁰ bytes)"},{"value":"GiB","label":"GiB (2³⁰ bytes)"}]},{"key":"show","label":"Show","input":"#l4mode","default":"one","options":[{"value":"one","label":"one way"},{"value":"rtt","label":"a round trip"}]},{"key":"window","label":"Window in KB (kilobytes); blank for none","input":"#l4w","default":"","min":0,"max":1000000000000,"integer":false,"blank":true}],"hide":[".relates"]},{"name":"download","title":"The download, from request to completion","group":"Learn, Lesson 5: Bandwidth is not throughput","mode":"learn","lesson":5,"keep":["#lctl","#l5xfer << .card"],"params":[{"key":"size","label":"Size","input":"#l5s","default":1,"min":1e-06,"max":1000000000.0,"integer":false},{"key":"unit","label":"Size unit","input":"#l5u","default":"MB","options":[{"value":"b","label":"bits"},{"value":"B","label":"bytes"},{"value":"KB","label":"KB (1,000 bytes)"},{"value":"MB","label":"MB (10⁶ bytes)"},{"value":"GB","label":"GB (10⁹ bytes)"},{"value":"KiB","label":"KiB (1,024 bytes)"},{"value":"MiB","label":"MiB (2²⁰ bytes)"},{"value":"GiB","label":"GiB (2³⁰ bytes)"}]},{"key":"bw","label":"Bandwidth","input":"#l5bw","default":"1000000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"rtt","label":"RTT (round-trip time) in ms (milliseconds)","input":"#l5r","default":100,"min":0,"max":1000000.0,"integer":false}],"hide":[".relates"]},{"name":"rate-time","title":"Bandwidth versus throughput, over time","group":"Learn, Lesson 5: Bandwidth is not throughput","mode":"learn","lesson":5,"keep":["#lctl","#l5use << details"],"open":["#l5use << details"],"params":[{"key":"size","label":"Size","input":"#l5s","default":1,"min":1e-06,"max":1000000000.0,"integer":false},{"key":"unit","label":"Size unit","input":"#l5u","default":"MB","options":[{"value":"b","label":"bits"},{"value":"B","label":"bytes"},{"value":"KB","label":"KB (1,000 bytes)"},{"value":"MB","label":"MB (10⁶ bytes)"},{"value":"GB","label":"GB (10⁹ bytes)"},{"value":"KiB","label":"KiB (1,024 bytes)"},{"value":"MiB","label":"MiB (2²⁰ bytes)"},{"value":"GiB","label":"GiB (2³⁰ bytes)"}]},{"key":"bw","label":"Bandwidth","input":"#l5bw","default":"1000000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"rtt","label":"RTT (round-trip time) in ms (milliseconds)","input":"#l5r","default":100,"min":0,"max":1000000.0,"integer":false}],"hide":["#lfig > details:nth-of-type(2) > summary",".relates"]},{"name":"throughput","title":"Throughput for every bandwidth","group":"Learn, Lesson 5: Bandwidth is not throughput","mode":"learn","lesson":5,"keep":["#lctl","#l5svg << details"],"open":["#l5svg << details"],"hide":["#lfig > details:nth-of-type(3) p.figtitle","#l5bar","#lfig > details:nth-of-type(3) > summary","#l5stats",".relates"],"params":[{"key":"size","label":"Size","input":"#l5s","default":1,"min":1e-06,"max":1000000000.0,"integer":false},{"key":"unit","label":"Size unit","input":"#l5u","default":"MB","options":[{"value":"b","label":"bits"},{"value":"B","label":"bytes"},{"value":"KB","label":"KB (1,000 bytes)"},{"value":"MB","label":"MB (10⁶ bytes)"},{"value":"GB","label":"GB (10⁹ bytes)"},{"value":"KiB","label":"KiB (1,024 bytes)"},{"value":"MiB","label":"MiB (2²⁰ bytes)"},{"value":"GiB","label":"GiB (2³⁰ bytes)"}]},{"key":"bw","label":"Bandwidth","input":"#l5bw","default":"1000000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"rtt","label":"RTT (round-trip time) in ms (milliseconds)","input":"#l5r","default":100,"min":0,"max":1000000.0,"integer":false}]},{"name":"time-split","title":"Where the transfer time goes","group":"Learn, Lesson 5: Bandwidth is not throughput","mode":"learn","lesson":5,"keep":["#lctl","#l5bar << .subfig"],"params":[{"key":"size","label":"Size","input":"#l5s","default":1,"min":1e-06,"max":1000000000.0,"integer":false},{"key":"unit","label":"Size unit","input":"#l5u","default":"MB","options":[{"value":"b","label":"bits"},{"value":"B","label":"bytes"},{"value":"KB","label":"KB (1,000 bytes)"},{"value":"MB","label":"MB (10⁶ bytes)"},{"value":"GB","label":"GB (10⁹ bytes)"},{"value":"KiB","label":"KiB (1,024 bytes)"},{"value":"MiB","label":"MiB (2²⁰ bytes)"},{"value":"GiB","label":"GiB (2³⁰ bytes)"}]},{"key":"bw","label":"Bandwidth","input":"#l5bw","default":"1000000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"rtt","label":"RTT (round-trip time) in ms (milliseconds)","input":"#l5r","default":100,"min":0,"max":1000000.0,"integer":false}],"open":["#l5bar << details"],"hide":[".relates"]},{"name":"path","title":"One packet from Host A to Host B","group":"Learn, Lesson 6: Across a switch and a router","mode":"learn","lesson":6,"keep":["#lctl","#l6wire << .card"],"params":[{"key":"size","label":"Packet size in bytes","input":"#l6s","default":1500,"min":64,"max":65535},{"key":"bw1","label":"Link 1 bandwidth","input":"#l6b0","default":"100000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"len1","label":"Link 1 length in km (kilometers)","input":"#l6d0","default":0.1,"min":0,"max":1000000.0,"integer":false},{"key":"med1","label":"Link 1 medium","input":"#l6m0","default":"copper","options":[{"value":"fiber","label":"Fiber (2.0 × 10⁸ m/s)"},{"value":"copper","label":"Copper (2.3 × 10⁸ m/s)"},{"value":"radio","label":"Radio or vacuum (3.0 × 10⁸ m/s)"}]},{"key":"bw2","label":"Link 2 bandwidth","input":"#l6b1","default":"1000000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"len2","label":"Link 2 length in km","input":"#l6d1","default":20,"min":0,"max":1000000.0,"integer":false},{"key":"med2","label":"Link 2 medium","input":"#l6m1","default":"fiber","options":[{"value":"fiber","label":"Fiber (2.0 × 10⁸ m/s)"},{"value":"copper","label":"Copper (2.3 × 10⁸ m/s)"},{"value":"radio","label":"Radio or vacuum (3.0 × 10⁸ m/s)"}]},{"key":"bw3","label":"Link 3 bandwidth","input":"#l6b2","default":"10000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"len3","label":"Link 3 length in km","input":"#l6d2","default":500,"min":0,"max":1000000.0,"integer":false},{"key":"med3","label":"Link 3 medium","input":"#l6m2","default":"fiber","options":[{"value":"fiber","label":"Fiber (2.0 × 10⁸ m/s)"},{"value":"copper","label":"Copper (2.3 × 10⁸ m/s)"},{"value":"radio","label":"Radio or vacuum (3.0 × 10⁸ m/s)"}]},{"key":"qswitch","label":"Queue at the switch, up to this many ms (milliseconds)","input":"#l6qs","default":0,"min":0,"max":10000.0,"integer":false},{"key":"qrouter","label":"Queue at the router, up to this many ms","input":"#l6qr","default":2,"min":0,"max":10000.0,"integer":false}],"hide":[".relates","#l6key"]},{"name":"path-time","title":"The same packet on a time diagram (time runs down)","group":"Learn, Lesson 6: Across a switch and a router","mode":"learn","lesson":6,"keep":["#lctl","#l6st << details"],"open":["#l6st << details"],"params":[{"key":"size","label":"Packet size in bytes","input":"#l6s","default":1500,"min":64,"max":65535},{"key":"bw1","label":"Link 1 bandwidth","input":"#l6b0","default":"100000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"len1","label":"Link 1 length in km (kilometers)","input":"#l6d0","default":0.1,"min":0,"max":1000000.0,"integer":false},{"key":"med1","label":"Link 1 medium","input":"#l6m0","default":"copper","options":[{"value":"fiber","label":"Fiber (2.0 × 10⁸ m/s)"},{"value":"copper","label":"Copper (2.3 × 10⁸ m/s)"},{"value":"radio","label":"Radio or vacuum (3.0 × 10⁸ m/s)"}]},{"key":"bw2","label":"Link 2 bandwidth","input":"#l6b1","default":"1000000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"len2","label":"Link 2 length in km","input":"#l6d1","default":20,"min":0,"max":1000000.0,"integer":false},{"key":"med2","label":"Link 2 medium","input":"#l6m1","default":"fiber","options":[{"value":"fiber","label":"Fiber (2.0 × 10⁸ m/s)"},{"value":"copper","label":"Copper (2.3 × 10⁸ m/s)"},{"value":"radio","label":"Radio or vacuum (3.0 × 10⁸ m/s)"}]},{"key":"bw3","label":"Link 3 bandwidth","input":"#l6b2","default":"10000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"len3","label":"Link 3 length in km","input":"#l6d2","default":500,"min":0,"max":1000000.0,"integer":false},{"key":"med3","label":"Link 3 medium","input":"#l6m2","default":"fiber","options":[{"value":"fiber","label":"Fiber (2.0 × 10⁸ m/s)"},{"value":"copper","label":"Copper (2.3 × 10⁸ m/s)"},{"value":"radio","label":"Radio or vacuum (3.0 × 10⁸ m/s)"}]},{"key":"qswitch","label":"Queue at the switch, up to this many ms (milliseconds)","input":"#l6qs","default":0,"min":0,"max":10000.0,"integer":false},{"key":"qrouter","label":"Queue at the router, up to this many ms","input":"#l6qr","default":2,"min":0,"max":10000.0,"integer":false}],"hide":["#lfig > details:nth-of-type(1) > summary",".relates"]},{"name":"ping","title":"Ping Host B from Host A","group":"Learn, Lesson 6: Across a switch and a router","mode":"learn","lesson":6,"keep":["#lctl","#l6ping << details"],"open":["#l6ping << details"],"params":[{"key":"size","label":"Packet size in bytes","input":"#l6s","default":1500,"min":64,"max":65535},{"key":"bw1","label":"Link 1 bandwidth","input":"#l6b0","default":"100000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"len1","label":"Link 1 length in km (kilometers)","input":"#l6d0","default":0.1,"min":0,"max":1000000.0,"integer":false},{"key":"med1","label":"Link 1 medium","input":"#l6m0","default":"copper","options":[{"value":"fiber","label":"Fiber (2.0 × 10⁸ m/s)"},{"value":"copper","label":"Copper (2.3 × 10⁸ m/s)"},{"value":"radio","label":"Radio or vacuum (3.0 × 10⁸ m/s)"}]},{"key":"bw2","label":"Link 2 bandwidth","input":"#l6b1","default":"1000000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"len2","label":"Link 2 length in km","input":"#l6d1","default":20,"min":0,"max":1000000.0,"integer":false},{"key":"med2","label":"Link 2 medium","input":"#l6m1","default":"fiber","options":[{"value":"fiber","label":"Fiber (2.0 × 10⁸ m/s)"},{"value":"copper","label":"Copper (2.3 × 10⁸ m/s)"},{"value":"radio","label":"Radio or vacuum (3.0 × 10⁸ m/s)"}]},{"key":"bw3","label":"Link 3 bandwidth","input":"#l6b2","default":"10000000","options":[{"value":"1000","label":"1 kbps"},{"value":"56000","label":"56 kbps"},{"value":"1000000","label":"1 Mbps"},{"value":"10000000","label":"10 Mbps"},{"value":"45000000","label":"45 Mbps"},{"value":"100000000","label":"100 Mbps"},{"value":"1000000000","label":"1 Gbps"},{"value":"10000000000","label":"10 Gbps"},{"value":"100000000000","label":"100 Gbps"}]},{"key":"len3","label":"Link 3 length in km","input":"#l6d2","default":500,"min":0,"max":1000000.0,"integer":false},{"key":"med3","label":"Link 3 medium","input":"#l6m2","default":"fiber","options":[{"value":"fiber","label":"Fiber (2.0 × 10⁸ m/s)"},{"value":"copper","label":"Copper (2.3 × 10⁸ m/s)"},{"value":"radio","label":"Radio or vacuum (3.0 × 10⁸ m/s)"}]},{"key":"qswitch","label":"Queue at the switch, up to this many ms (milliseconds)","input":"#l6qs","default":0,"min":0,"max":10000.0,"integer":false},{"key":"qrouter","label":"Queue at the router, up to this many ms","input":"#l6qr","default":2,"min":0,"max":10000.0,"integer":false}],"hide":["#lfig > details:nth-of-type(3) > summary",".relates"]},{"name":"calc-wire","title":"The message on the link, over time","group":"Calculator: one link","mode":"calc","keep":["#c_size << .card","#c_wire << .card"],"hide":["#c_one > .card:first-child > h2","#c_one > .card:first-child > h2 + p","#c_one > .card:first-child > details",".relates"],"params":[{"key":"size","label":"Message size","default":1500,"min":0,"max":1000000000000000.0},{"key":"unit","label":"Size unit","default":"B","options":[{"value":"b","label":"bits"},{"value":"B","label":"bytes"},{"value":"KB","label":"KB (kilobytes, 1,000 bytes)"},{"value":"MB","label":"MB (megabytes, 10^6 bytes)"},{"value":"GB","label":"GB (gigabytes, 10^9 bytes)"},{"value":"KiB","label":"KiB (kibibytes, 1,024 bytes)"},{"value":"MiB","label":"MiB (mebibytes, 2^20 bytes)"},{"value":"GiB","label":"GiB (gibibytes, 2^30 bytes)"}]},{"key":"bw","label":"Bandwidth in bps (bits per second)","default":100000000,"min":1e-09,"max":1000000000000000.0},{"key":"dist","label":"Distance in meters","default":1000000,"min":0,"max":1000000000000.0},{"key":"medium","label":"Medium","default":"fiber","options":[{"value":"fiber","label":"fiber"},{"value":"copper","label":"copper cable"},{"value":"radio","label":"radio or vacuum"}]},{"key":"q","label":"Queuing delay in ms (milliseconds)","default":0,"min":0,"max":1000000000.0},{"key":"rtt","label":"RTT (round-trip time) in ms; blank for twice the propagation delay","default":"","min":0,"max":1000000000.0}]},{"name":"calc-time","title":"The same message on a time diagram (time runs down)","group":"Calculator: one link","mode":"calc","keep":["#c_size << .card","#c_st << details"],"open":["#c_st << details"],"hide":["#c_one > .card:first-child > h2","#c_one > .card:first-child > h2 + p","#c_one > .card:first-child > details","#c_one > details:nth-of-type(1) > summary","#c_key",".relates"],"params":[{"key":"size","label":"Message size","default":1500,"min":0,"max":1000000000000000.0},{"key":"unit","label":"Size unit","default":"B","options":[{"value":"b","label":"bits"},{"value":"B","label":"bytes"},{"value":"KB","label":"KB (kilobytes, 1,000 bytes)"},{"value":"MB","label":"MB (megabytes, 10^6 bytes)"},{"value":"GB","label":"GB (gigabytes, 10^9 bytes)"},{"value":"KiB","label":"KiB (kibibytes, 1,024 bytes)"},{"value":"MiB","label":"MiB (mebibytes, 2^20 bytes)"},{"value":"GiB","label":"GiB (gibibytes, 2^30 bytes)"}]},{"key":"bw","label":"Bandwidth in bps (bits per second)","default":100000000,"min":1e-09,"max":1000000000000000.0},{"key":"dist","label":"Distance in meters","default":1000000,"min":0,"max":1000000000000.0},{"key":"medium","label":"Medium","default":"fiber","options":[{"value":"fiber","label":"fiber"},{"value":"copper","label":"copper cable"},{"value":"radio","label":"radio or vacuum"}]},{"key":"q","label":"Queuing delay in ms (milliseconds)","default":0,"min":0,"max":1000000000.0},{"key":"rtt","label":"RTT (round-trip time) in ms; blank for twice the propagation delay","default":"","min":0,"max":1000000000.0}]},{"name":"calc-latency","title":"Where the latency comes from","group":"Calculator: one link","mode":"calc","keep":["#c_size << .card","#c_bar << details"],"open":["#c_bar << details"],"hide":["#c_one > .card:first-child > h2","#c_one > .card:first-child > h2 + p","#c_one > .card:first-child > details","#c_one > details:nth-of-type(2) > summary",".relates"],"params":[{"key":"size","label":"Message size","default":1500,"min":0,"max":1000000000000000.0},{"key":"unit","label":"Size unit","default":"B","options":[{"value":"b","label":"bits"},{"value":"B","label":"bytes"},{"value":"KB","label":"KB (kilobytes, 1,000 bytes)"},{"value":"MB","label":"MB (megabytes, 10^6 bytes)"},{"value":"GB","label":"GB (gigabytes, 10^9 bytes)"},{"value":"KiB","label":"KiB (kibibytes, 1,024 bytes)"},{"value":"MiB","label":"MiB (mebibytes, 2^20 bytes)"},{"value":"GiB","label":"GiB (gibibytes, 2^30 bytes)"}]},{"key":"bw","label":"Bandwidth in bps (bits per second)","default":100000000,"min":1e-09,"max":1000000000000000.0},{"key":"dist","label":"Distance in meters","default":1000000,"min":0,"max":1000000000000.0},{"key":"medium","label":"Medium","default":"fiber","options":[{"value":"fiber","label":"fiber"},{"value":"copper","label":"copper cable"},{"value":"radio","label":"radio or vacuum"}]},{"key":"q","label":"Queuing delay in ms (milliseconds)","default":0,"min":0,"max":1000000000.0},{"key":"rtt","label":"RTT (round-trip time) in ms; blank for twice the propagation delay","default":"","min":0,"max":1000000000.0}]},{"name":"calc-pipe","title":"The link as a pipe","group":"Calculator: one link","mode":"calc","keep":["#c_size << .card","#c_pipe << details"],"open":["#c_pipe << details"],"hide":["#c_one > .card:first-child > h2","#c_one > .card:first-child > h2 + p","#c_one > .card:first-child > details","#c_one > details:nth-of-type(3) > summary","#c_key",".relates"],"params":[{"key":"size","label":"Message size","default":1500,"min":0,"max":1000000000000000.0},{"key":"unit","label":"Size unit","default":"B","options":[{"value":"b","label":"bits"},{"value":"B","label":"bytes"},{"value":"KB","label":"KB (kilobytes, 1,000 bytes)"},{"value":"MB","label":"MB (megabytes, 10^6 bytes)"},{"value":"GB","label":"GB (gigabytes, 10^9 bytes)"},{"value":"KiB","label":"KiB (kibibytes, 1,024 bytes)"},{"value":"MiB","label":"MiB (mebibytes, 2^20 bytes)"},{"value":"GiB","label":"GiB (gibibytes, 2^30 bytes)"}]},{"key":"bw","label":"Bandwidth in bps (bits per second)","default":100000000,"min":1e-09,"max":1000000000000000.0},{"key":"dist","label":"Distance in meters","default":1000000,"min":0,"max":1000000000000.0},{"key":"medium","label":"Medium","default":"fiber","options":[{"value":"fiber","label":"fiber"},{"value":"copper","label":"copper cable"},{"value":"radio","label":"radio or vacuum"}]},{"key":"q","label":"Queuing delay in ms (milliseconds)","default":0,"min":0,"max":1000000000.0},{"key":"rtt","label":"RTT (round-trip time) in ms; blank for twice the propagation delay","default":"","min":0,"max":1000000000.0}]},{"name":"calc-throughput","title":"Bandwidth versus throughput for this transfer","group":"Calculator: one link","mode":"calc","keep":["#c_size << .card","#c_use << details"],"open":["#c_use << details"],"hide":["#c_one > .card:first-child > h2","#c_one > .card:first-child > h2 + p","#c_one > .card:first-child > details","#c_one > details:nth-of-type(4) > summary","#c_key",".relates"],"params":[{"key":"size","label":"Message size","default":1500,"min":0,"max":1000000000000000.0},{"key":"unit","label":"Size unit","default":"B","options":[{"value":"b","label":"bits"},{"value":"B","label":"bytes"},{"value":"KB","label":"KB (kilobytes, 1,000 bytes)"},{"value":"MB","label":"MB (megabytes, 10^6 bytes)"},{"value":"GB","label":"GB (gigabytes, 10^9 bytes)"},{"value":"KiB","label":"KiB (kibibytes, 1,024 bytes)"},{"value":"MiB","label":"MiB (mebibytes, 2^20 bytes)"},{"value":"GiB","label":"GiB (gibibytes, 2^30 bytes)"}]},{"key":"bw","label":"Bandwidth in bps (bits per second)","default":100000000,"min":1e-09,"max":1000000000000000.0},{"key":"dist","label":"Distance in meters","default":1000000,"min":0,"max":1000000000000.0},{"key":"medium","label":"Medium","default":"fiber","options":[{"value":"fiber","label":"fiber"},{"value":"copper","label":"copper cable"},{"value":"radio","label":"radio or vacuum"}]},{"key":"q","label":"Queuing delay in ms (milliseconds)","default":0,"min":0,"max":1000000000.0},{"key":"rtt","label":"RTT (round-trip time) in ms; blank for twice the propagation delay","default":"","min":0,"max":1000000000.0}]},{"name":"calc-path","title":"One packet across the path","group":"Calculator: a path of links","mode":"calc","click":["#c_seg2"],"keep":["#p_size << .card","#p_wire << .card"],"hide":["#c_path > .card:first-child > h2","#c_path > .card:first-child > h2 + p","#c_path > .card:first-child > details",".relates","#p_key"],"params":[{"key":"psize","label":"Packet size in bytes","input":"#p_size","default":1500,"min":1,"max":65535},{"key":"packets","label":"Packets in the message","input":"#p_n","default":1,"min":1,"max":100000}]},{"name":"calc-path-time","title":"The same packet on a time diagram (time runs down)","group":"Calculator: a path of links","mode":"calc","click":["#c_seg2"],"keep":["#p_size << .card","#p_st << details"],"open":["#p_st << details"],"hide":["#c_path > .card:first-child > h2","#c_path > .card:first-child > h2 + p","#c_path > .card:first-child > details","#c_path > details:nth-of-type(1) > summary","#p_key",".relates"],"params":[{"key":"psize","label":"Packet size in bytes","input":"#p_size","default":1500,"min":1,"max":65535},{"key":"packets","label":"Packets in the message","input":"#p_n","default":1,"min":1,"max":100000}]}]};</script>
+<script id="vz-guard">
+/* Slide widgets, part 1 of 2 (runs first, in <head>, right after the widget list).
+   With ?widget=<name> it opens the widget's mode and lesson through the app's own link
+   parameters, and it makes sure a widget never saves anything or rewrites its address. */
+(function () {
+  'use strict';
+  var R = window.VZ_WIDGETS || { widgets: [] }, q;
+  try { q = new URLSearchParams(location.search); } catch (e) { return; }
+  var w = q.get('widget');
+  if (!w) return;
+  var V = window.VZ_MODE = { name: w, list: w === 'list', data: q.get('format') === 'data', spec: null, query: q };
+  for (var i = 0; i < R.widgets.length; i++) if (R.widgets[i].name === w) V.spec = R.widgets[i];
+  V.valid = function (p, raw) {   // is this starting value one the widget (and the app) accepts?
+    if (raw === null || raw === undefined) return false;
+    raw = String(raw);
+    if (raw === '') return p['default'] === '' || !!p.blank;
+    if (p.options) return p.options.some(function (o) { return String(o.value) === raw; });
+    if (p.pattern) return new RegExp('^(?:' + p.pattern + ')$').test(raw);
+    var v = Number(raw);
+    if (!isFinite(v) || (p.min !== undefined && v < p.min) || (p.max !== undefined && v > p.max)) return false;
+    return p.integer === false || Math.round(v) === v;
+  };
+  try {   // a widget reads and writes no saved progress: the full app keeps the student's own
+    var S = Storage.prototype, nop = function () {};
+    S.getItem = function () { return null; }; S.setItem = nop; S.removeItem = nop; S.clear = nop;
+  } catch (e) { /* storage already blocked */ }
+  try {
+    var q2 = new URLSearchParams(location.search);
+    if (V.spec) (V.spec.params || []).forEach(function (p) {   // a bad value the app reads itself is dropped, so the app uses its default
+      if (!p.input && !p.click && q2.get(p.key) !== null && !V.valid(p, q2.get(p.key))) { q2['delete'](p.key); q['delete'](p.key); }
+    });
+    if (V.spec) { q2.set('mode', V.spec.mode); if (V.spec.lesson) q2.set('lesson', String(V.spec.lesson)); else q2['delete']('lesson'); }
+    else q2.set('mode', 'home');
+    history.replaceState(null, '', location.pathname + '?' + q2.toString());
+  } catch (e) { /* history blocked */ }
+  try { history.replaceState = function () {}; history.pushState = function () {}; } catch (e) { /* ignore */ }
+  document.documentElement.className += ' vz-w vz-w-loading';
+  var st = document.createElement('style');
+  st.textContent = 'html.vz-w-loading body{visibility:hidden}';
+  (document.head || document.documentElement).appendChild(st);
+})();
+</script>
+<!-- vz-widgets:end head -->
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bandwidth and Latency Visualizer</title>
 <meta name="description" content="See how bandwidth, distance, and queues add up to latency; how many bits fill a link (the delay × bandwidth product); and what throughput a transfer really gets.">
@@ -70,12 +116,11 @@ input[aria-invalid=true] { border-color: var(--bad); background: var(--bad-soft)
 /* start screen */
 .hero { background: linear-gradient(135deg, var(--navy), #0E6A92 60%, var(--brand)); color: #fff; border-radius: 14px; padding: 28px 26px; display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; align-items: center; }
 .hero h1 { color: #fff; font-size: 32px; margin: 0 0 8px; }
-/* link back to the website's home page with every Network Visualizer */
-.sitelink { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 12px; padding: 5px 14px; border-radius: 999px; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.45); color: #fff; font-weight: 600; font-size: 15px; text-decoration: none; }
-.sitelink:hover { background: rgba(255,255,255,.28); }
-.sitelink:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
 .hero p { font-size: 17px; max-width: 560px; }
 .hero svg { width: 100%; height: auto; max-height: 220px; }
+.sitehome { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; color: #fff; border: 2px solid rgba(255,255,255,.75); border-radius: 8px; padding: 6px 14px; font-weight: 600; text-decoration: none; }
+.sitehome:hover { background: rgba(255,255,255,.15); }
+.sitehome svg { width: 16px; height: 16px; }
 .modecards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 18px; }
 .modecard { display: flex; flex-direction: column; gap: 6px; }
 .modecard .icon { font-size: 30px; line-height: 1; }
@@ -118,7 +163,35 @@ details.figfold { background: var(--white); border: 1px solid var(--line); borde
 details.figfold > summary { font-size: 16px; }
 .terms { margin: 4px 0; padding-left: 18px; }
 .terms li { margin: 4px 0; }
-.ctls { border-top: 1px solid var(--line); margin-top: 10px; padding-top: 4px; }
+/* the controls of a figure sit in a light panel at the top of its card, above the figure they change */
+.figctls { margin: 4px 0 10px; padding: 4px 12px; background: var(--panel-soft); border: 1px solid var(--line); border-radius: 8px; }
+.figctls .row { margin: 6px 0; }
+.figctls .segs { margin: 6px 0; }
+.figctls details.fold { margin: 4px 0 6px; }
+.figctls .links { margin: 6px 0; }
+/* step and lesson numbers set apart from their titles */
+.stepno { display: inline-flex; align-items: center; justify-content: center; min-width: 1.5em; height: 1.5em; padding: 0 4px; border-radius: 0.75em; background: var(--navy); color: #fff; font-size: 0.78em; font-weight: 700; line-height: 1; margin-right: 6px; vertical-align: 1px; }
+.srt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* the first sentence of a second figure: how it relates to the figure before it */
+.relates { margin: 6px 0 8px; padding: 6px 10px; border-left: 4px solid var(--brand); background: var(--panel-soft); border-radius: 6px; }
+/* glossary: dotted terms with a definition popup, and the Glossary page */
+.gl { border-bottom: 1px dotted var(--brand); cursor: help; }
+.gl:hover, .gl:focus { background: var(--panel-soft); outline: none; border-bottom-style: solid; }
+#glpop { position: fixed; z-index: 60; background: #fff; border: 1px solid var(--brand); border-radius: 10px; box-shadow: 0 6px 22px rgba(11, 61, 92, .18); padding: 10px 12px; font-size: 14.5px; line-height: 1.45; color: var(--ink); }
+#glpop p { margin: 4px 0 0; } #glpop .glt { margin: 0; font-weight: 700; color: var(--navy); }
+#glpop .glmeta, .gll { font-size: 13px; color: var(--muted); }
+.gll { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 4px; }
+.glh { color: var(--brand-dark); border-bottom: 2px solid var(--panel); margin: 18px 0 4px; font-size: 17px; }
+.gloss { margin: 0; }
+.gloss dt { font-weight: 700; color: var(--navy); margin-top: 10px; scroll-margin-top: 90px; }
+.gloss dt.hl { background: var(--panel-soft); box-shadow: -6px 0 0 var(--amber); }
+.gloss dd { margin: 2px 0 0; }
+.glossline { margin: 12px 0 0; }
+.linkbtn { background: none; border: none; padding: 0; color: var(--brand-dark); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; text-align: left; }
+.lessonlink { font: inherit; font-size: 13px; border: 1px solid var(--brand); background: #fff; color: var(--brand-dark); border-radius: 999px; padding: 2px 10px; cursor: pointer; }
+.lessonlink:hover { background: var(--panel-soft); }
+.legend.herokey { color: #fff; margin: 6px 0 0; justify-content: center; }
+.herofig { min-width: 0; }
 .speed { font-size: 14px; color: var(--muted); }
 .speed { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .speed input[type=range] { width: 90px; }
@@ -131,6 +204,7 @@ details.figfold > summary { font-size: 16px; }
 .mapitem { display: block; width: 100%; text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin: 0 0 8px; cursor: pointer; font: inherit; color: inherit; }
 .mapitem:hover { border-color: var(--brand); }
 .mapitem b { color: var(--navy); display: block; }
+.mapitem b .stepno { background: var(--brand-dark); }
 .mapitem span { color: var(--muted); font-size: 14px; }
 .mapitem.done b::after { content: ' ✓'; color: var(--ok); }
 @media (max-width: 880px) { .mapparts { grid-template-columns: 1fr; } }
@@ -196,6 +270,11 @@ summary { cursor: pointer; color: var(--brand-dark); font-weight: 600; }
 .linkbox { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
 .linkbox b { color: var(--navy); display: block; font-size: 14px; }
 .linkbox label { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 4px 0; font-size: 14px; }
+.figctls .links { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 6px; }
+.figctls .linkbox { padding: 4px 8px; }
+.figctls .linkbox label { margin: 2px 0; gap: 4px; }
+.figctls .linkbox select, .figctls .linkbox input { font-size: 14px; padding: 3px 6px; max-width: 100%; min-width: 0; }
+.figctls .linkbox input[type=number] { width: 5.5em; }
 
 /* challenge */
 .levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 12px 0; }
@@ -263,11 +342,12 @@ footer .card { border-top-width: 1px; border-right-width: 1px; }
 <section id="view-home">
   <div class="hero">
     <div>
-      <a class="sitelink" id="sitehome" href="https://asammoud-rh.github.io/Communication_Networks/" target="_top"><span aria-hidden="true">←</span> All Network Visualizers</a>
       <h1>Bandwidth and Latency Visualizer</h1>
       <p>Why does a fast link still feel slow? Watch a packet's bits leave one host and arrive at another. See how bandwidth, distance, and waiting in queues add up to latency, how many bits fill a link, and what throughput a transfer really gets. Then measure it yourself with real commands.</p>
+      <a class="sitehome" id="siteHome" href="https://asammoud-rh.github.io/Communication_Networks/"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>All Visualizers</a>
     </div>
-    <svg id="heroFig" viewBox="0 0 360 200" role="img" aria-label="A link drawn as a pipe filled with bits, with its length labeled delay and its width labeled bandwidth"></svg>
+    <div class="herofig"><svg id="heroFig" viewBox="0 0 360 200" role="img" aria-label="A link drawn as a pipe filled with bits, with its length labeled delay and its width labeled bandwidth"></svg>
+      <ul class="legend herokey"><li><i style="background:#fff;border:1px solid #fff"></i>bits in flight</li><li><i style="background:rgba(255,255,255,.15);border:1px solid #fff"></i>empty part of the pipe</li></ul></div>
   </div>
   <div class="modecards">
     <div class="card modecard">
@@ -347,21 +427,27 @@ footer .card { border-top-width: 1px; border-right-width: 1px; }
     <p class="figtitle">The message on the link, over time</p>
     <div id="c_strip"></div>
     <div class="fig"><svg id="c_wire" role="img" aria-label="Host A, the link, and Host B, with the message's bits on the link at the chosen time"></svg></div>
-    <ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>the message's bits</li><li><i style="background:#9DB3C1;height:9px"></i>a thicker link has more bandwidth</li></ul>
+    <ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>the packet's bits</li><li><i style="background:#F5A524"></i>first bit</li><li><i style="background:#0B3D5C"></i>last bit</li><li><i style="background:#00A2D7;height:6px"></i>bar under a device: the share of the message it holds (green: all of it has arrived)</li><li><i style="background:#9DB3C1;height:9px"></i>a thicker link has more bandwidth</li></ul>
   </div>
   <details class="figfold"><summary>The same message on a time diagram (time runs down)</summary>
+    <p class="relates">The same message as the figure above, drawn with time running down the page. Both figures follow one clock.</p>
     <div id="c_stripb"></div>
     <div class="fig"><svg id="c_st" role="img" aria-label="Space-time diagram: the message leaves Host A and arrives at Host B"></svg></div>
     <ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>the message's bits</li><li><i style="background:#FDF0D5;border:1px solid #F5A524"></i>waiting in a queue</li><li><i style="background:#F5A524;height:3px"></i>the chosen moment</li></ul>
   </details>
   <details class="figfold"><summary>Where the latency comes from</summary>
+    <p class="relates">The same message's latency, split into its three parts. The bar is to scale.</p>
     <div class="fig"><svg id="c_bar" role="img" aria-label="Bar split into queuing, transmit, and propagation delay"></svg></div>
+    <ul class="legend"><li><i style="background:#FDF0D5;border:1px solid #F5A524"></i>queue</li><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>transmit</li><li><i style="background:#E7E1FF;border:1px solid #7B61FF"></i>propagation</li></ul>
   </details>
   <details class="figfold"><summary>The link as a pipe</summary>
+    <p class="relates">The same link, drawn as a pipe: how many bits are on it at once when the sender keeps sending.</p>
     <div class="fig"><svg id="c_pipe" role="img" aria-label="The link drawn as a pipe holding the delay times bandwidth bits"></svg></div>
+    <ul class="legend"><li><i style="background:#00A2D7"></i>bits in flight</li><li><i style="background:#fff;border:1px solid #9DB3C1"></i>empty part of the pipe</li></ul>
     <p class="cmdnote">The pipe's width shows the bandwidth and its length the one-way delay, both on logarithmic scales: each step of 10 times more adds the same amount.</p>
   </details>
   <details class="figfold"><summary>Bandwidth versus throughput for this transfer</summary>
+    <p class="relates">The same link used for a whole transfer: the rate over time, from the request to the last bit.</p>
     <div class="fig"><svg id="c_use" role="img" aria-label="Rate over time: nothing during the first RTT, then the full bandwidth; the dashed line is the throughput"></svg></div>
     <ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>data at the full bandwidth</li><li><i style="background:#fff;border:1px dashed #9DB3C1"></i>waiting one RTT</li><li><i style="background:#D98A00;height:3px"></i>throughput: the average rate</li></ul>
   </details>
@@ -385,14 +471,19 @@ footer .card { border-top-width: 1px; border-right-width: 1px; }
     <p class="figtitle">One packet across the path</p>
     <div id="p_strip"></div>
     <div class="fig"><svg id="p_wire" role="img" aria-label="The hosts, switch, and router on the path, with the packet's bits at the chosen time"></svg></div>
-    <p class="cmdnote">Thicker links have more bandwidth. The thinnest one is the bottleneck: it limits the throughput of the whole path.</p>
+    <ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>the packet's bits</li><li><i style="background:#F5A524"></i>first bit</li><li><i style="background:#0B3D5C"></i>last bit</li><li><i style="background:#00A2D7;height:6px"></i>bar under a device: the share of the packet it holds (green: all of it has arrived)</li><li><i style="background:#9DB3C1;height:9px"></i>a thicker link has more bandwidth</li></ul>
+    <p class="cmdnote">The thinnest link is the bottleneck: it limits the throughput of the whole path.</p>
   </div>
   <details class="figfold"><summary>The same packet on a time diagram (time runs down)</summary>
+    <p class="relates">The same packet as the figure above, drawn with time running down the page. Both figures follow one clock.</p>
     <div id="p_stripb"></div>
+
     <div class="fig"><svg id="p_st" role="img" aria-label="Space-time diagram of one packet crossing every link"></svg></div>
+    <ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>the packet's bits on each link (one color per link)</li><li><i style="background:#FDF0D5;border:1px solid #F5A524"></i>waiting in a queue</li><li><i style="background:#F5A524;height:3px"></i>the chosen moment</li></ul>
   </details>
   </div>
   <details class="figfold"><summary>Measure it yourself: Linux and Windows commands</summary>
+    <p class="relates">Not a figure: real Linux and Windows commands that measure these delays on your own computers.</p>
     <div id="c_cmds"></div>
   </details>
 </section>
@@ -468,7 +559,7 @@ var store = {
    Latency = Queue + Transmit + Propagation. Transmit = bits / bandwidth. Propagation = distance / signal speed.
    Times are in seconds, sizes in bits, bandwidth in bits per second, distances in meters. */
 var SPEED = { fiber: 2.0e8, copper: 2.3e8, radio: 3.0e8 };
-var MEDIA = [['fiber', 'Fiber (2.0 × 10⁸ m/s)'], ['copper', 'Copper cable (2.3 × 10⁸ m/s)'], ['radio', 'Radio or vacuum (3.0 × 10⁸ m/s)']];
+var MEDIA = [['fiber', 'Fiber (2.0 × 10⁸ m/s)'], ['copper', 'Copper (2.3 × 10⁸ m/s)'], ['radio', 'Radio or vacuum (3.0 × 10⁸ m/s)']];
 var MEDIUM_NAME = { fiber: 'fiber', copper: 'copper cable', radio: 'radio' };
 var SIZE_UNITS = [['b', 1, 'bits'], ['B', 8, 'bytes'], ['KB', 8e3, 'KB (1,000 bytes)'], ['MB', 8e6, 'MB (10⁶ bytes)'], ['GB', 8e9, 'GB (10⁹ bytes)'],
   ['KiB', 8 * 1024, 'KiB (1,024 bytes)'], ['MiB', 8 * 1048576, 'MiB (2²⁰ bytes)'], ['GiB', 8 * 1073741824, 'GiB (2³⁰ bytes)']];
@@ -605,6 +696,10 @@ Fig.prototype.text = function (x, y, s, o) {   // centered on y; no dominant-bas
   lines.forEach(function (ln, i) { var ts = el('tspan', { x: self.X(x), y: r4(yc + (i - (n - 1) / 2) * lh + size * 0.35) }, t); ts.textContent = ln; });
   return t;
 };
+/* an axis label (rule, November 23, 2026: every figure says what runs across, which = 'x', and what runs up, which = 'y'); tests look for data-axis */
+Fig.prototype.ax = function (which, x, y, s, o) { o = o || {}; if (!o.fs) o.fs = 7.2; if (!o.color) o.color = C.muted; var t = this.text(x, y, s, o); t.setAttribute('data-axis', which); return t; };
+/* the axis row at the top of a host-and-link figure: what its two directions mean */
+Fig.prototype.axRow = function (y, xs) { this.ax('y', 0.1, y, '↕ thicker link = more bandwidth', { ha: 'left' }); this.ax('x', 9.9, y, xs || 'distance along the link →', { ha: 'right' }); };
 Fig.prototype.tw = function (s, fs) { return String(s).length * (fs * this.k / 72) * 0.55; };
 Fig.prototype.label = function (x, y, s, o) {   // text on a white patch, for labels that sit on lines
   o = o || {}; var w = this.tw(s, o.fs || 8.5) + 0.12, hh = (o.fs || 8.5) * this.k / 72 * 1.5, x0 = o.ha === 'left' ? x - 0.06 : o.ha === 'right' ? x - w + 0.06 : x - w / 2;
@@ -647,8 +742,9 @@ function columns(n) { var a = 1.9, b = n === 2 ? 7.2 : 8.1, xs = []; for (var i 
 
 /* The hosts and links, with the packet's bits on each link at time tc */
 function drawWire(svg, o) {
-  var names = o.names, hops = o.hops, tc = o.tc, n = names.length, xs = columns(n), f = new Fig(svg, 0, 10, 0, 2.55, 1.55), W = n > 3 ? 0.95 : 1.1, H = 0.56, yc = 1.66, onLinks = [];
+  var names = o.names, hops = o.hops, tc = o.tc, n = names.length, xs = columns(n), f = new Fig(svg, 0, 10, 0, 2.78, 1.55), W = n > 3 ? 0.95 : 1.1, H = 0.56, yc = 1.66, onLinks = [];
   var tot = hops[hops.length - 1].end, eps = Math.max(1e-15, tot * 1e-9);
+  f.axRow(2.64, n > 2 ? 'distance along the path, Host A to Host B →' : 'distance along the link, Host A to Host B →');
   function nm(i) { return /^Host/.test(names[i]) ? names[i] : 'the ' + names[i]; }
   function cap(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
   for (var i = 0; i < n - 1; i++) {
@@ -729,7 +825,7 @@ function wrapText(t, n) { var out = [], line = ''; t.split(' ').forEach(function
 function eventAxis(f, xa, xb, Y0, ev, tc, tot) {
   var L = xb - xa, last = -9, lvl = 0;
   f.line(xa, Y0, xb, Y0, { lw: 1 });
-  f.text(xa - 0.12, Y0, 'time', { fs: 7.4, color: C.muted, ha: 'right' });
+  f.text(xa - 0.12, Y0, 'time →', { fs: 7.4, color: C.muted, ha: 'right' });
   f.text(xa, Y0 - 0.2, '0', { fs: 7.2, color: C.muted }); f.text(xb, Y0 - 0.2, fmtT(tot, 3), { fs: 7.2, color: C.muted });
   ev.forEach(function (e, i) {
     var x = xa + L * (tot ? e.t / tot : 0); lvl = x - last < 0.22 ? lvl + 1 : 0; last = x;
@@ -755,7 +851,8 @@ function linkEvents(h) {
 /* The message's journey on one link: bits drain out of Host A, travel as a train, and fill Host B.
    The train's length on the link is to scale (transmit time ÷ propagation delay), with a minimum so it stays visible. */
 function drawJourney(svg, o) {
-  var h = o.h, tc = o.tc, tot = h.end || 1, f = new Fig(svg, 0, 10, 0, 3.35, 1.55);
+  var h = o.h, tc = o.tc, tot = h.end || 1, f = new Fig(svg, 0, 10, 0, 3.58, 1.55);
+  f.axRow(3.46, 'distance along the link, Host A to Host B →');
   var A0 = 0.1, AW = 1.5, B0 = 8.4, xa = A0 + AW, xb = B0, L = xb - xa, yc = 2.3, th = 0.18 + 0.4 * bwFrac(h.bw);
   var sent = h.T > 0 ? clamp((tc - h.start) / h.T, 0, 1) : (tc >= h.start ? 1 : 0), got = h.T > 0 ? clamp((tc - h.firstIn) / h.T, 0, 1) : (tc >= h.firstIn ? 1 : 0);
   [[A0, 'Host A', 1 - sent, 'to send'], [B0, 'Host B', got, 'received']].forEach(function (b, j) {
@@ -815,10 +912,11 @@ function clipT(pts, tc) {
 /* Time runs down the page. Each band is the packet: its height at the sender is the transmit time, its slope is the propagation delay. */
 function drawSpaceTime(svg, o) {
   var names = o.names, hops = o.hops, n = names.length, xs = o.detail ? [2.8, 7.2] : columns(n), tMax = o.tMax || hops[hops.length - 1].end || 1, tc = o.tc;
-  var f = new Fig(svg, 0, 10, 0, 4.4, 1.55), top = 3.7, bot = names.length > 2 ? 0.68 : 0.45;
+  var f = new Fig(svg, 0, 10, 0, 4.58, 1.55), top = 3.7, bot = names.length > 2 ? 0.68 : 0.45;
   function Y(t) { return top - (top - bot) * t / tMax; }
   xs.forEach(function (x, i) { f.text(x, 4.13, names[i], { fs: 8.6, bold: true, color: C.navy }); f.line(x, top, x, bot - 0.08, { color: C.ink, lw: 1.2 }); });
-  f.arrow(0.4, top, 0.4, bot - 0.05, { lw: 1 }); f.text(0.22, (top + bot) / 2, 'time', { fs: 8, rot: -90, color: C.muted });
+  f.arrow(0.4, top, 0.4, bot - 0.05, { lw: 1 }); f.ax('y', 0.22, (top + bot) / 2, 'time runs down ↓', { fs: 8, rot: -90 });
+  f.ax('x', 9.9, 4.45, (n > 2 ? 'position along the path →' : 'position along the link →'), { ha: 'right' });
   hops.forEach(function (h, i) {
     var xa = xs[i], xb = xs[i + 1];
     if (h.q > 0 && h.ready <= tc) f.rect(xa - 0.09, Y(Math.min(h.start, tc)), 0.18, Y(h.ready) - Y(Math.min(h.start, tc)), { fill: C.amberSoft, stroke: C.amber, lw: 1 });
@@ -851,9 +949,11 @@ function drawSpaceTime(svg, o) {
 }
 
 /* stacked bar of the delay parts */
-function drawBar(svg, parts) {
-  var f = new Fig(svg, 0, 10, 0, 1.15, 1.5), tot = 0, x = 0.3, W = 9.4;
+function drawBar(svg, parts, row) {
+  var f = new Fig(svg, 0, 10, 0, 1.38, 1.5), tot = 0, x = 1.45, W = 8.3;
   parts.forEach(function (p) { tot += p.v; });
+  f.ax('y', 1.35, 0.81, row || 'Latency', { ha: 'right', fs: 7.8, bold: true, color: C.navy });
+  f.ax('x', 9.75, 0.14, 'time, to scale: the whole bar is the total →', { ha: 'right' });
   if (tot <= 0) return;
   parts.forEach(function (p) {
     var w = W * p.v / tot; if (w <= 0) return;
@@ -861,7 +961,7 @@ function drawBar(svg, parts) {
     if (w > f.tw(p.name, 7.8) + 0.15) f.text(x + w / 2, 0.81, p.name, { fs: 7.8, bold: true });
     x += w;
   });
-  f.text(5, 0.26, parts.map(function (p) { return p.name + ' ' + fmtT(p.v, 3) + ' (' + fmtN(100 * p.v / tot, 3) + '%)'; }).join('    '), { fs: 7.8 });
+  f.text(5.6, 0.42, parts.map(function (p) { return p.name + ' ' + fmtT(p.v, 3) + ' (' + fmtN(100 * p.v / tot, 3) + '%)'; }).join('    '), { fs: 7.8 });
 }
 
 /* the link as a pipe: length = delay, width = bandwidth, volume = delay × bandwidth */
@@ -930,9 +1030,9 @@ function drawPipe(svg, o) {
   f.line(x0, yr, x1, yr, { lw: 1 });
   [0, 0.5, 1].forEach(function (q) { var xq = x0 + q * L; f.line(xq, yr - 0.06, xq, yr + 0.06, { lw: 1 }); f.text(xq, yr + 0.18, fmtT(q * D, 3), { fs: 7.2, color: C.muted }); });
   var lt = 'length = one-way delay = ' + fmtT(D, 3) + ' (the time one bit takes to cross)', lw2 = f.tw(lt, 8) / 2 + 0.1;
-  f.text(clamp((x0 + x1) / 2, lw2, 10 - lw2), yr + 0.42, lt, { fs: 8, bold: true, color: C.navy });
+  f.ax('x', clamp((x0 + x1) / 2, lw2, 10 - lw2), yr + 0.42, lt, { fs: 8, bold: true, color: C.navy });
   f.arrow(x0 - 0.3, yc, x0 - 0.3, yt + 0.02, { lw: 1, color: '#B86E00' }); f.arrow(x0 - 0.3, yc, x0 - 0.3, yb - 0.02, { lw: 1, color: '#B86E00' });
-  f.text(0.1, 3.78, 'width = bandwidth = ' + fmtRate(bw, 3) + ' (bits put in per second)', { fs: 8, bold: true, ha: 'left', color: '#B86E00' });
+  f.ax('y', 0.1, 3.78, '↕ width = bandwidth = ' + fmtRate(bw, 3) + ' (bits put in per second)', { fs: 8, bold: true, ha: 'left', color: '#B86E00' });
   // acknowledgments come back on a return path
   var ya = yb - 0.36;
   if (rtt) {
@@ -981,8 +1081,9 @@ function drawUsage(svg, o) {
   f.text(X0, Y0 - 0.2, '0', { fs: 7.2, color: C.muted });
   if (o.rtt > 0 && xr - X0 > 0.5 && X1 - xr > 0.5) f.text(xr, Y0 - 0.2, fmtT(o.rtt, 3), { fs: 7.2, color: C.muted });
   f.text(X1, Y0 - 0.2, fmtT(tot, 3), { fs: 7.2, color: C.muted, bold: true });
-  f.text((X0 + X1) / 2, 0.14, 'time from the request to the last bit (rate goes up the page)', { fs: 7.4, color: C.muted });
-  f.text(5.4, 2.55, 'Both shapes hold the same number of bits: the blue box and the area under the amber line.', { fs: 7.4, color: C.muted });
+  f.ax('x', (X0 + X1) / 2, 0.14, 'time from the request to the last bit →', { fs: 7.4 });
+  f.ax('y', 0.1, 2.55, '↑ rate (bits per second)', { fs: 7.4, ha: 'left' });
+  f.text(9.55, 2.55, 'Both shapes hold the same number of bits: the blue box and the area under the amber line.', { fs: 7.4, color: C.muted, ha: 'right' });
   if (o.tc !== undefined && o.tc < tot * 0.999) {   // the moment shown in the transfer animation
     var xt = PX(clamp(o.tc, 0, tot));
     f.line(xt, Y0, xt, Y1 + 0.12, { color: C.amber, lw: 1.8, dash: [4, 2] });
@@ -1013,7 +1114,8 @@ function drawBitSpace(svg, o) {
   var yr = 0.85;
   f.line(X0, yr, X1, yr, { lw: 1 });
   for (var i = 0; i <= 8; i++) { var xi = X0 + i * w1; f.line(xi, yr - 0.05, xi, yr + 0.05, { lw: 1 }); if (i % 2 === 0) f.text(xi, yr - 0.19, fmtLen(i * Lb), { fs: 7, color: C.muted }); }
-  f.text(X0 - 0.12, yr, 'distance', { fs: 7.2, color: C.muted, ha: 'right' });
+  f.ax('x', X0 - 0.12, yr, 'distance →', { fs: 7.2, ha: 'right' });
+  f.ax('y', 0.1, 2.86, 'Each row:\none bandwidth', { fs: 7, ha: 'left' });
   var ob = null; SCALE_OBJECTS.forEach(function (x) { if (x[0] <= S && x[0] >= S / 60) ob = x; });
   if (ob) {
     var xe = X0 + (X1 - X0) * ob[0] / S, yo = 0.32;
@@ -1038,7 +1140,8 @@ function transferEvents(o) {
 }
 function drawTransfer(svg, o) {
   var T = o.bits / o.bw, hD = o.rtt / 2, tot = o.rtt + T, tc = clamp(o.tc, 0, tot), eps = Math.max(1e-15, tot * 1e-9);
-  var f = new Fig(svg, 0, 10, 0, 3.5, 1.55), A0 = 0.1, AW = 1.5, B0 = 8.4, xa = A0 + AW, xb = B0, L = xb - xa, yc = 2.4, th = 0.18 + 0.4 * bwFrac(o.bw);
+  var f = new Fig(svg, 0, 10, 0, 3.72, 1.55), A0 = 0.1, AW = 1.5, B0 = 8.4, xa = A0 + AW, xb = B0, L = xb - xa, yc = 2.4, th = 0.18 + 0.4 * bwFrac(o.bw);
+  f.axRow(3.6, 'distance along the link, Host A to Host B →');
   var doneX = tc >= o.rtt + T - Math.max(1e-15, (o.rtt + T) * 1e-9);
   var sentF = T > 0 ? clamp((tc - hD) / T, 0, 1) : (tc >= hD ? 1 : 0), gotF = T > 0 ? clamp((tc - o.rtt) / T, 0, 1) : (tc >= o.rtt ? 1 : 0);
   [[A0, 'Host A\n(downloads)', gotF, 'received', '#D3F1E8', C.ok, '#0B7A64'], [B0, 'Host B\n(server)', 1 - sentF, 'still to send', C.panel, C.brand, C.navy]].forEach(function (b) {
@@ -1082,7 +1185,7 @@ function drawPlot(svg, o) {
   f.rect(X0, Y0, X1 - X0, Y1 - Y0, { fill: '#fff', stroke: C.wire, lw: 0.8 });
   for (var d = Math.ceil(lx0); d <= Math.floor(lx1); d++) { var xx = PX(Math.pow(10, d)); f.line(xx, Y0, xx, Y1, { color: C.gray, lw: 0.6 }); f.text(xx, Y0 - 0.2, o.xfmt(Math.pow(10, d)), { fs: 7.2, color: C.muted }); }
   for (var e = Math.ceil(ly0); e <= Math.floor(ly1); e++) { var yy = PY(Math.pow(10, e)); f.line(X0, yy, X1, yy, { color: C.gray, lw: 0.6 }); f.text(X0 - 0.08, yy, o.yfmt(Math.pow(10, e)), { fs: 7.2, color: C.muted, ha: 'right' }); }
-  f.text((X0 + X1) / 2, 0.2, o.xlab, { fs: 8, bold: true }); f.text(0.17, (Y0 + Y1) / 2, o.ylab, { fs: 8, bold: true, rot: -90 });
+  f.ax('x', (X0 + X1) / 2, 0.2, o.xlab + ' →', { fs: 8, bold: true, color: C.ink }); f.ax('y', 0.17, (Y0 + Y1) / 2, o.ylab + ' →', { fs: 8, bold: true, rot: -90, color: C.ink });
   var clipId = f.id + 'c', cp = el('clipPath', { id: clipId }, f.svg.firstChild); el('rect', { x: f.X(X0), y: f.Y(Y1), width: r4(X1 - X0), height: r4(Y1 - Y0) }, cp);
   var g = el('g', { 'clip-path': 'url(#' + clipId + ')' }, f.root);
   (o.vlines || []).forEach(function (v) { var xx = PX(v.x); f.line(xx, Y0, xx, Y1, { color: v.color || C.muted, lw: 1, dash: [4, 3], parent: g }); f.label(xx, Y1 - 0.15 - (v.dy || 0), v.label, { fs: 7.2, color: v.color || C.muted, bold: true, parent: g }); });
@@ -1114,7 +1217,8 @@ function drawBits(svg, rate, mult) {
   });
   f.line(X0, 0.62, X1, 0.62, { color: C.ink, lw: 1 });
   for (var i = 0; i <= 8; i++) { var x = X0 + (X1 - X0) * i / 8; f.line(x, 0.57, x, 0.67, { color: C.ink, lw: 1 }); if (i % 2 === 0) f.text(x, 0.38, fmtT(i / rate, 3), { fs: 7.2, color: C.muted }); }
-  f.text((X0 + X1) / 2, 0.12, 'time', { fs: 7.6, color: C.muted });
+  f.ax('x', (X0 + X1) / 2, 0.12, 'time →', { fs: 7.6 });
+  f.ax('y', 0.1, 2.36, 'Each row:\none bandwidth', { fs: 7, ha: 'left' });
   f.label(X0 + (X1 - X0) / 16, 2.38, '← one bit: ' + fmtT(1 / rate, 3), { fs: 7.6, bold: true, ha: 'left', color: C.navy });
 }
 
@@ -1124,11 +1228,11 @@ function drawHero() {
   f.slab(0.15, 1.5, 1.05, 0.9, { text: 'Host A', fill: '#fff', fs: 8.6, bold: true });
   f.slab(6.0, 1.5, 1.05, 0.9, { text: 'Host B', fill: '#fff', fs: 8.6, bold: true });
   f.rect(1.25, 1.55, 4.7, 0.8, { fill: 'rgba(255,255,255,0.18)', stroke: '#fff', lw: 1.4, rx: 0.4 });
-  for (var i = 0; i < 14; i++) f.rect(1.45 + i * 0.31, 1.68, 0.24, 0.54, { fill: i < 10 ? (i % 3 === 2 ? C.amber : '#fff') : 'rgba(255,255,255,0.15)', stroke: '#fff', lw: 0.6, rx: 0.04 });
+  for (var i = 0; i < 14; i++) f.rect(1.45 + i * 0.31, 1.68, 0.24, 0.54, { fill: i < 10 ? '#fff' : 'rgba(255,255,255,0.15)', stroke: '#fff', lw: 0.6, rx: 0.04 });
   f.arrow(1.3, 2.75, 5.9, 2.75, { color: '#fff', lw: 1.2, both: true });
-  f.text(3.6, 3.05, 'length = delay', { fs: 9, bold: true, color: '#fff' });
+  f.ax('x', 3.6, 3.05, 'length = delay', { fs: 9, bold: true, color: '#fff' });
   f.arrow(3.6, 1.45, 3.6, 0.95, { color: '#fff', lw: 1 });
-  f.text(3.6, 0.7, 'width = bandwidth', { fs: 9, bold: true, color: '#FCE9C6' });
+  f.ax('y', 3.6, 0.7, '↕ width = bandwidth', { fs: 9, bold: true, color: '#FCE9C6' });
   f.text(3.6, 0.3, 'bits in flight = delay × bandwidth', { fs: 8.2, color: '#CFE6F0' });
 }
 
@@ -1224,7 +1328,7 @@ function animateS(ms, step, alive) {
 
 /* ===================================================== player: Send + time slider + speed, repeated next to every figure it moves, all in sync */
 function stripHTML(p, label, paced) {
-  return '<div class="scrub"><button class="btn small" id="' + p + 'play">▶ ' + (label || 'Send') + '</button>' + (paced ? '<button class="btn alt small" id="' + p + 'next">Next moment ⏭</button>' : '') +
+  return '<div class="scrub"><button class="btn small" id="' + p + 'play">▶ ' + (label || 'Send') + '</button><button class="btn alt small" id="' + p + 'reset">⟲ Reset</button>' + (paced ? '<button class="btn alt small" id="' + p + 'next">Next moment ⏭</button>' : '') +
     '<label for="' + p + 'scrub">Time</label><input type="range" id="' + p + 'scrub" min="0" max="1000" value="0"><span class="tnow" id="' + p + 'tnow"></span>' + speedHTML() + '</div>' +
     (paced ? '<p class="cmdnote">Short steps are stretched so you can see them, so the animation is not to scale in time; t shows the real time.</p>' : '');
 }
@@ -1232,10 +1336,21 @@ function Player(o) {   // o.strips: id prefixes of the control strips; o.draw(fr
   var self = this; this.o = o; this.frac = o.frac === undefined ? 0 : o.frac; this.tok = 0;
   o.strips.forEach(function (p) {
     $('#' + p + 'scrub').oninput = function () { self.tok++; self.frac = this.value / 1000; self.show(); };
-    $('#' + p + 'play').onclick = function () { self.play(); };
+    $('#' + p + 'play').onclick = function () { self.jump(0); self.play(); };   // Play always replays from the start
+    var rb = $('#' + p + 'reset'); if (rb) rb.onclick = function () { self.reset(); };
   });
   wireSpeeds();
 }
+/* Rule (November 23, 2026): an animation plays once by itself when the student reaches it, and resets and plays once again
+   whenever one of its options changes. Reset goes back to the start without playing. Tests can turn auto-play off with
+   window.__BL_NOAUTO; with reduced motion it stays at the start until the student presses Play. */
+/* A slide widget opens at the start without playing, so the presenter starts it (and the native slides show the first frame);
+   after the presenter's first click or key press in the widget, a changed option replays it as in the app. */
+var BL_WIDGET = /[?&]widget=/.test(location.search), blArmed = !BL_WIDGET;
+if (BL_WIDGET) ['pointerdown', 'keydown', 'input', 'change'].forEach(function (ev) { document.addEventListener(ev, function (e) { if (e.isTrusted) blArmed = true; }, true); });
+function autoOK() { return blArmed && !window.__BL_NOAUTO && !reduceMotion; }
+Player.prototype.reset = function () { this.tok++; this.frac = 0; this.show(); this.o.strips.forEach(function (p) { var b = $('#' + p + 'play'); if (b) b.disabled = false; }); };
+Player.prototype.restart = function () { this.reset(); if (autoOK()) this.play(); };
 Player.prototype.show = function () {
   var lab = this.o.draw(this.frac), f = this.frac;
   this.o.strips.forEach(function (p) {
@@ -1310,8 +1425,14 @@ Timeline.prototype.draw = function (frac) {
 };
 Timeline.prototype.jump = function (frac) { this.pl.jump(frac); };
 Timeline.prototype.play = function () { return this.pl.play(); };
-var ST_LEGEND = '<ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>the packet\'s bits</li><li><i style="background:#FDF0D5;border:1px solid #F5A524"></i>waiting in a queue</li><li><i style="background:#F5A524;height:3px"></i>the chosen moment</li></ul>';
-function figFold(title, body, open) { return '<details class="figfold"' + (open ? ' open' : '') + '><summary>' + title + '</summary>' + body + '</details>'; }
+Timeline.prototype.restart = function () { this.pl.restart(); };
+Timeline.prototype.reset = function () { this.pl.reset(); };
+var ST_LEGEND = '<ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>the packet\'s bits (one color per link)</li><li><i style="background:#FDF0D5;border:1px solid #F5A524"></i>waiting in a queue</li><li><i style="background:#F5A524;height:3px"></i>the chosen moment</li></ul>';
+/* a folded figure; rel is its first sentence, saying how it relates to the figure before it (rule, November 23, 2026) */
+var WIRE_KEY = '<ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>the packet\'s bits</li><li><i style="background:#F5A524"></i>first bit</li><li><i style="background:#0B3D5C"></i>last bit</li><li><i style="background:#00A2D7;height:6px"></i>bar under a device: the share of the packet it holds (green: all of it has arrived)</li><li><i style="background:#9DB3C1;height:9px"></i>a thicker link has more bandwidth</li></ul>';
+var BAR_KEY = '<ul class="legend"><li><i style="background:#FDF0D5;border:1px solid #F5A524"></i>queue</li><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>transmit</li><li><i style="background:#E7E1FF;border:1px solid #7B61FF"></i>propagation</li></ul>';
+var BAR_KEY5 = '<ul class="legend"><li><i style="background:#E7E1FF;border:1px solid #7B61FF"></i>RTT (round-trip time)</li><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>transmit</li></ul>';
+function figFold(title, body, rel) { return '<details class="figfold"><summary>' + title + '</summary>' + (rel ? '<p class="relates">' + rel + '</p>' : '') + body + '</details>'; }
 
 /* ===================================================== LEARN */
 var lessonState = { i: (function () { var v = store.get('lesson', -1); return clamp(isFinite(+v) ? +v : -1, -1, 5); })(), task: null, token: 0,
@@ -1322,12 +1443,18 @@ var lessonState = { i: (function () { var v = store.get('lesson', -1); return cl
   l5: { size: 1, unit: 'MB', bw: 1e9, rtt: 100 },
   l6: { size: 1500, links: [{ bw: 100e6, dist: 100, medium: 'copper' }, { bw: 1e9, dist: 20000, medium: 'fiber' }, { bw: 10e6, dist: 500000, medium: 'fiber' }], qs: 0, qr: 2 } };
 var LESSONS = [
-  { t: 'A bit is a slice of time', setup: l1, what: 'See how long one bit lasts, and how long it is on the wire.' },
-  { t: 'Three parts of latency', setup: l2, what: 'Watch a packet travel and add up its queue, transmit, and propagation times.' },
-  { t: 'Which part dominates?', setup: l3, what: 'Compare a far, fast link with a near, slow one for small and large messages.' },
-  { t: 'The pipe: delay × bandwidth', setup: l4, what: 'Watch the link fill with bits and find the window that keeps it full.' },
-  { t: 'Bandwidth is not throughput', setup: l5, what: 'Watch a download from request to completion and find the rate it really gets.' },
-  { t: 'Across a switch and a router', setup: l6, what: 'Add up the delays link by link, find the bottleneck, and predict ping times.' }
+  { t: 'A bit is a slice of time', setup: l1, what: 'See how long one bit lasts, and how long it is on the wire.',
+    terms: ['bandwidth', 'bps', 'mbps', 'gbps', 'bit', 'byte', 'bit-width', 'us', 'ns', 'bit-length', 'signal-speed', 'medium', 'fiber', 'mps', 'pow10', 'm', 'cm', 'kb', 'mb', 'kib', 'mib'] },
+  { t: 'Three parts of latency', setup: l2, what: 'Watch a packet travel and add up its queue, transmit, and propagation times.',
+    terms: ['latency', 'packet', 'host', 'queue', 'buffer', 'transmit', 'propagation', 'first-bit', 'last-bit', 'time-diagram', 't', 'ms', 'km', 'mbps', 'gbps'] },
+  { t: 'Which part dominates?', setup: l3, what: 'Compare a far, fast link with a near, slow one for small and large messages.',
+    terms: ['latency', 'one-way-delay', 'transmit', 'latency-bound', 'bandwidth-bound', 'dxb', 'log-scale', 'ms', 'mbps', 'gbps', 'kb', 'mb', 'gb'] },
+  { t: 'The pipe: delay × bandwidth', setup: l4, what: 'Watch the link fill with bits and find the window that keeps it full.',
+    terms: ['pipe', 'dxb', 'one-way-delay', 'bandwidth', 'rtt', 'ack', 'window', 'in-flight', 'throughput', 'ms', 'mb-bit', 'mbps', 'kb', 'mb'] },
+  { t: 'Bandwidth is not throughput', setup: l5, what: 'Watch a download from request to completion and find the rate it really gets.',
+    terms: ['bandwidth', 'latency', 'throughput', 'dxb', 'rtt', 'transfer-time', 'latency-bound', 'tcp', 'mb', 'mb-bit', 'mbps', 'gbps', 'ms'] },
+  { t: 'Across a switch and a router', setup: l6, what: 'Add up the delays link by link, find the bottleneck, and predict ping times.',
+    terms: ['store-forward', 'switch', 'router', 'bottleneck', 'queue', 'jitter', 'ping', 'rtt', 'ttl', 'vm', 'mdev', 'sudo', 'interface', 'powershell', 'mbs', 'ms', 'km', 'mbps', 'gbps'] }
 ];
 var PARTS = [
   { t: 'Part 1: One packet on one link', l: [0, 1, 2] },
@@ -1349,22 +1476,36 @@ function renderStepper() {
 }
 function renderMap() {
   $('#ltext').innerHTML = '<h2>Lesson map</h2><div class="mapintro"><p>Six short lessons in three parts. Each lesson has a short intro, a few controls, one main figure that you can play and step through, and a Try it task worth 20 points.</p>' +
-    '<p>Start with Part 1 if bandwidth and delay are new to you. Extra explanations and figures are folded under <b>Show more</b> and the other closed sections; open them when you want more.</p></div>' +
+    '<p>Start with Part 1 if bandwidth and delay are new to you. Extra explanations and figures are folded under <b>Show more</b> and the other closed sections; open them when you want more.</p>' +
+    '<p>A word with a dotted underline shows its definition when you point at it or tap it. The <button type="button" class="linkbtn" id="mapgloss">Glossary</button> lists every term.</p></div>' +
     '<div class="mapparts">' + PARTS.map(function (P) {
       return '<div class="mappart"><h3>' + P.t + '</h3>' + P.l.map(function (i) {
-        return '<button class="mapitem' + (progress.lessons[i] ? ' done' : '') + '" data-ml="' + i + '"><b>' + (i + 1) + '. ' + LESSONS[i].t + '</b><span>' + LESSONS[i].what + '</span></button>';
+        return '<button class="mapitem' + (progress.lessons[i] ? ' done' : '') + '" data-ml="' + i + '"><b><span class="stepno" aria-hidden="true">' + (i + 1) + '</span><span class="srt">Lesson ' + (i + 1) + ': </span>' + LESSONS[i].t + '</b><span>' + LESSONS[i].what + '</span></button>';
       }).join('') + '</div>';
     }).join('') + '</div>';
   $$('[data-ml]').forEach(function (b) { b.onclick = function () { openLesson(+b.getAttribute('data-ml')); }; });
+  $('#mapgloss').onclick = function () { glFrom = 0; glFilter = 'all'; glMark = null; openLesson(GLP); };
+}
+/* Rule (November 20, 2026): the controls of a lesson's figure sit in a light panel at the top of the figure's card, under its
+   title and above the figure, never at the end of the lesson text. lessonText() builds them in #lctl; this moves them. */
+function pullControls() {
+  var box = $('#ltext #lctl'), card = $('#lfig > .card'); if (!box || !card) return;
+  var segs = null, t = null;
+  Array.prototype.forEach.call(card.children, function (c) { if (!t && c.classList.contains('figtitle')) t = c; if (!segs && c.classList.contains('segs')) segs = c; });
+  if (segs) { card.insertBefore(box, card.firstChild); box.insertBefore(segs, box.firstChild); }   // a view switch joins the panel
+  else if (t) card.insertBefore(box, t.nextSibling); else card.insertBefore(box, card.firstChild);
 }
 function openLesson(i) {
   lessonState.token++;   // stops any animation from the previous lesson
-  i = clamp(i, -1, LESSONS.length - 1);
+  i = clamp(i, -1, GLP); if (typeof glClose === 'function') glClose();
   if (lessonState.i !== i) lessonState.task = null;
-  lessonState.i = i; store.set('lesson', i);
+  lessonState.i = i; if (i !== GLP) store.set('lesson', i);
   renderStepper(); $('#lfig').innerHTML = ''; $('#ltry').innerHTML = '';
   $('#lgrid').className = 'lesson' + (i < 0 ? ' map' : '');
-  if (i < 0) renderMap(); else LESSONS[i].setup();
+  if (i === GLP) { glPage(); glNav(); wireSpeeds(); writeLink(); window.scrollTo(0, 0); return; }
+  if (i < 0) renderMap(); else { LESSONS[i].setup(); pullControls(); }
+  if (i >= 0) $('#ltry').insertAdjacentHTML('beforeend', '<p class="glossline"><button type="button" class="linkbtn" id="lgloss">Glossary: every term and symbol in this lesson, with its definition →</button></p>');
+  if ($('#lgloss')) $('#lgloss').onclick = function () { glOpen(null); };
   var nav = '<div class="navrow">' + (i < 0 ? '<span></span>' : '<button class="btn alt" id="lprev">← ' + (i === 0 ? 'Lesson map' : 'Back') + '</button>') +
     (i < LESSONS.length - 1 ? '<button class="btn" id="lnext">' + (i < 0 ? 'Start Lesson 1 →' : 'Next lesson →') + '</button>' : '<button class="btn amber" id="lnext">Take the challenge →</button>') + '</div>';
   $('#ltry').insertAdjacentHTML('beforeend', nav);
@@ -1373,12 +1514,18 @@ function openLesson(i) {
   wireSpeeds();
   writeLink();
 }
-/* One lesson's text column: kicker, title, a short intro, Show more and Terms (both closed), then the controls right above the figure. */
+function glNav() {   // the Glossary page: back to the lesson it came from, or on to the challenge
+  var back = glFrom ? glFrom - 1 : -1;
+  $('#ltry').insertAdjacentHTML('beforeend', '<div class="navrow"><button class="btn alt" id="lprev">← ' + (glFrom ? 'Back to Lesson ' + glFrom : 'Lesson map') + '</button><button class="btn amber" id="lnext">Take the challenge →</button></div>');
+  $('#lprev').onclick = function () { openLesson(back); };
+  $('#lnext').onclick = function () { go('challenge'); };
+}
+/* One lesson's text column: kicker, title, a short intro, Show more and Terms (both closed). The controls go to the top of the figure's card. */
 function lessonText(n, title, o) {
   $('#ltext').innerHTML = '<p class="kicker">Lesson ' + n + ' of 6 · ' + partOf(n - 1) + '</p><h2>' + title + '</h2><div class="intro">' + o.intro + '</div>' +
     '<details class="fold"><summary>Show more</summary>' + o.more + '</details>' +
-    '<details class="fold"><summary>Terms in this lesson</summary><ul class="terms">' + o.terms.map(function (t) { return '<li><b>' + t[0] + '</b>: ' + t[1] + '</li>'; }).join('') + '</ul></details>' +
-    '<div class="ctls">' + o.ctl + '</div>';
+    '<details class="fold"><summary>Terms in this lesson</summary>' + termsHTML(LESSONS[n - 1].terms) + '</details>' +
+    '<div class="figctls" id="lctl">' + o.ctl + '</div>';
 }
 function setTry(html) { $('#ltry').innerHTML = tryBox(html); }
 function lessonDone(fb, msg) {
@@ -1415,10 +1562,6 @@ function l1() {
       '<p><b>Why a bit has a length.</b> While Host A is still sending a bit, the start of that bit is already travelling down the wire. When the bit is finished, its start is speed × bit width away. So one bit is speed ÷ bandwidth long.</p>' +
       '<p>At 1 Mbps on copper cable a bit is 230 m (meters) long, more than two football fields. At 1 Gbps it is 23 cm (centimeters), shorter than a ruler.</p>' +
       '<p><b>Bits and bytes.</b> A lowercase b is a bit and an uppercase B is a byte, which is 8 bits. Sizes here are decimal: 1 KB (kilobyte) = 1,000 bytes and 1 MB (megabyte) = 10⁶ bytes. Memory and some programs count in powers of 2: 1 KiB (kibibyte) = 1,024 bytes and 1 MiB (mebibyte) = 1,048,576 bytes. The unit converter under the figure shows both.</p>',
-    terms: [['Bandwidth', 'how many bits per second a link can put on the wire'], ['Mbps and Gbps', 'megabits (10⁶) and gigabits (10⁹) per second'], ['Bit width', 'how long one bit lasts: 1 ÷ bandwidth'],
-      ['µs and ns', 'microsecond (a millionth of a second) and nanosecond (a billionth of a second)'], ['Length on the wire', 'how far one bit stretches along the wire: signal speed ÷ bandwidth'],
-      ['Signal speed', 'about 2.0 × 10⁸ m/s (meters per second) in fiber, 2.3 × 10⁸ m/s in copper cable, and 3.0 × 10⁸ m/s by radio'],
-      ['b and B', 'a bit, and a byte (8 bits)'], ['KB and MB', 'kilobyte (1,000 bytes) and megabyte (10⁶ bytes)'], ['KiB and MiB', 'kibibyte (1,024 bytes) and mebibyte (1,048,576 bytes)']],
     ctl: '<div class="row"><label>Bandwidth <select id="l1rate">' + rateOptions(s.rate) + '</select></label><label>Compare with <select id="l1mult">' + [2, 4, 10].map(function (m) { return '<option value="' + m + '"' + (m === s.mult ? ' selected' : '') + '>' + m + ' times faster</option>'; }).join('') + '</select></label></div>' +
       '<div class="row"><label>Medium <select id="l1med">' + mediumOptions(s.medium) + '</select></label></div>'
   });
@@ -1426,15 +1569,18 @@ function l1() {
   $('#lfig').innerHTML = '<div class="card"><div class="segs" role="group" aria-label="Figure view"><button id="l1vtime" aria-pressed="' + (s.view === 'time') + '">⏱ In time</button><button id="l1vwire" aria-pressed="' + (s.view === 'wire') + '">📏 On the wire</button></div>' +
     '<div id="l1ptime"' + (s.view === 'time' ? '' : ' hidden') + '><p class="figtitle">Eight bits at two bandwidths, on the same time axis</p><div class="fig"><svg id="l1svg" role="img" aria-label="The bits 10110010 at two bandwidths; the faster link packs more bits into the same time"></svg></div>' +
     '<ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>chosen bandwidth</li><li><i style="background:#E7E1FF;border:1px solid #7B61FF"></i>faster link</li></ul></div>' +
-    '<div id="l1pwire"' + (s.view === 'wire' ? '' : ' hidden') + '><p class="figtitle">The same bits on the wire, in meters</p><div class="scrub"><button class="btn small" id="l1go">▶ Watch the bits move</button>' + speedHTML() + '</div><p class="cmdnote" id="l1slow"></p><div class="fig"><svg id="l1space" role="img" aria-label="The bits laid out along the wire with a ruler in meters and an everyday object for scale; both rows move at the same speed"></svg></div>' +
+    '<div id="l1pwire"' + (s.view === 'wire' ? '' : ' hidden') + '><p class="figtitle">The same bits on the wire, in meters</p><p class="relates">The same eight bits as in the <b>In time</b> view, now laid out along the wire: across is distance, not time.</p>' + stripHTML('l1w', 'Watch the bits move') + '<p class="cmdnote" id="l1slow"></p><div class="fig"><svg id="l1space" role="img" aria-label="The bits laid out along the wire with a ruler in meters and an everyday object for scale; both rows move at the same speed"></svg></div>' +
     '<ul class="legend"><li><i style="background:#9DB3C1;height:9px"></i>the wire</li><li><i style="background:#13A88A;height:4px"></i>an everyday object, for scale</li></ul></div>' +
     '<div class="calcgrid" id="l1stats"></div></div>' +
-    figFold('Unit converter: bits, bytes, KB and KiB', '<div class="row"><label>Size ' + numIn('l1cv', s.cv, 0, 1e15, 'Size') + '</label><select id="l1cu" aria-label="Unit">' + sizeUnitOptions(s.cu) + '</select></div><div class="calcgrid" id="l1conv"></div>');
-  function view(v) { s.view = v; $('#l1ptime').hidden = v !== 'time'; $('#l1pwire').hidden = v !== 'wire'; $('#l1vtime').setAttribute('aria-pressed', String(v === 'time')); $('#l1vwire').setAttribute('aria-pressed', String(v === 'wire')); }
+    figFold('Unit converter: bits, bytes, KB and KiB', '<div class="row"><label>Size ' + numIn('l1cv', s.cv, 0, 1e15, 'Size') + '</label><select id="l1cu" aria-label="Unit">' + sizeUnitOptions(s.cu) + '</select></div><div class="calcgrid" id="l1conv"></div>', 'A separate tool, not a figure of the link: type any size to see it in bits, bytes, and the decimal and binary units.');
+  var pl = new Player({ strips: ['l1w'], ms: 6000, alive: lessonAlive(), draw: function (f) {
+    drawBitSpace($('#l1space'), { rate: s.rate, mult: s.mult, medium: s.medium, phase: 4 * f });
+    return 'moved ' + fmtLen(4 * f * bitLength(s.rate, s.medium));
+  } });
+  function view(v) { s.view = v; $('#l1ptime').hidden = v !== 'time'; $('#l1pwire').hidden = v !== 'wire'; $('#l1vtime').setAttribute('aria-pressed', String(v === 'time')); $('#l1vwire').setAttribute('aria-pressed', String(v === 'wire')); if (v === 'wire') pl.restart(); }
   function upd() {
     s.rate = +$('#l1rate').value; s.mult = +$('#l1mult').value; s.medium = $('#l1med').value;
     drawBits($('#l1svg'), s.rate, s.mult);
-    drawBitSpace($('#l1space'), { rate: s.rate, mult: s.mult, medium: s.medium, phase: 0 });
     $('#l1slow').textContent = 'Both rows move at the signal speed, slowed down about ' + fmtN(6 * s.rate / 4, 2) + ' times at 1×.';
     $('#l1stats').innerHTML = stat('Bit width at ' + fmtRate(s.rate), fmtT(bitWidth(s.rate)), '1 ÷ ' + fmtRate(s.rate) + '; at ' + fmtRate(s.rate * s.mult) + ': ' + fmtT(bitWidth(s.rate * s.mult))) +
       stat('Length of one bit on ' + MEDIUM_NAME[s.medium], fmtLen(bitLength(s.rate, s.medium)), fmtN(SPEED[s.medium]) + ' m/s ÷ ' + fmtRate(s.rate));
@@ -1444,8 +1590,8 @@ function l1() {
     $('#l1conv').innerHTML = stat('Bits', fmtN(b, 6)) + stat('Bytes', fmtN(b / 8, 6)) + stat('KB and KiB', fmtN(b / 8e3, 5) + ' KB', fmtN(b / 8192, 5) + ' KiB') + stat('MB and MiB', fmtN(b / 8e6, 5) + ' MB', fmtN(b / 8388608, 5) + ' MiB');
   }
   $('#l1vtime').onclick = function () { view('time'); }; $('#l1vwire').onclick = function () { view('wire'); };
-  $('#l1rate').onchange = upd; $('#l1mult').onchange = upd; $('#l1med').onchange = upd;
-  $('#l1go').onclick = function () { var ok = lessonAlive(), b = this; b.disabled = true; animateS(6000, function (f) { drawBitSpace($('#l1space'), { rate: s.rate, mult: s.mult, medium: s.medium, phase: 4 * f }); }, ok).then(function () { b.disabled = false; }); };
+  function ch() { upd(); if (s.view === 'wire') pl.restart(); else pl.reset(); }
+  $('#l1rate').onchange = ch; $('#l1mult').onchange = ch; $('#l1med').onchange = ch;
   $('#l1cv').oninput = conv; $('#l1cu').onchange = conv;
   var ans = 1000 / t.r;
   $('#l1c').onclick = function () {
@@ -1453,10 +1599,10 @@ function l1() {
     if (near(v, ans)) lessonDone(fb, 'Right: 1 ÷ (' + t.r + ' × 10⁶ bits per second) = ' + fmtN(ans) + ' ns. Every bit on this link lasts ' + fmtN(ans) + ' ns.');
     else if (near(v, ans / 1000)) wrong(fb, 'That is the right size in µs (microseconds). The task asks for ns: 1 µs = 1,000 ns.');
     else if (near(v, t.r)) wrong(fb, 'That is the bandwidth itself. The bit width is 1 ÷ bandwidth.');
-    else wrong(fb, 'Not yet. Choose a bandwidth above and read the bit width under the figure, then work out the same thing for ' + t.r + ' Mbps.');
+    else wrong(fb, 'Not yet. Choose a bandwidth above the figure and read the bit width under it, then work out the same thing for ' + t.r + ' Mbps.');
   };
   $('#l1h').onclick = function () { note($('#l1fb'), '💡 At 1 Mbps a bit lasts 1 µs = 1,000 ns. At ' + t.r + ' Mbps it lasts ' + t.r + ' times less.'); };
-  upd(); conv();
+  upd(); conv(); if (s.view === 'wire') pl.restart(); else pl.reset();
 }
 
 /* Lesson 2: three parts of latency. Every part of the task's answer is at least 5% of it, so an answer that leaves one out is never accepted. */
@@ -1484,10 +1630,6 @@ function l2() {
       '<p>The line under the link marks the four moments in time order. Press <b>Show</b> next to a moment to jump to it.</p>' +
       '<p><b>Which comes first?</b> The last bit leaves Host A one transmit time after the first. The first bit reaches Host B one propagation delay after it leaves. If the transmit time is longer than the propagation delay, the first bit arrives before the last bit leaves.</p>' +
       '<p>Signals travel at about 2.0 × 10⁸ m/s (meters per second) in fiber, 2.3 × 10⁸ m/s in copper cable, and 3.0 × 10⁸ m/s by radio. The folded time diagram under the figure shows the same journey with time running down the page.</p>',
-    terms: [['Latency', 'the time from when a packet is ready to send until its last bit arrives'], ['Queue (queuing delay)', 'time spent waiting in a buffer behind other packets'],
-      ['Transmit time', 'the time to put every bit on the wire: size ÷ bandwidth'], ['Propagation delay', 'the time one bit takes to cross the link: distance ÷ signal speed'],
-      ['ms', 'millisecond, a thousandth of a second'], ['km', 'kilometer, 1,000 m (meters)'], ['Mbps and Gbps', 'megabits (10⁶) and gigabits (10⁹) per second'],
-      ['First bit and last bit', 'the first and the last bit of the packet to leave Host A'], ['Time diagram', 'a figure with the hosts across the top and time running down the page']],
     ctl: '<div class="row"><label>Example <select id="l2p"><option value="">choose…</option>' + Object.keys(L2_PRESETS).map(function (k) { return '<option value="' + k + '">' + esc(L2_PRESETS[k].name) + '</option>'; }).join('') + '</select></label></div>' +
       '<div class="row"><label>Size ' + numIn('l2s', s.size, 1, 1e12, 'Size in bytes') + ' bytes</label><label>Bandwidth <select id="l2bw">' + rateOptions(s.bw) + '</select></label></div>' +
       '<div class="row"><label>Distance ' + numIn('l2d', s.distKm, 0, 1e7, 'Distance in kilometers') + ' km</label><label>Medium <select id="l2m">' + mediumOptions(s.medium) + '</select></label><label>Queue ' + numIn('l2q', s.q, 0, 1e6, 'Queuing delay in milliseconds') + ' ms</label></div>'
@@ -1498,8 +1640,8 @@ function l2() {
     '<ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>the packet\'s bits</li><li><i style="background:#F5A524"></i>first bit</li><li><i style="background:#0B3D5C"></i>last bit</li><li><i style="background:#13A88A;border-radius:50%;width:12px"></i>a moment that has happened</li></ul>' +
     '<p class="figtitle">The four moments</p><ol class="log" id="l2ev" aria-live="polite"></ol></div>' +
     figFold('The same journey on a time diagram (time runs down)', stripHTML('l2b') + '<div class="fig"><svg id="l2st" role="img" aria-label="Space-time diagram: Host A sends one packet to Host B"></svg></div>' + ST_LEGEND +
-      '<p class="cmdnote">The height of the band at Host A is the transmit time. Its slope is the propagation delay.</p>') +
-    figFold('The numbers: queue, transmit, and propagation', '<div class="calcgrid" id="l2stats"></div><p class="figtitle">Where the latency comes from</p><div class="fig"><svg id="l2bar" role="img" aria-label="Bar split into queue, transmit, and propagation"></svg></div>');
+      '<p class="cmdnote">The height of the band at Host A is the transmit time. Its slope is the propagation delay.</p>', 'The same journey as the figure above, drawn with time running down the page. Both figures follow one clock: Send, Reset, and the time slider move them together.') +
+    figFold('The numbers: queue, transmit, and propagation', '<div class="calcgrid" id="l2stats"></div><p class="figtitle">Where the latency comes from</p><div class="fig"><svg id="l2bar" role="img" aria-label="Bar split into queue, transmit, and propagation"></svg></div>' + BAR_KEY, 'The same packet as the figures above, in numbers: each part of its latency, then a bar that shows how big each part is.');
   var curL = null, evKey = '';
   var tl = new Timeline({ strips: ['l2', 'l2b'], st: $('#l2st'), detail: true, alive: lessonAlive(), ms: 6000,
     extra: function (tc, r) {
@@ -1513,15 +1655,16 @@ function l2() {
       markEvents($('#l2ev'), tc, h.end);
     } });
   function upd() {
-    var size = readF('#l2s', 1, 1e12), d = readF('#l2d', 0, 1e7), q = readF('#l2q', 0, 1e6); if (size === null || d === null || q === null) return;
+    var size = readF('#l2s', 1, 1e12), d = readF('#l2d', 0, 1e7), q = readF('#l2q', 0, 1e6); if (size === null || d === null || q === null) return false;
     s.size = size; s.distKm = d; s.q = q; s.bw = +$('#l2bw').value; s.medium = $('#l2m').value;
     var L = { bw: s.bw, dist: d * 1000, medium: s.medium, q: q / 1000 }, bits = size * 8, r = pathTimes(bits, [L]).hops[0];
     curL = L; tl.set(['Host A', 'Host B'], [L], bits);
     $('#l2stats').innerHTML = stat('Queue', fmtT(r.q)) + stat('Transmit', fmtT(r.T), fmtN(bits) + ' bits ÷ ' + fmtRate(s.bw)) + stat('Propagation', fmtT(r.P), fmtDist(d * 1000) + ' ÷ ' + fmtN(SPEED[s.medium]) + ' m/s') + stat('Latency', fmtT(r.end), r.T > r.P ? 'transmit is the biggest part' : 'propagation is the biggest part', true);
-    drawBar($('#l2bar'), [{ name: 'Queue', v: r.q, fill: C.amberSoft, line: C.amber }, { name: 'Transmit', v: r.T, fill: C.panel, line: C.brand }, { name: 'Propagation', v: r.P, fill: '#E7E1FF', line: '#7B61FF' }]);
+    drawBar($('#l2bar'), [{ name: 'Queue', v: r.q, fill: C.amberSoft, line: C.amber }, { name: 'Transmit', v: r.T, fill: C.panel, line: C.brand }, { name: 'Propagation', v: r.P, fill: '#E7E1FF', line: '#7B61FF' }], 'Latency');
   }
-  $('#l2p').onchange = function () { var P = L2_PRESETS[this.value]; if (!P) return; $('#l2s').value = P.size; $('#l2bw').value = P.bw; $('#l2d').value = P.distKm; $('#l2m').value = P.medium; $('#l2q').value = P.q; upd(); tl.play(); };
-  ['#l2s', '#l2d', '#l2q'].forEach(function (id) { $(id).oninput = upd; }); $('#l2bw').onchange = upd; $('#l2m').onchange = upd;
+  function ch() { if (upd() !== false) tl.restart(); }
+  $('#l2p').onchange = function () { var P = L2_PRESETS[this.value]; if (!P) return; $('#l2s').value = P.size; $('#l2bw').value = P.bw; $('#l2d').value = P.distKm; $('#l2m').value = P.medium; $('#l2q').value = P.q; ch(); };
+  ['#l2s', '#l2d', '#l2q'].forEach(function (id) { $(id).oninput = ch; }); $('#l2bw').onchange = ch; $('#l2m').onchange = ch;
   $('#l2c').onclick = function () {
     var v = readAnswer('#l2a'), fb = $('#l2fb');
     if (near(v, ans)) lessonDone(fb, 'Right: ' + t.q + ' ms (queue) + ' + fmtN(tT) + ' ms (transmit: ' + fmt(t.size * 8) + ' bits ÷ ' + fmtRate(t.bw) + ') + ' + fmtN(tP) + ' ms (propagation: ' + fmt(t.distKm) + ' km ÷ 2 × 10⁸ m/s) = ' + fmtN(ans) + ' ms.');
@@ -1529,10 +1672,10 @@ function l2() {
     else if (near(v, tP + t.q) || near(v, tP)) wrong(fb, 'You have the propagation part. The packet also needs time to be put on the wire.');
     else if (near(v, 2 * ans) || near(v, 2 * (tT + tP) + t.q)) wrong(fb, 'That looks like a round trip. Latency here is one way, from Host A to Host B.');
     else if (near(v, t.q + t.size / t.bw * 1e3 + tP)) wrong(fb, 'Check the transmit part: the size is in bytes, and the bandwidth is in bits per second.');
-    else wrong(fb, 'Not yet. Type the task\'s numbers into the boxes above, then read the last moment\'s time or open <b>The numbers</b> under the figure.');
+    else wrong(fb, 'Not yet. Type the task\'s numbers into the boxes above the figure, then read the last moment\'s time or open <b>The numbers</b> under the figure.');
   };
   $('#l2h').onclick = function () { note($('#l2fb'), '💡 Transmit = ' + fmt(t.size) + ' × 8 bits ÷ ' + fmtRate(t.bw) + '. Propagation = ' + fmt(t.distKm) + ',000 m ÷ 2 × 10⁸ m/s. Then add the queue.'); };
-  upd();
+  upd(); tl.restart();
 }
 
 /* Lesson 3: which part dominates? */
@@ -1554,10 +1697,6 @@ function l3() {
       '<p><b>Large messages:</b> the transmit time dominates, so bandwidth matters most. The transfer is <b>bandwidth-bound</b>.</p>' +
       '<p>Transmit and propagation are equal when size ÷ bandwidth = delay, that is, when the size equals <b>delay × bandwidth</b>. That product is the subject of the next lesson.</p>' +
       '<p><b>Reading the plot.</b> Both axes are logarithmic: each grid step is 10 times more. A flat part of a curve means the delay dominates; a rising part means the transmit time dominates.</p>',
-    terms: [['Latency', 'one-way delay (propagation) plus transmit time, here with no queue'], ['One-way delay', 'the time one bit takes to cross the link'], ['Transmit time', 'size ÷ bandwidth'],
-      ['Latency-bound', 'the delay is the bigger part, so more bandwidth hardly helps'], ['Bandwidth-bound', 'the transmit time is the bigger part, so bandwidth matters most'],
-      ['Logarithmic scale', 'each equal step on the axis is 10 times more'], ['ms', 'millisecond, a thousandth of a second'], ['Mbps and Gbps', 'megabits (10⁶) and gigabits (10⁹) per second'],
-      ['KB, MB, GB', 'kilobyte (1,000 bytes), megabyte (10⁶ bytes), gigabyte (10⁹ bytes)']],
     ctl: '<div class="row"><b style="color:#00A2D7">Link 1</b><label>Bandwidth <select id="l3ba">' + rateOptions(s.bwA) + '</select></label><label>One-way delay ' + numIn('l3da', s.dA, 0, 1e6, 'Link 1 one-way delay in milliseconds') + ' ms</label></div>' +
       '<div class="row"><b style="color:#7B61FF">Link 2</b><label>Bandwidth <select id="l3bb">' + rateOptions(s.bwB) + '</select></label><label>One-way delay ' + numIn('l3db', s.dB, 0, 1e6, 'Link 2 one-way delay in milliseconds') + ' ms</label></div>' +
       '<div class="row"><label>Message size <input type="range" id="l3sz" min="2" max="9" step="0.1" value="' + s.lsize + '"></label><b class="mono" id="l3szv"></b></div>'
@@ -1589,7 +1728,7 @@ function l3() {
     var fb = $('#l3fb');
     var why = 'Link 1 takes ' + fmtT(t.a.d) + ' + ' + fmtT(t.sz[0] * 8 / t.a.bw) + ' = ' + fmtT(t.la) + '. Link 2 takes ' + fmtT(t.b.d) + ' + ' + fmtT(t.sz[0] * 8 / t.b.bw) + ' = ' + fmtT(t.lb) + '.';
     if (k === t.win) lessonDone(fb, 'Right. ' + why + (t.win === 2 ? ' The message is small enough that the satellite\'s long delay dominates.' : ' The message is big enough that bandwidth dominates.'));
-    else wrong(fb, 'Not this time. Set the two links and the size above to the task\'s values, then compare the two latencies under the figure.');
+    else wrong(fb, 'Not this time. Set the two links and the size above the figure to the task\'s values, then compare the two latencies under the figure.');
   }
   $('#l3c1').onclick = function () { check(1); }; $('#l3c2').onclick = function () { check(2); };
   $('#l3h').onclick = function () { note($('#l3fb'), '💡 For each link, add the one-way delay and the transmit time (size × 8 ÷ bandwidth).'); };
@@ -1609,10 +1748,6 @@ function l4() {
       '<p><b>A small window.</b> With a window smaller than RTT × bandwidth, Host A sends one window, waits for the ACK, and sends the next. Part of the pipe sits empty, and the throughput drops to <b>window ÷ RTT</b>, however fast the link is.</p>' +
       '<p><b>Width is not bit width.</b> A wider pipe puts more bits on the wire each second, so each bit lasts a <i>shorter</i> time. Width and length are drawn on logarithmic scales: each step of 10 times more bandwidth (or delay) adds the same width (or length).</p>' +
       '<p><b>The controls.</b> Leave the window blank for no limit; a window matters only in a round trip. Leave the message blank to keep sending without an end. When you quote a delay × bandwidth product, say which delay you mean: one way or the RTT.</p>',
-    terms: [['Delay × bandwidth', 'how many bits fit on the link at once: the pipe\'s volume'], ['One-way delay', 'the time one bit takes to cross the link: the pipe\'s length'], ['Bandwidth', 'bits per second the link carries: the pipe\'s width'],
-      ['RTT', 'round-trip time: there and back, twice the one-way delay here'], ['ACK', 'acknowledgment: a short message from the receiver saying what has arrived'],
-      ['Window', 'how many bits the sender may have in flight before it must wait for an ACK'], ['In flight', 'sent but not yet acknowledged'], ['Throughput', 'the rate a transfer really gets, in bits per second'],
-      ['ms', 'millisecond, a thousandth of a second'], ['Mb and Mbps', 'megabits (10⁶ bits) and megabits per second'], ['KB and MB', 'kilobyte (1,000 bytes) and megabyte (10⁶ bytes)']],
     ctl: '<div class="row"><label>One-way delay ' + numIn('l4d', s.dMs, 0.001, 1e6, 'One-way delay in milliseconds') + ' ms</label><label>Bandwidth <select id="l4bw">' + rateOptions(s.bw) + '</select></label></div>' +
       '<div class="row"><label>Message ' + numIn('l4m', s.msg, 0, 1e12, 'Message size') + '</label><select id="l4mu" aria-label="Message size unit">' + sizeUnitOptions(s.msgu) + '</select></div>' +
       '<div class="row"><label>Show <select id="l4mode"><option value="one"' + (s.mode === 'one' ? ' selected' : '') + '>one way</option><option value="rtt"' + (s.mode === 'rtt' ? ' selected' : '') + '>a round trip</option></select></label><label>Window ' + numIn('l4w', s.winKB, 0, 1e12, 'Window in kilobytes') + ' KB</label></div>'
@@ -1621,7 +1756,7 @@ function l4() {
   $('#lfig').innerHTML = '<div class="card"><p class="figtitle">The link as a pipe</p>' + stripHTML('l4') + '<div class="fig"><svg id="l4svg" role="img" aria-label="A pipe whose length is the delay and whose width is the bandwidth, filled with blocks of bits"></svg></div>' +
     '<ul class="legend"><li><i style="background:#00A2D7"></i>bits in flight</li><li><i style="background:#F5A524"></i>the first bit</li><li><i style="background:#fff;border:1px solid #9DB3C1"></i>empty part of the pipe</li><li><i style="background:#13A88A"></i>acknowledgment (ACK)</li></ul>' +
     '<div class="calcgrid" id="l4key"></div></div>' +
-    figFold('More numbers for this pipe', '<div class="calcgrid" id="l4stats"></div>');
+    figFold('More numbers for this pipe', '<div class="calcgrid" id="l4stats"></div>', 'More numbers for the same pipe as the figure above.');
   var D = 0, tEnd = 0, pl;
   function draw(frac) {
     var w = s.winKB, winBits = w === '' ? null : w * 8000, Sbits = s.msg === '' || s.msg <= 0 ? Infinity : s.msg * unitBits(s.msgu);
@@ -1629,7 +1764,7 @@ function l4() {
     return 't = ' + fmtT(frac * tEnd, 4);
   }
   function upd() {
-    var d = readF('#l4d', 0.001, 1e6), w = readF('#l4w', 0, 1e12, true), m = readF('#l4m', 0, 1e12, true); if (d === null || w === null || m === null) return;
+    var d = readF('#l4d', 0.001, 1e6), w = readF('#l4w', 0, 1e12, true), m = readF('#l4m', 0, 1e12, true); if (d === null || w === null || m === null) return false;
     s.dMs = d; s.winKB = w; s.bw = +$('#l4bw').value; s.mode = $('#l4mode').value; s.msg = m; s.msgu = $('#l4mu').value;
     D = d / 1000; var rtt = 2 * D, one = dxb(D, s.bw), two = dxb(rtt, s.bw), winBits = w === '' ? null : w * 8000;
     var Sbits = m === '' || m <= 0 ? Infinity : m * unitBits(s.msgu), Wuse = s.mode === 'rtt' && winBits !== null ? winBits : Infinity;
@@ -1644,17 +1779,18 @@ function l4() {
     if (pl) pl.show();
   }
   pl = new Player({ strips: ['l4'], ms: 7000, alive: lessonAlive(), draw: draw });
-  $('#l4d').oninput = upd; $('#l4w').oninput = upd; $('#l4m').oninput = upd; $('#l4mu').onchange = upd; $('#l4bw').onchange = upd; $('#l4mode').onchange = upd;
+  function ch() { if (upd() !== false) pl.restart(); }
+  $('#l4d').oninput = ch; $('#l4w').oninput = ch; $('#l4m').oninput = ch; $('#l4mu').onchange = ch; $('#l4bw').onchange = ch; $('#l4mode').onchange = ch;
   $('#l4c').onclick = function () {
     var v = readAnswer('#l4a'), fb = $('#l4fb');
     if (near(v, ans)) lessonDone(fb, 'Right: ' + t.rtt + ' ms × ' + t.bw + ' Mbps = ' + fmt(t.rtt * t.bw) + ' kilobits, and ÷ 8 = ' + fmtN(ans) + ' KB. With less than that, the sender stalls before the first acknowledgment returns.');
     else if (near(v, ans * 8)) wrong(fb, 'That is in kilobits. Divide by 8 for bytes.');
     else if (near(v, ans / 2)) wrong(fb, 'That fills the pipe one way. The sender must keep sending until an acknowledgment comes back: a full round trip.');
     else if (near(v, ans * 1000) || near(v, ans / 1000)) wrong(fb, 'Check the units: ms × Mbps gives kilobits.');
-    else wrong(fb, 'Not yet. Set a one-way delay of ' + t.rtt / 2 + ' ms and ' + t.bw + ' Mbps above and read RTT × bandwidth under <b>More numbers</b>.');
+    else wrong(fb, 'Not yet. Set a one-way delay of ' + t.rtt / 2 + ' ms and ' + t.bw + ' Mbps above the figure and read RTT × bandwidth under <b>More numbers</b>.');
   };
   $('#l4h').onclick = function () { note($('#l4fb'), '💡 Window = RTT × bandwidth. ms × Mbps gives kilobits (10³ bits); then divide by 8 for kilobytes.'); };
-  upd();
+  upd(); pl.restart();
 }
 
 /* Lesson 5: bandwidth is not throughput. The task always has a throughput clearly below the bandwidth (at most 90%), so answering with the bandwidth is never accepted. */
@@ -1670,11 +1806,6 @@ function l5() {
       '<p><b>Example.</b> Fetch a 1 MB (megabyte) file over a 1 Gbps (gigabit per second) link with a 100 ms (millisecond) RTT. Transmitting 8 × 10⁶ bits takes 8 ms, so the transfer takes 108 ms and the throughput is about 74 Mbps, not 1 Gbps. Ten times the bandwidth would save only 7.2 ms. This transfer is <b>latency-bound</b>: shorten the RTT, not the transmit time.</p>' +
       '<p>Real TCP (Transmission Control Protocol) transfers also need a handshake and start slowly, so they take even longer than this.</p>' +
       '<p>The folded figures under the main one show how the link is used over time and the throughput for every bandwidth.</p>',
-    terms: [['Bandwidth', 'how many bits per second a link can carry: the pipe\'s width'], ['Latency', 'how long one packet takes from host to host: the pipe\'s length, plus any waiting'],
-      ['Throughput', 'how many bits per second a transfer actually delivers, from start to finish. It is never more than the slowest link\'s bandwidth'],
-      ['Delay × bandwidth', 'how many bits fit in the pipe: its volume'], ['RTT', 'round-trip time: there and back'], ['Transfer time', 'RTT + size ÷ bandwidth'],
-      ['Latency-bound', 'the RTT is the bigger part, so more bandwidth hardly helps'], ['TCP', 'Transmission Control Protocol, which most downloads use'],
-      ['MB and Mb', 'megabyte (10⁶ bytes) and megabit (10⁶ bits)'], ['Mbps and Gbps', 'megabits (10⁶) and gigabits (10⁹) per second'], ['ms', 'millisecond, a thousandth of a second']],
     ctl: '<div class="row"><label>Size ' + numIn('l5s', s.size, 0.000001, 1e9, 'Size') + '</label><select id="l5u" aria-label="Size unit">' + sizeUnitOptions(s.unit) + '</select></div>' +
       '<div class="row"><label>Bandwidth <select id="l5bw">' + rateOptions(s.bw) + '</select></label><label>RTT ' + numIn('l5r', s.rtt, 0, 1e6, 'Round-trip time in milliseconds') + ' ms</label></div>'
   });
@@ -1683,13 +1814,13 @@ function l5() {
     '<div class="fig"><svg id="l5xfer" role="img" aria-label="Host A sends a request; Host B sends the file back through the pipe; the transfer completes when the last bit arrives"></svg></div>' +
     '<ul class="legend"><li><i style="background:#F5A524"></i>the request</li><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>the file\'s data</li><li><i style="background:#13A88A;border-radius:50%;width:12px"></i>a moment that has happened</li></ul>' +
     '<div class="calcgrid" id="l5key"></div></div>' +
-    figFold('Step through the five moments', '<ol class="log" id="l5ev" aria-live="polite"></ol><p class="cmdnote">The request is tiny, so its transmit time is left out.</p>') +
+    figFold('Step through the five moments', '<ol class="log" id="l5ev" aria-live="polite"></ol><p class="cmdnote">The request is tiny, so its transmit time is left out.</p>', 'The five moments of the download in the figure above, in time order. Press Show to jump the figure to one.') +
     figFold('Bandwidth versus throughput, over time', stripHTML('l5b') + '<div class="fig"><svg id="l5use" role="img" aria-label="Rate over time: nothing during the first RTT, then the full bandwidth; the dashed line is the average rate, the throughput"></svg></div>' +
       '<ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>data arriving at the full bandwidth</li><li><i style="background:#fff;border:1px dashed #9DB3C1"></i>waiting: no data yet</li><li><i style="background:#D98A00;height:3px"></i>throughput: the average rate</li></ul>' +
-      '<p class="cmdnote">The box\'s height is the bandwidth. Spread the same bits over the whole transfer time and you get the throughput.</p>') +
+      '<p class="cmdnote">The box\'s height is the bandwidth. Spread the same bits over the whole transfer time and you get the throughput.</p>', 'The same download as the figure above, as a graph of the rate over time. It moves with the same clock.') +
     figFold('Throughput for every bandwidth', '<p class="cmdnote">Both axes are logarithmic: each grid step is 10 times more.</p><div class="fig"><svg id="l5svg" role="img" aria-label="Effective throughput against bandwidth on logarithmic scales, with the ceiling set by size divided by RTT"></svg></div>' +
       '<ul class="legend"><li><i style="background:#00A2D7"></i>effective throughput</li><li><i style="background:#fff;border:1px dashed #5B6B78"></i>throughput = bandwidth</li><li><i style="background:#fff;border:1px dashed #D98A00"></i>ceiling: size ÷ RTT</li></ul><div class="calcgrid" id="l5stats"></div>' +
-      '<p class="figtitle">Where the transfer time goes</p><div class="fig"><svg id="l5bar" role="img" aria-label="Bar split into RTT and transmit time"></svg></div>');
+      '<div class="subfig"><p class="figtitle">Where the transfer time goes</p><p class="relates">The same download as the graph above: its transfer time split into the RTT and the transmit time.</p><div class="fig"><svg id="l5bar" role="img" aria-label="Bar split into RTT and transmit time"></svg></div>' + BAR_KEY5 + '</div>', 'The same file size and RTT as the download above, but every bandwidth at once: the dot is the bandwidth you chose.');
   var cur = null, evKey = '', pl;
   function draw(frac) {   // the transfer, the moments, and the bandwidth-versus-throughput figure, at the same moment
     if (!cur) return '';
@@ -1705,7 +1836,7 @@ function l5() {
     return 't = ' + fmtT(tc, 4);
   }
   function upd() {
-    var v = readF('#l5s', 0.000001, 1e9), r = readF('#l5r', 0, 1e6); if (v === null || r === null) return;
+    var v = readF('#l5s', 0.000001, 1e9), r = readF('#l5r', 0, 1e6); if (v === null || r === null) return false;
     s.size = v; s.unit = $('#l5u').value; s.bw = +$('#l5bw').value; s.rtt = r;
     var bits = v * unitBits(s.unit), R = r / 1000, x = transfer(bits, s.bw, R), fn = function (b) { return transfer(bits, b, R).thr; };
     var series = [{ pts: logPts(1e3, 1e11, fn), color: C.brand }, { pts: [[1e3, 1e3], [1e11, 1e11]], color: C.muted, lw: 1.2, dash: [4, 3] }];
@@ -1717,22 +1848,23 @@ function l5() {
       tKind = stat('This transfer is', R > x.trans ? 'latency-bound' : 'bandwidth-bound', R > x.trans ? 'the RTT is the bigger part' : 'the transmit time is the bigger part');
     $('#l5key').innerHTML = tTime + tThr + tKind;
     $('#l5stats').innerHTML = stat('Transmit time', fmtT(x.trans), fmtBits(bits) + ' ÷ ' + fmtRate(s.bw)) + tTime + tThr + tKind + stat('With 10 times the bandwidth', fmtT(x10.time), 'saves ' + fmtT(x.time - x10.time, 3));
-    drawBar($('#l5bar'), [{ name: 'RTT', v: R, fill: '#E7E1FF', line: '#7B61FF' }, { name: 'Transmit', v: x.trans, fill: C.panel, line: C.brand }]);
+    drawBar($('#l5bar'), [{ name: 'RTT', v: R, fill: '#E7E1FF', line: '#7B61FF' }, { name: 'Transmit', v: x.trans, fill: C.panel, line: C.brand }], 'Transfer time');
     cur = { bits: bits, bw: s.bw, rtt: R, binary: /i/.test(s.unit), thr: x.thr, trans: x.trans };
     if (pl) pl.show();
   }
   pl = new Player({ strips: ['l5', 'l5b'], ms: 6000, alive: lessonAlive(), draw: draw });
-  $('#l5s').oninput = upd; $('#l5r').oninput = upd; $('#l5u').onchange = upd; $('#l5bw').onchange = upd;
+  function ch() { if (upd() !== false) pl.restart(); }
+  $('#l5s').oninput = ch; $('#l5r').oninput = ch; $('#l5u').onchange = ch; $('#l5bw').onchange = ch;
   $('#l5c').onclick = function () {
     var v = readAnswer('#l5a'), fb = $('#l5fb');
     if (near(v, ans)) lessonDone(fb, 'Right: transmitting ' + t.mb * 8 + ' Mb at ' + t.bw + ' Mbps takes ' + fmtT(tt) + '. Add the ' + t.rtt + ' ms RTT: ' + fmtT(t.rtt / 1000 + tt) + '. Throughput = ' + t.mb * 8 + ' Mb ÷ ' + fmtT(t.rtt / 1000 + tt) + ' = ' + fmtN(ans) + ' Mbps.');
     else if (near(v, t.bw)) wrong(fb, 'That is the link\'s bandwidth. The transfer also spends one RTT before data arrives.');
     else if (near(v, t.mb * 8 / (t.rtt / 1000))) wrong(fb, 'You divided by the RTT only. The transfer time also includes the transmit time.');
     else if (near(v, ans / 8)) wrong(fb, 'That is in MB per second. The task asks for megabits per second.');
-    else wrong(fb, 'Not yet. Type the task into the boxes above and read the throughput under the figure.');
+    else wrong(fb, 'Not yet. Type the task into the boxes above the figure and read the throughput under it.');
   };
   $('#l5h').onclick = function () { note($('#l5fb'), '💡 ' + t.mb + ' MB = ' + t.mb * 8 + ' Mb. Transfer time = ' + t.rtt + ' ms + ' + t.mb * 8 + ' Mb ÷ ' + t.bw + ' Mbps. Throughput = ' + t.mb * 8 + ' Mb ÷ transfer time.'); };
-  upd();
+  upd(); pl.restart();
 }
 
 /* Lesson 6: across a switch and a router */
@@ -1766,11 +1898,6 @@ function l6() {
       '<p>The bottleneck sets the highest throughput the path can give, however wide the other links are. Its transmit time is usually the biggest part.</p>' +
       '<p><b>Queues and jitter.</b> Queues grow and shrink with other traffic, so one packet waits longer than the next. That is why ping times vary from line to line. The variation is called <b>jitter</b>. The single packet in the figure waits the full queue at each device; the pings wait a random part of it, each way.</p>' +
       '<p>A real ping time also includes the time the hosts take to answer. It is small on a fast computer and larger in a VM (virtual machine).</p>',
-    terms: [['Store and forward', 'a switch or router receives the whole packet before it sends it on the next link'], ['Bottleneck', 'the slowest link on the path; it limits the throughput'],
-      ['Queue', 'time a packet waits in a device\'s buffer behind other packets'], ['Jitter', 'how much the delay varies from one packet to the next'],
-      ['Ping', 'a command that sends small packets to a host and prints each RTT'], ['RTT', 'round-trip time: there and back'],
-      ['TTL', 'Time To Live: a counter in each packet that every router lowers by 1'], ['VM', 'virtual machine: a computer running inside another computer'],
-      ['ms', 'millisecond, a thousandth of a second'], ['m and km', 'meter and kilometer (1,000 m)'], ['Mbps and Gbps', 'megabits (10⁶) and gigabits (10⁹) per second']],
     ctl: '<div class="row"><label>Packet size ' + numIn('l6s', s.size, 64, 65535, 'Packet size in bytes', 1) + ' bytes</label></div>' +
       '<div class="links">' + s.links.map(function (L, i) { return '<div class="linkbox"><b>Link ' + (i + 1) + ': ' + L6_NAMES[i] + ' → ' + L6_NAMES[i + 1] + '</b><label>Bandwidth <select id="l6b' + i + '">' + rateOptions(L.bw) + '</select></label><label>Length ' + numIn('l6d' + i, L.dist / 1000, 0, 1e6, 'Link ' + (i + 1) + ' length in kilometers') + ' km</label><label>Medium <select id="l6m' + i + '">' + mediumOptions(L.medium) + '</select></label></div>'; }).join('') + '</div>' +
       '<details class="fold"><summary>Queues at the switch and the router</summary><div class="row"><label>At the switch, up to ' + numIn('l6qs', s.qs, 0, 1e4, 'Queue at the switch in milliseconds') + ' ms</label><label>at the router, up to ' + numIn('l6qr', s.qr, 0, 1e4, 'Queue at the router in milliseconds') + ' ms</label></div></details>'
@@ -1778,16 +1905,16 @@ function l6() {
   setTry('<p>A <b>1500-byte</b> packet crosses three links with no queuing: <b>' + t.links.map(function (L) { return fmtRate(L.bw) + ' over ' + fmtDist(L.dist) + ' of ' + MEDIUM_NAME[L.medium]; }).join('</b>, then <b>') + '</b>. What is its latency from Host A to Host B, in <b>ms</b>?</p>' + answerRow('l6', 'Latency in milliseconds'));
   $('#lfig').innerHTML = '<div class="card"><p class="figtitle">One packet from Host A to Host B</p>' + stripHTML('l6', 'Send', true) +
     '<div class="fig"><svg id="l6wire" role="img" aria-label="One packet crossing a switch and a router at the chosen time"></svg></div><p class="figsay" id="l6say" aria-live="polite"></p>' +
-    '<ul class="legend"><li><i style="background:#CFE6F0;border:1px solid #00A2D7"></i>the packet\'s bits</li><li><i style="background:#9DB3C1;height:9px"></i>a thicker link has more bandwidth</li></ul><div class="calcgrid" id="l6key"></div></div>' +
-    figFold('The same packet on a time diagram (time runs down)', stripHTML('l6b', 'Send', true) + '<div class="fig"><svg id="l6st" role="img" aria-label="Space-time diagram: one packet crossing a switch and a router"></svg></div>' + ST_LEGEND) +
-    figFold('The delay on each link', '<div class="calcgrid" id="l6stats"></div>') +
-    figFold('Ping Host B from Host A', '<div class="row"><button class="btn small" id="l6ping">▶ Run 5 pings</button></div><div class="term" id="l6term" aria-live="polite"><span class="d">Press Run 5 pings.</span></div><p class="cmdnote">Linux output. Host B is at 192.168.20.20; the router lowers the TTL (Time To Live) from 64 to 63. Each RTT (round-trip time) is the request and the reply crossing all three links, plus the queues.</p>') +
-    figFold('Measure it on your own computers', '<div id="l6cmds"></div>');
+    WIRE_KEY + '<div class="calcgrid" id="l6key"></div></div>' +
+    figFold('The same packet on a time diagram (time runs down)', stripHTML('l6b', 'Send', true) + '<div class="fig"><svg id="l6st" role="img" aria-label="Space-time diagram: one packet crossing a switch and a router"></svg></div>' + ST_LEGEND, 'The same packet as the figure above, drawn with time running down the page. Both figures follow one clock.') +
+    figFold('The delay on each link', '<div class="calcgrid" id="l6stats"></div>', 'The same path as the figure above, in numbers, link by link.') +
+    figFold('Ping Host B from Host A', '<div class="row"><button class="btn small" id="l6ping">▶ Run 5 pings</button></div><div class="term" id="l6term" aria-live="polite"><span class="d">Press Run 5 pings.</span></div><p class="cmdnote">Linux output. Host B is at 192.168.20.20; the router lowers the TTL (Time To Live) from 64 to 63. Each RTT (round-trip time) is the request and the reply crossing all three links, plus the queues.</p>', 'The same path as the figure above, measured the way a real computer would: each ping crosses it there and back.') +
+    figFold('Measure it on your own computers', '<div id="l6cmds"></div>', 'Not a figure: real Linux and Windows commands that measure the same delays on your own computers.');
   var tl = new Timeline({ strips: ['l6', 'l6b'], wire: $('#l6wire'), sayEl: $('#l6say'), st: $('#l6st'), detail: false, alive: lessonAlive(), paced: true, ms: 9000 }), links = [];
   function upd() {
-    var size = readF('#l6s', 64, 65535), qs = readF('#l6qs', 0, 1e4), qr = readF('#l6qr', 0, 1e4); if (size === null || qs === null || qr === null) return;
+    var size = readF('#l6s', 64, 65535), qs = readF('#l6qs', 0, 1e4), qr = readF('#l6qr', 0, 1e4); if (size === null || qs === null || qr === null) return false;
     size = Math.round(size);
-    var ls = []; for (var i = 0; i < 3; i++) { var d = readF('#l6d' + i, 0, 1e6); if (d === null) return; ls.push({ bw: +$('#l6b' + i).value, dist: d * 1000, medium: $('#l6m' + i).value }); }
+    var ls = []; for (var i = 0; i < 3; i++) { var d = readF('#l6d' + i, 0, 1e6); if (d === null) return false; ls.push({ bw: +$('#l6b' + i).value, dist: d * 1000, medium: $('#l6m' + i).value }); }
     s.size = size; s.links = ls; s.qs = qs; s.qr = qr;
     links = ls.map(function (L, i) { return { bw: L.bw, dist: L.dist, medium: L.medium, q: i === 1 ? qs / 1000 : i === 2 ? qr / 1000 : 0 }; });
     tl.set(L6_NAMES, links, size * 8);
@@ -1797,8 +1924,9 @@ function l6() {
     $('#l6key').innerHTML = tLat + tBot;
     $('#l6stats').innerHTML = r.hops.map(function (h, i) { return stat('Link ' + (i + 1), fmtT(h.q + h.T + h.P, 3), (h.q ? 'queue ' + fmtT(h.q, 3) + ' + ' : '') + 'transmit ' + fmtT(h.T, 3) + ' + propagation ' + fmtT(h.P, 3)); }).join('') + tLat + tBot;
   }
-  $('#l6s').oninput = upd; $('#l6qs').oninput = upd; $('#l6qr').oninput = upd;
-  for (var i = 0; i < 3; i++) { $('#l6b' + i).onchange = upd; $('#l6d' + i).oninput = upd; $('#l6m' + i).onchange = upd; }
+  function ch() { if (upd() !== false) tl.restart(); }
+  $('#l6s').oninput = ch; $('#l6qs').oninput = ch; $('#l6qr').oninput = ch;
+  for (var i = 0; i < 3; i++) { $('#l6b' + i).onchange = ch; $('#l6d' + i).oninput = ch; $('#l6m' + i).onchange = ch; }
   $('#l6ping').onclick = function () {
     var run = pingRun(s.size, s.links, s.qs, s.qr, 5, '192.168.20.20'), term = $('#l6term'), b = this, ok = lessonAlive(), k = 0;
     b.disabled = true; term.innerHTML = '<span class="d">$ ping -c 5 -s ' + (s.size - 28) + ' 192.168.20.20</span>\n' + esc(run.lines[0]);
@@ -1817,10 +1945,251 @@ function l6() {
     else if (near(v, cut + P) || near(v, P + 12000 / Math.min(t.links[0].bw, t.links[1].bw, t.links[2].bw))) wrong(fb, 'You counted the transmit time once. With store and forward, every link transmits the whole packet again.');
     else if (near(v, 2 * t.ans)) wrong(fb, 'That is a round trip. The task asks for one way.');
     else if (near(v, t.ans * 1000) || near(v, t.ans / 1000)) wrong(fb, 'Check your units: the answer is in milliseconds.');
-    else wrong(fb, 'Not yet. Type the task\'s links into the boxes above, set the queues to 0, and read the latency under the figure.');
+    else wrong(fb, 'Not yet. Type the task\'s links into the boxes above the figure, set the queues to 0, and read the latency under the figure.');
   };
   $('#l6h').onclick = function () { note($('#l6fb'), '💡 For each link: 12,000 bits ÷ its bandwidth, plus its length ÷ the signal speed. Add the three links.'); };
-  upd();
+  upd(); tl.restart();
+}
+/* ----------------------------------------------------- Glossary: every term, acronym, unit, and symbol, with one plain definition
+   (instructor's rule, November 23, 2026: a student can point at, tap, or tab to any term or symbol and see its definition,
+   each lesson keeps its "Terms in this lesson" list, and a link at the bottom of every lesson opens the full glossary).
+   Each entry: k = its key (lessons list their terms by key), t = the term as listed, p = the patterns that mark it in the text
+   (a pattern starting with / is a regular expression, ranked against the others by n, its length in letters; a lowercase word
+   also matches with a capital first letter and a plural s), d = the definition, l = the lesson that teaches it (0 for none),
+   sym = true for symbols and units, which come first on the Glossary page. The lessons that use a term are the lessons whose
+   Terms list names it, plus the lesson that teaches it. testing/glossary_check.py fails any term or acronym on a lesson screen
+   that has no entry. */
+var GLOSSARY = [
+  // symbols and units
+  { k: 't', sym: 1, t: 't (time)', p: ['/t(?= = | shows the real time)'], n: 1, d: 'the time on the animation\'s clock: t = 0 is the moment Host A is ready to send, and t shows the real time even when the animation is slowed down.', l: 2 },
+  { k: 'pow10', sym: 1, t: '10³, 10⁶, 10⁹ (powers of ten)', p: ['/10[⁰¹²³⁴⁵⁶⁷⁸⁹]+'], n: 3, d: '10³ is a thousand, 10⁶ a million, and 10⁹ a billion. So 2.0 × 10⁸ m/s is 200 million meters per second.', l: 1 },
+  { k: 'pow2', sym: 1, t: '2²⁰ (a power of two)', p: ['/2[⁰¹²³⁴⁵⁶⁷⁸⁹]+'], n: 3, d: '2 multiplied by itself 20 times: 1,048,576. Memory sizes such as KiB and MiB count in powers of two.', l: 0 },
+  { k: 'bps', sym: 1, t: 'bps (bits per second)', p: ['bps', 'bits/s'], d: 'the unit of bandwidth and throughput: how many bits pass each second.', l: 1 },
+  { k: 'kbps', sym: 1, t: 'kbps (kilobits per second)', p: ['kbps'], d: 'a thousand (10³) bits per second.', l: 1 },
+  { k: 'mbps', sym: 1, t: 'Mbps (megabits per second)', p: ['Mbps'], d: 'a million (10⁶) bits per second.', l: 1 },
+  { k: 'gbps', sym: 1, t: 'Gbps (gigabits per second)', p: ['Gbps'], d: 'a billion (10⁹) bits per second.', l: 1 },
+  { k: 'mb-bit', sym: 1, t: 'Mb (megabit)', p: ['Mb'], d: 'a million (10⁶) bits. A lowercase b means bits; an uppercase B means bytes.', l: 4 },
+  { k: 'kb', sym: 1, t: 'KB (kilobyte)', p: ['KB', 'kilobyte'], d: '1,000 bytes, which is 8,000 bits.', l: 1 },
+  { k: 'mb', sym: 1, t: 'MB (megabyte)', p: ['MB', 'megabyte'], d: '1,000,000 (10⁶) bytes, which is 8 million bits.', l: 1 },
+  { k: 'gb', sym: 1, t: 'GB (gigabyte)', p: ['GB', 'gigabyte'], d: '10⁹ bytes, a billion bytes.', l: 3 },
+  { k: 'mbs', sym: 1, t: 'MB/s (megabytes per second)', p: ['MB/s'], n: 4, d: 'a million bytes per second. Multiply by 8 to get Mbps (megabits per second).', l: 0 },
+  { k: 'kib', sym: 1, t: 'KiB (kibibyte)', p: ['KiB', 'kibibyte'], d: '1,024 bytes (2¹⁰). Memory and some programs count in powers of two.', l: 1 },
+  { k: 'mib', sym: 1, t: 'MiB (mebibyte)', p: ['MiB', 'mebibyte'], d: '1,048,576 bytes (2²⁰), a little more than 1 MB (megabyte).', l: 1 },
+  { k: 'ms', sym: 1, t: 'ms (millisecond)', p: ['ms', 'millisecond'], d: 'a thousandth of a second.', l: 2 },
+  { k: 'us', sym: 1, t: 'µs (microsecond)', p: ['µs', 'microsecond'], d: 'a millionth of a second (10⁻⁶ s).', l: 1 },
+  { k: 'ns', sym: 1, t: 'ns (nanosecond)', p: ['ns', 'nanosecond'], d: 'a billionth of a second (10⁻⁹ s).', l: 1 },
+  { k: 'm', sym: 1, t: 'm (meter)', p: ['/m(?= \\(meters?\\)| of copper| of Ethernet| long)'], n: 1, d: 'the meter, the unit of length.', l: 1 },
+  { k: 'cm', sym: 1, t: 'cm (centimeter)', p: ['/cm(?= \\(centimeters?\\))'], n: 2, d: 'a hundredth of a meter.', l: 1 },
+  { k: 'km', sym: 1, t: 'km (kilometer)', p: ['km', 'kilometer'], d: '1,000 meters.', l: 2 },
+  { k: 'mps', sym: 1, t: 'm/s (meters per second)', p: ['m/s'], d: 'meters per second, the unit of the signal speed.', l: 1 },
+  { k: 'x-op', sym: 1, t: '× and ÷ (times and divided by)', p: ['/[×÷](?= ?[A-Za-z0-9(])'], n: 1, d: '× multiplies and ÷ divides. Delay × bandwidth is the delay multiplied by the bandwidth.', l: 0 },
+  // terms, A to Z
+  { k: 'ack', t: 'ACK (acknowledgment)', p: ['/ACKs?', 'acknowledgment'], n: 3, d: 'a short message from the receiver that says what has arrived. The sender waits for ACKs before it sends more than its window.', l: 4 },
+  { k: 'bandwidth', t: 'Bandwidth', p: ['bandwidth'], d: 'how many bits per second a link can put on the wire, in bps (bits per second). In the pipe picture, it is the pipe\'s width.', l: 1 },
+  { k: 'bandwidth-bound', t: 'Bandwidth-bound', p: ['bandwidth-bound'], d: 'a transfer whose transmit time is the bigger part of its time, so more bandwidth helps the most.', l: 3 },
+  { k: 'bit', t: 'Bit (b)', p: ['bit'], d: 'the smallest unit of data: a 0 or a 1. A lowercase b in a unit, as in Mb or Mbps, means bits.', l: 1 },
+  { k: 'bit-length', t: 'Bit length (length on the wire)', p: ['length on the wire', 'bit length', 'length of one bit'], d: 'how far one bit stretches along the wire while it is sent: signal speed ÷ bandwidth.', l: 1 },
+  { k: 'bit-width', t: 'Bit width', p: ['bit width'], d: 'how long one bit lasts in time: 1 ÷ bandwidth. At 1 Mbps (megabit per second) it is 1 µs (microsecond).', l: 1 },
+  { k: 'bottleneck', t: 'Bottleneck', p: ['bottleneck'], d: 'the slowest link on a path. It limits the throughput of the whole path, however fast the other links are.', l: 6 },
+  { k: 'buffer', t: 'Buffer', p: ['buffer'], d: 'memory in a host, switch, or router where packets wait their turn to be sent: the queue.', l: 2 },
+  { k: 'byte', t: 'Byte (B)', p: ['byte'], d: '8 bits. An uppercase B in a unit, as in KB or MB, means bytes.', l: 1 },
+  { k: 'dxb', t: 'Delay × bandwidth', p: ['delay × bandwidth', 'RTT × bandwidth'], d: 'how many bits fit on the link at once: the pipe\'s volume. With the RTT (round-trip time) as the delay, it is the window that keeps the pipe full.', l: 4 },
+  { k: 'ethernet', t: 'Ethernet', p: ['Ethernet'], d: 'the usual wired network for computers in a building, over copper cable or fiber.', l: 0 },
+  { k: 'fiber', t: 'Fiber (optical fiber)', p: ['fiber'], d: 'a glass strand that carries light. A signal travels through it at about 2.0 × 10⁸ m/s (meters per second).', l: 1 },
+  { k: 'first-bit', t: 'First bit', p: ['first bit'], d: 'the first bit of the packet to leave the sender. Drawn in amber.', l: 2 },
+  { k: 'host', t: 'Host', p: ['/Host [AB]'], n: 6, d: 'a computer at either end of the path: Host A sends and Host B receives (in a download, Host A asks and Host B sends).', l: 2 },
+  { k: 'in-flight', t: 'In flight', p: ['in flight'], d: 'sent but not yet acknowledged: on the wire or waiting at the receiver.', l: 4 },
+  { k: 'interface', t: 'Interface (network adapter)', p: ['interface'], d: 'a computer\'s connection to a network, such as eth0 on Linux. Each one has its own link speed.', l: 0 },
+  { k: 'jitter', t: 'Jitter', p: ['jitter'], d: 'how much the delay changes from one packet to the next, mostly because queues grow and shrink.', l: 6 },
+  { k: 'last-bit', t: 'Last bit', p: ['last bit'], d: 'the last bit of the packet to leave the sender. The packet has arrived only when this bit arrives. Drawn in dark blue.', l: 2 },
+  { k: 'latency', t: 'Latency', p: ['latency'], d: 'the time from when a packet is ready to send until its last bit arrives: queue + transmit + propagation, added up over every link.', l: 2 },
+  { k: 'latency-bound', t: 'Latency-bound', p: ['latency-bound'], d: 'a transfer whose delay (propagation, or the RTT) is the bigger part of its time, so more bandwidth hardly helps.', l: 3 },
+  { k: 'link', t: 'Link', p: ['link'], d: 'the cable, fiber, or radio channel between two devices. It has a bandwidth and a length.', l: 1 },
+  { k: 'log-scale', t: 'Logarithmic scale', p: ['logarithmic'], d: 'an axis on which each equal step is 10 times more, so 1, 10, 100, and 1,000 are evenly spaced.', l: 3 },
+  { k: 'mdev', t: 'mdev (mean deviation)', p: ['mdev'], d: 'in Linux ping output, how much the RTT (round-trip time) varies from one ping to the next.', l: 0 },
+  { k: 'medium', t: 'Medium', p: ['medium'], d: 'what the signal travels through: fiber, copper cable, or radio. It sets the signal speed.', l: 1 },
+  { k: 'one-way-delay', t: 'One-way delay', p: ['one-way delay'], d: 'the time one bit takes to cross the link from one end to the other: the propagation delay. In the pipe picture, it is the pipe\'s length.', l: 3 },
+  { k: 'packet', t: 'Packet', p: ['packet'], d: 'a block of data that a network sends as one unit. A large message is split into many packets.', l: 2 },
+  { k: 'ping', t: 'Ping', p: ['ping'], d: 'a command that sends small echo requests to a host and prints each RTT (round-trip time).', l: 6 },
+  { k: 'pipe', t: 'Pipe', p: ['pipe'], d: 'a picture of a link: its length is the one-way delay, its width is the bandwidth, and its volume is delay × bandwidth, the bits on the link at once.', l: 4 },
+  { k: 'powershell', t: 'PowerShell', p: ['PowerShell'], d: 'the command window in Windows in which the Get-NetAdapter commands run.', l: 0 },
+  { k: 'propagation', t: 'Propagation delay', p: ['propagation delay', 'propagation'], d: 'the time one bit takes to cross a link: distance ÷ signal speed.', l: 2 },
+  { k: 'queue', t: 'Queue (queuing delay)', p: ['queuing delay', 'queue'], d: 'time a packet spends waiting in a buffer behind other packets before it is sent.', l: 2 },
+  { k: 'router', t: 'Router', p: ['router'], d: 'a device that joins two networks and forwards each packet toward its destination. It lowers each packet\'s TTL (Time To Live) by 1.', l: 6 },
+  { k: 'rtt', t: 'RTT (round-trip time)', p: ['RTT', 'round-trip time', 'round trip'], d: 'the time to go there and back: a request to the other host plus the reply back. On one link with no queues, about twice the one-way delay.', l: 4 },
+  { k: 'signal-speed', t: 'Signal speed', p: ['signal speed'], d: 'how fast the signal travels along the medium: about 2.0 × 10⁸ m/s (meters per second) in fiber, 2.3 × 10⁸ m/s in copper cable, and 3.0 × 10⁸ m/s by radio.', l: 1 },
+  { k: 'store-forward', t: 'Store and forward', p: ['store and forward', 'stores and forwards'], d: 'a switch or router receives the whole packet before it sends it on the next link, so every link transmits the whole packet again.', l: 6 },
+  { k: 'sudo', t: 'sudo (superuser do)', p: ['sudo'], d: 'runs a Linux command with administrator rights. Commands that change settings need it.', l: 0 },
+  { k: 'switch', t: 'Switch', p: ['switch'], d: 'a device that joins the hosts of one local network and forwards each packet out of the right port.', l: 6 },
+  { k: 'tcp', t: 'TCP (Transmission Control Protocol)', p: ['TCP'], d: 'the protocol most downloads and web pages use. It delivers data reliably and in order, and waits for ACKs (acknowledgments).', l: 5 },
+  { k: 'throughput', t: 'Throughput', p: ['throughput'], d: 'how many bits per second a transfer really delivers, from start to finish: size ÷ transfer time. It is never more than the bottleneck\'s bandwidth.', l: 5 },
+  { k: 'time-diagram', t: 'Time diagram', p: ['time diagram'], d: 'a figure with the devices across the top and time running down the page. Each band is the packet: its height at the sender is the transmit time, and its slope is the propagation delay.', l: 2 },
+  { k: 'transfer-time', t: 'Transfer time', p: ['transfer time'], d: 'the time from the request to the last bit of the reply: RTT + size ÷ bandwidth.', l: 5 },
+  { k: 'transmit', t: 'Transmit time', p: ['transmit time', 'transmit'], d: 'the time to put every bit of a packet on the wire: size ÷ bandwidth.', l: 2 },
+  { k: 'ttl', t: 'TTL (Time To Live)', p: ['TTL'], d: 'a counter in each packet that every router lowers by 1. In ping output, a TTL of 63 means one router was crossed (from 64).', l: 6 },
+  { k: 'vm', t: 'VM (virtual machine)', p: ['VM', 'virtual machine'], d: 'a computer that runs as a program inside another computer. Its network adapter is simulated.', l: 6 },
+  { k: 'window', t: 'Window', p: ['window'], d: 'how many bits the sender may have in flight before it must wait for an ACK (acknowledgment). A window of RTT × bandwidth keeps the pipe full.', l: 4 }
+];
+
+/* ---- matching: one regular expression per entry; entries with longer patterns go first, so "bit width" wins over "bit" */
+var GLBYK = {}, GL_ORDER = [], GLP = 6, glFrom = 0, glFilter = null, glMark = null;
+(function () {
+  function pat(p) {
+    if (p.charAt(0) === '/') return p.slice(1);
+    var e = p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), c = p.charAt(0);
+    if (/[a-z]/.test(c)) e = '[' + c.toUpperCase() + c + ']' + e.slice(1) + (/^[a-z][a-z \-]*[a-z]$/.test(p) ? '(?:s|es)?' : '');
+    return e;
+  }
+  GLOSSARY.forEach(function (g) {
+    GLBYK[g.k] = g;
+    g.word = g.p.some(function (p) { return /^[a-z]/.test(p); });
+    var ps = g.p.slice().sort(function (a, b) { return b.length - a.length; });
+    g.len = Math.max.apply(null, g.p.map(function (p) { return p.charAt(0) === '/' ? (g.n || 1) : p.length; }));
+    g.re = new RegExp('(^|[^\\w\\-/])(' + ps.map(pat).join('|') + ')(?![\\w])', 'g');
+  });
+  GL_ORDER = GLOSSARY.slice().sort(function (a, b) { return b.len - a.len; });
+})();
+/* the lessons whose Terms list names a term, plus the lesson that teaches it */
+function glUses(g) {
+  var out = [];
+  LESSONS.forEach(function (L, i) { if ((L.terms || []).indexOf(g.k) >= 0 || g.l === i + 1) out.push(i + 1); });
+  return out;
+}
+/* the "Terms in this lesson" list, in the glossary's own words */
+function termsHTML(keys) {
+  return '<ul class="terms">' + keys.map(function (k) {
+    var g = GLBYK[k]; if (!g) throw new Error('No glossary entry for the term key "' + k + '"');
+    return '<li><b>' + g.t + '</b>: ' + g.d + '</li>';
+  }).join('') + '</ul>';
+}
+
+/* ---- marking terms in the lesson: the first use of each term in each part of the page gets a dotted underline */
+var GL_SKIP = 'svg, button, input, select, textarea, label, summary, h1, h2, h3, code, script, style, .kicker, .segs, .cmd, .gl, .noglos, .feedback, .stat .v, .navrow, .figctls, .scrub, .tnow, .figsay, .term, .evmark, .terms b, .mapitem, #glpop';
+function glText(zone) {
+  var out = [], w = document.createTreeWalker(zone, NodeFilter.SHOW_TEXT, null, false), n;
+  while ((n = w.nextNode())) if (n.nodeValue.trim() && n.parentNode && !n.parentNode.closest(GL_SKIP) && !n.parentNode.closest('[hidden], details:not([open])')) out.push(n);
+  return out;
+}
+function glInName(node, before) {   // true when the text sits inside "(...)" right after an acronym, as in "RTT (round-trip time)"
+  var o = before.lastIndexOf('('); if (o < 0 || before.indexOf(')', o) >= 0) return false;
+  var pre = before.slice(0, o).replace(/\s+$/, '');
+  if (!pre) { var w = node.previousSibling; pre = w ? (w.textContent || '').replace(/\s+$/, '') : ''; }
+  return /[A-Z0-9][A-Za-z0-9\-\/]*[A-Z0-9]$|[A-Z]{2,}$|[µkMGK]i?[bBs]p?s?$/.test(pre);
+}
+function glWrap(zone) {
+  if (!zone || zone.hidden) return;
+  var have = {}, nodes = glText(zone);
+  $$('.gl', zone).forEach(function (e) { have[e.getAttribute('data-g')] = 1; });
+  GL_ORDER.forEach(function (g) {
+    if (have[g.k]) return;
+    for (var i = 0; i < nodes.length; i++) {
+      var t = nodes[i].nodeValue, m; g.re.lastIndex = 0;
+      while ((m = g.re.exec(t))) {
+        var at = m.index + m[1].length;
+        if (g.word && glInName(nodes[i], t.slice(0, at))) continue;   // a word inside an acronym's spelled-out name stays plain
+        var after = nodes[i].splitText(at); after.splitText(m[2].length);
+        var sp = document.createElement('span'); sp.className = 'gl'; sp.setAttribute('data-g', g.k); sp.tabIndex = 0;
+        after.parentNode.replaceChild(sp, after); sp.appendChild(after);
+        have[g.k] = 1; nodes = glText(zone); return;
+      }
+    }
+  });
+}
+var glObs = null, glBusy = false, glTimer = 0;
+function glRun() {
+  glTimer = 0; glBusy = true;
+  if (/[?&]widget=/.test(location.search)) { glTimer = 0; return; }   // a slide widget shows the figure only, with no definition popups
+  try { if (current === 'learn' && lessonState.i >= 0 && lessonState.i !== GLP) ['#ltext', '#lfig', '#ltry'].forEach(function (s) { glWrap($(s)); }); } catch (e) { /* a marking problem must never break a lesson */ }
+  if (glObs) glObs.takeRecords(); glBusy = false;
+}
+/* a change inside a figure, a time slider, or the moving status line is not new text to mark: skip it, so animations stay smooth */
+function glNeeds(recs) {
+  return recs.some(function (r) { var t = r.target.nodeType === 1 ? r.target : r.target.parentNode; return !(t && t.closest && t.closest('svg, .scrub, .tnow, .figsay, .evmark, .gl, #glpop')); });
+}
+
+/* ---- the definition popup: on pointing, on keyboard focus, and on tap; Escape or a tap elsewhere closes it */
+var glCur = null, glHideT = 0;
+function glPlace(el) {
+  var pop = $('#glpop'), r = el.getBoundingClientRect(), w, h, x, y;
+  pop.style.maxWidth = Math.min(340, window.innerWidth - 16) + 'px'; pop.style.left = '0px'; pop.style.top = '0px';
+  w = pop.offsetWidth; h = pop.offsetHeight;
+  x = Math.max(8, Math.min(r.left, window.innerWidth - w - 8)); y = r.bottom + 6;
+  if (y + h > window.innerHeight - 8 && r.top - h - 6 > 8) y = r.top - h - 6;
+  pop.style.left = x + 'px'; pop.style.top = y + 'px';
+}
+function glShow(el) {
+  clearTimeout(glHideT);
+  var g = GLBYK[el.getAttribute('data-g')], pop = $('#glpop'); if (!g || !pop) return;
+  if (glCur === el && !pop.hidden) return;
+  pop.innerHTML = '<p class="glt">' + g.t + '</p><p>' + g.d.charAt(0).toUpperCase() + g.d.slice(1) + '</p><p class="glmeta">' + (g.l ? 'Taught in Lesson ' + g.l + '. ' : '') +
+    '<button type="button" class="linkbtn" id="glmore">All terms in the glossary →</button></p>';
+  pop.hidden = false;
+  if (glCur && glCur !== el) glCur.removeAttribute('aria-describedby');
+  glCur = el; el.setAttribute('aria-describedby', 'glpop'); glPlace(el);
+  $('#glmore').onclick = function () { var k = g.k; glClose(); glOpen(k); };
+}
+function glClose() { clearTimeout(glHideT); var pop = $('#glpop'); if (pop) pop.hidden = true; if (glCur) glCur.removeAttribute('aria-describedby'); glCur = null; }
+function glLater() { clearTimeout(glHideT); glHideT = setTimeout(glClose, 300); }
+function glIn(e, sel) { return e.target && e.target.closest ? e.target.closest(sel) : null; }
+
+/* ---- the Glossary page: an appendix after the lessons, opened from the link at the bottom of every lesson */
+function glOpen(k) {   // from a lesson: show that lesson's terms (or all of them when the term is not on that list)
+  if (lessonState.i >= 0 && lessonState.i < GLP) glFrom = lessonState.i + 1;
+  var g = k ? GLBYK[k] : null;
+  glFilter = glFrom && (!g || glUses(g).indexOf(glFrom) >= 0) ? 'l' : 'all';
+  glMark = k || null; openLesson(GLP);
+}
+function glPage() {
+  var from = glFrom, filt = from && glFilter === 'l' ? 'l' : 'all', q = '';
+  $('#ltext').innerHTML = '<p class="kicker">Appendix</p><h2>Glossary</h2>' +
+    '<p>Every term, acronym, unit, and symbol the lessons use, with a plain definition and the lessons that use it. Symbols and units come first, then the terms from A to Z.</p>' +
+    '<p>Inside a lesson, a word with a dotted underline shows its definition when you point at it, tap it, or reach it with the Tab key.</p>' +
+    '<div class="row"><label>Find <input type="search" id="glq" placeholder="a term, an acronym, or a symbol" autocomplete="off"></label></div>' +
+    (from ? '<div class="row"><div class="segs" role="group" aria-label="Which terms to show" id="glf"><button data-v="l" aria-pressed="' + (filt === 'l') + '">Terms in Lesson ' + from + '</button><button data-v="all" aria-pressed="' + (filt === 'all') + '">All terms</button></div></div>' : '');
+  $('#lfig').innerHTML = '<div class="card noglos"><p class="figtitle" id="glt"></p><div id="gllist"></div></div>';
+  function draw() {
+    var qq = q.trim().toLowerCase(), list = GLOSSARY.filter(function (g) {
+      if (filt === 'l' && glUses(g).indexOf(from) < 0) return false;
+      return !qq || (g.t + ' ' + g.d + ' ' + g.p.join(' ')).toLowerCase().indexOf(qq) >= 0;
+    });
+    $('#glt').textContent = (filt === 'l' ? 'Terms in Lesson ' + from + ': ' + LESSONS[from - 1].t : 'All terms') + ' (' + list.length + ')';
+    var groups = [], cur = null;
+    list.filter(function (g) { return g.sym; }).concat(list.filter(function (g) { return !g.sym; }).sort(function (a, b) { return a.t.toLowerCase() < b.t.toLowerCase() ? -1 : 1; })).forEach(function (g) {
+      var h = g.sym ? 'Symbols and units' : g.t.charAt(0).toUpperCase();
+      if (!cur || cur.h !== h) { cur = { h: h, gs: [] }; groups.push(cur); }
+      cur.gs.push(g);
+    });
+    $('#gllist').innerHTML = list.length ? groups.map(function (G) {
+      return '<h3 class="glh">' + G.h + '</h3><dl class="gloss">' + G.gs.map(function (g) {
+        var ls = glUses(g);
+        return '<dt id="g-' + g.k + '"' + (g.k === glMark ? ' class="hl"' : '') + '>' + g.t + '</dt><dd>' + g.d.charAt(0).toUpperCase() + g.d.slice(1) +
+          (ls.length ? '<span class="gll">' + (g.l ? 'Taught in Lesson ' + g.l + '. ' : '') + 'Used in: ' + ls.map(function (l) {
+            return '<button type="button" class="lessonlink" data-open="' + (l - 1) + '">Lesson ' + l + '</button>'; }).join('') + '</span>' : '<span class="gll">Used in the commands and the Calculator.</span>') + '</dd>';
+      }).join('') + '</dl>';
+    }).join('') : '<p class="soft">No term matches "' + esc(q) + '".</p>';
+    $$('#gllist [data-open]').forEach(function (b) { b.onclick = function () { openLesson(+b.getAttribute('data-open')); }; });
+  }
+  $('#glq').oninput = function () { q = this.value; draw(); };
+  $$('#glf button').forEach(function (b) { b.onclick = function () { filt = b.getAttribute('data-v'); $$('#glf button').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); }); draw(); }; });
+  setTry('<p>Pick a term above, then go back to its lesson with the <b>Lesson</b> buttons. Every definition here is the one the lessons show when you point at a dotted word.</p>');
+  draw();
+  if (glMark) setTimeout(function () { var d = document.getElementById('g-' + glMark); if (d) d.scrollIntoView({ block: 'center' }); glMark = null; }, 60);
+}
+
+function glInit() {
+  if (!$('#glpop')) { var p = document.createElement('div'); p.id = 'glpop'; p.setAttribute('role', 'tooltip'); p.hidden = true; document.body.appendChild(p); }
+  if (typeof MutationObserver !== 'undefined' && !glObs) {
+    glObs = new MutationObserver(function (recs) { if (!glBusy && !glTimer && glNeeds(recs)) glTimer = setTimeout(glRun, 30); });
+    glObs.observe($('#lgrid'), { childList: true, subtree: true, attributes: true, attributeFilter: ['open', 'hidden'] });
+  }
+  document.addEventListener('mouseover', function (e) { var el = glIn(e, '.gl'); if (el) glShow(el); else if (glIn(e, '#glpop')) clearTimeout(glHideT); });
+  document.addEventListener('mouseout', function (e) { var el = glIn(e, '.gl, #glpop'); if (el && !(e.relatedTarget && el.contains(e.relatedTarget))) glLater(); });
+  document.addEventListener('focusin', function (e) { var el = glIn(e, '.gl'); if (el) glShow(el); else if (!glIn(e, '#glpop')) glClose(); });
+  document.addEventListener('click', function (e) { var el = glIn(e, '.gl'); if (el) glShow(el); else if (!glIn(e, '#glpop')) glClose(); });
+  document.addEventListener('keydown', function (e) { if ((e.key === 'Escape' || e.key === 'Esc') && glCur) { var c = glCur; glClose(); c.focus(); } });
+  window.addEventListener('scroll', function () { if (glCur) glPlace(glCur); }, true);
+  window.addEventListener('resize', glClose);
+  glRun();
 }
 
 /* ===================================================== CALCULATOR: one link */
@@ -1872,9 +2241,11 @@ function calc() {
     'Transfer time = ' + fmtT(rtt, 4) + ' + ' + fmtT(T, 4) + ' = ' + fmtT(x.time, 5) + '; throughput = ' + fmtN(bits, 6) + ' bits ÷ ' + fmtT(x.time, 5) + ' = ' + fmtRate(x.thr, 5) + '.'
   ].map(function (t) { return '<li>' + t + '</li>'; }).join('');
   calcTL.set(['Host A', 'Host B'], [L], bits);
+  if (current === 'calc' && !$('#c_one').hidden) calcTL.restart(); else calcTL.reset();   // a changed option replays the animation from the start
   drawBar($('#c_bar'), [{ name: 'Queue', v: Q, fill: C.amberSoft, line: C.amber }, { name: 'Transmit', v: T, fill: C.panel, line: C.brand }, { name: 'Propagation', v: P, fill: '#E7E1FF', line: '#7B61FF' }]);
   drawUsage($('#c_use'), { rtt: rtt, trans: T, bw: s.bw, thr: x.thr });
-  if (P > 0) drawPipe($('#c_pipe'), { delay: P, bw: s.bw, mode: 'one', binary: bin }); else { var f = new Fig($('#c_pipe'), 0, 10, 0, 0.6, 1.5); f.text(5, 0.3, 'With no distance there is no pipe: the delay × bandwidth product is 0.', { fs: 8.4, color: C.muted }); }
+  $('#c_pipe').removeAttribute('data-noaxes');
+  if (P > 0) drawPipe($('#c_pipe'), { delay: P, bw: s.bw, mode: 'one', binary: bin }); else { $('#c_pipe').setAttribute('data-noaxes', 'message'); var f = new Fig($('#c_pipe'), 0, 10, 0, 0.6, 1.5); f.text(5, 0.3, 'With no distance there is no pipe: the delay × bandwidth product is 0.', { fs: 8.4, color: C.muted }); }
   writeLink();
 }
 
@@ -1915,6 +2286,7 @@ function pathCalc() {
   $('#p_work').innerHTML = r.hops.map(function (h, i) { return '<li>Link ' + (i + 1) + ': ' + fmtT(h.q, 4) + ' + ' + fmt(bits) + ' bits ÷ ' + fmtRate(h.bw) + ' (' + fmtT(h.T, 4) + ') + ' + fmtDist(links[i].dist) + ' ÷ ' + fmtN(SPEED[links[i].medium]) + ' m/s (' + fmtT(h.P, 4) + ') = ' + fmtT(h.q + h.T + h.P, 5) + '.</li>'; }).join('') +
     '<li>One packet: ' + fmtT(r.total, 5) + '.</li>' + (pathState.n > 1 ? '<li>' + fmt(pathState.n) + ' packets sent back to back: the last arrives (' + fmt(pathState.n) + ' − 1) × ' + fmtT(bits / L[bi].bw, 4) + ' after the first, at ' + fmtT(msg, 5) + '.</li>' : '');
   pathTL.set(names, L, bits);
+  if (current === 'calc' && !$('#c_path').hidden) pathTL.restart(); else pathTL.reset();
 }
 
 function calcInit() {
@@ -1931,7 +2303,7 @@ function calcInit() {
   $('#p_strip').innerHTML = stripHTML('p_', 'Send one packet', true); $('#p_stripb').innerHTML = stripHTML('p_b', 'Send one packet', true);
   calcTL = new Timeline({ strips: ['c_', 'c_b'], wire: $('#c_wire'), st: $('#c_st'), detail: true, paced: true, ms: 6000, alive: function () { return current === 'calc'; } });
   pathTL = new Timeline({ strips: ['p_', 'p_b'], wire: $('#p_wire'), st: $('#p_st'), detail: false, paced: true, ms: 9000, alive: function () { return current === 'calc'; } });
-  function seg(path) { $('#c_one').hidden = path; $('#c_path').hidden = !path; $('#c_seg1').setAttribute('aria-pressed', String(!path)); $('#c_seg2').setAttribute('aria-pressed', String(path)); }
+  function seg(path) { $('#c_one').hidden = path; $('#c_path').hidden = !path; $('#c_seg1').setAttribute('aria-pressed', String(!path)); $('#c_seg2').setAttribute('aria-pressed', String(path)); if (path) { calcTL.reset(); pathTL.restart(); } else { pathTL.reset(); calcTL.restart(); } }
   $('#c_seg1').onclick = function () { seg(false); }; $('#c_seg2').onclick = function () { seg(true); };
   $('#p_size').oninput = pathCalc; $('#p_n').oninput = pathCalc;
   $('#p_add').onclick = function () { if (pathState.links.length < 4) { pathState.links.push({ bw: 1e9, dist: 10000, medium: 'fiber', q: 0 }); renderPathLinks(); pathCalc(); } };
@@ -2214,7 +2586,7 @@ function go(mode) {
 function writeLink() {
   try {
     var q = new URLSearchParams(); q.set('mode', current);
-    if (current === 'learn') q.set('lesson', lessonState.i + 1);   // 0 is the lesson map
+    if (current === 'learn') q.set('lesson', lessonState.i === GLP ? 'glossary' : lessonState.i + 1);   // 0 is the lesson map
     if (current === 'calc') { var s = calcState; q.set('size', s.size); q.set('unit', s.unit); q.set('bw', s.bw); q.set('dist', s.dist); q.set('medium', s.medium); if (s.q) q.set('q', s.q); if (s.rtt !== '') q.set('rtt', s.rtt); }
     if (current === 'challenge') q.set('level', ($('.level[aria-pressed=true]') || $('.level')).getAttribute('data-level'));
     if (window.history && history.replaceState) history.replaceState(null, '', location.pathname + '?' + q.toString());
@@ -2222,7 +2594,8 @@ function writeLink() {
 }
 function readLink() {
   var q; try { q = new URLSearchParams(location.search); } catch (e) { return null; }
-  if (q.get('lesson') !== null && q.get('lesson') !== '') lessonState.i = clamp((+q.get('lesson') || 0) - 1, -1, LESSONS.length - 1);   // lesson=0 opens the lesson map
+  if (q.get('lesson') === 'glossary') lessonState.i = GLP;
+  else if (q.get('lesson') !== null && q.get('lesson') !== '') lessonState.i = clamp((+q.get('lesson') || 0) - 1, -1, LESSONS.length - 1);   // lesson=0 opens the lesson map
   if (/^[EMH]$/.test(q.get('level') || '')) setLevel(q.get('level'));
   function num(k, lo, hi) { var raw = q.get(k); if (raw === null || raw === '') return null; var v = +raw; return isFinite(v) && v >= lo && v <= hi ? v : null; }
   var v;
@@ -2239,7 +2612,7 @@ function readLink() {
 /* ===================================================== start */
 function init() {
   var mode = readLink();   // read the link before anything rewrites it
-  drawHero(); showXP(false); calcInit(); renderShelf();
+  drawHero(); showXP(false); calcInit(); renderShelf(); glInit();
   $$('.modes button').forEach(function (b) { b.onclick = function () { go(b.getAttribute('data-mode')); }; });
   $$('[data-go]').forEach(function (b) { b.onclick = function () { go(b.getAttribute('data-go')); }; });
   $('#home').onclick = function () { go('home'); };
@@ -2252,9 +2625,300 @@ function init() {
 }
 init();
 window.BandwidthLatencyVisualizer = { SPEED: SPEED, propDelay: propDelay, transDelay: transDelay, bitWidth: bitWidth, bitLength: bitLength, dxb: dxb, pathTimes: pathTimes, messageTime: messageTime, transfer: transfer, windowThroughput: windowThroughput,
-  pingRun: pingRun, GEN: GEN, makeRound: makeRound, code: code, checkCode: checkCode, near: near,
+  pingRun: pingRun, GEN: GEN, GLOSSARY: GLOSSARY, GLBYK: GLBYK, LESSONS: LESSONS, glRun: glRun, openLesson: openLesson, GLP: GLP, makeRound: makeRound, code: code, checkCode: checkCode, near: near,
   currentQuestion: function () { return game ? { input: game.qs[game.i].input, answer: game.qs[game.i].answer } : null; } };
 })();
 </script>
+
+<!-- vz-widgets:begin body -->
+<script id="vz-shell">
+/* Slide widgets, part 2 of 2 (runs last, after the app's own script).
+   Normal page: adds "For instructors: slide widget links" to the footer.
+   ?widget=<name>: shows only that figure and its controls, scaled to fill the frame.
+   ?widget=list: the instructors' page of widget links (&format=data also sends the list to a parent page).
+   One figure per widget; the list of widgets is window.VZ_WIDGETS (written by patch_widgets.py). */
+(function () {
+  'use strict';
+  var R = window.VZ_WIDGETS, V = window.VZ_MODE;
+  if (!R || !R.widgets) return;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function addStyle(css) { var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st); }
+  function linkFor(w, rel) { return (rel ? location.pathname : R.published) + '?widget=' + encodeURIComponent(w.name); }
+  function post(msg) { try { if (window.parent && window.parent !== window) window.parent.postMessage(msg, '*'); } catch (e) { /* no parent */ } }
+  function listData() {
+    return { type: 'vz-widget-list', app: R.app, published: R.published, widgets: R.widgets.map(function (w) {
+      return { name: w.name, title: w.title, group: w.group, link: linkFor(w), params: (w.params || []).map(function (p) {
+        return { key: p.key, label: p.label, type: p.options ? 'select' : p.pattern ? 'text' : 'number', pattern: p.pattern || null, 'default': p['default'], min: p.min, max: p.max,
+          integer: p.integer !== false, multi: !!p.multi, blank: p['default'] === '' || !!p.blank, options: p.options || null };
+      }) };
+    }) };
+  }
+  function copy(text, btn) {
+    function done(ok) { var o = btn.textContent; btn.textContent = ok ? 'Copied' : 'Select and copy'; setTimeout(function () { btn.textContent = o; }, 1300); }
+    function fallback() {
+      var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); var ok = false; try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      document.body.removeChild(ta); done(ok);
+    }
+    try { if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(function () { done(true); }, fallback); return; } } catch (e) { /* fall back */ }
+    fallback();
+  }
+
+  /* ===================================================== normal page: the footer link */
+  if (!V) {
+    var addFooterLink = function () {
+      if ($('#vzInstr')) return;
+      var foot = $('footer'), anchor = null;
+      if (!foot) return;
+      $$('details', foot).forEach(function (d) { var s = $('summary', d); if (s && /for instructors/i.test(s.textContent)) anchor = d; });
+      var p = document.createElement('p');
+      p.id = 'vzInstr'; p.className = 'vz-instr';
+      p.innerHTML = '<a href="?widget=list">For instructors: slide widget links<\/a> (put one figure at a time on a lecture slide)';
+      if (anchor) anchor.parentNode.insertBefore(p, anchor.nextSibling);
+      else ($('.card', foot) || foot).appendChild(p);
+    };
+    addStyle('.vz-instr{margin:8px 0 0;font-size:14px}.vz-instr a{font-weight:600}');
+    addFooterLink();
+    return;
+  }
+
+  /* ===================================================== shared look for widget and list pages */
+  addStyle(
+    'html.vz-w,html.vz-w body{overflow:hidden;background:#fff}' +
+    'html.vz-w body{margin:0}' +
+    '.vz-hide{display:none!important}' +
+    '.vz-path{display:block!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;' +
+      'max-width:none!important;width:auto!important;min-height:0!important;height:auto!important;position:static!important;transform:none!important;overflow:visible!important;top:auto!important}' +
+    '.vz-keep{margin:0 0 10px!important;max-width:none!important;position:static!important;top:auto!important}' +
+    '.vz-pinned>summary{pointer-events:none;cursor:default;list-style:none}.vz-pinned>summary::-webkit-details-marker{display:none}' +
+    '#vzHead{display:flex;align-items:center;gap:10px;padding:0 0 8px;margin:0 0 10px;border-bottom:2px solid #CFE6F0}' +
+    '#vzHead h1{margin:0;font-size:22px;color:#0B3D5C;flex:1;line-height:1.25}' +
+    '#vzHead .vz-name{font-size:12px;color:#5B6B78}' +
+    'body.vz-stage{position:absolute!important;left:0;top:0;transform-origin:0 0;padding:14px 18px!important;box-sizing:border-box}' +
+    '.vz-note{max-width:640px;margin:40px auto;padding:16px 20px}' +
+    /* list page */
+    'html.vz-list,html.vz-list body{overflow:auto}' +
+    '#vzList{max-width:980px;margin:0 auto;padding:18px 16px 40px}' +
+    '#vzList h1{font-size:26px;margin:0 0 6px}#vzList h2{font-size:19px;margin:22px 0 8px}' +
+    '#vzList .vz-item{margin:10px 0}#vzList .vz-item h3{margin:0 0 4px;font-size:17px}' +
+    '#vzList .vz-link{display:block;font-family:Consolas,Menlo,monospace;font-size:13px;background:#EAF5FA;border:1px solid #D3E3EC;border-radius:6px;padding:6px 8px;overflow-wrap:anywhere;margin:6px 0}' +
+    '#vzList .vz-params{font-size:14px;color:#5B6B78;margin:4px 0}' +
+    '#vzList .vz-prev{margin-top:8px;width:100%;max-width:560px;aspect-ratio:16/9;border:1px solid #D3E3EC;border-radius:8px;background:#fff}' +
+    '#vzList .vz-howto{font-size:15px}#vzList .vz-howto li{margin:3px 0}#vzList a.btn{text-decoration:none;display:inline-block}'
+  );
+
+  if (V.list) { showList(); return; }
+  if (!V.spec) { showUnknown(); return; }
+
+  /* ===================================================== one widget */
+  var spec = V.spec, W = spec.width || R.width || 960, applying = false, head = null, ready = false;
+
+  function controlRows() {   // the lesson's own controls: rows in the lesson text that hold an input, a menu, or a button
+    var box = $(R.lessonText || '#ltext');
+    if (!box) return [];
+    return $$('.row', box).filter(function (r) {
+      if (r.closest('.tryit, #ltry, .navrow, details')) return false;
+      if ($('#lprev, #lnext', r)) return false;
+      return !!$('input, select, button, textarea', r);
+    }).filter(function (r, i, all) { return !all.some(function (o) { return o !== r && o.contains(r); }); });
+  }
+  function resolve(sel) {   // "#a" or "#a << .card" (the closest .card around #a); "@controls" = the lesson's controls
+    if (sel === '@controls') return controlRows();
+    var parts = sel.split('<<'), out = $$(parts[0].trim());
+    if (parts[1]) out = out.map(function (e) { return e.closest(parts[1].trim()); }).filter(Boolean);
+    return out;
+  }
+  function keepList() {
+    var ks = spec.keep || (spec.mode === 'learn' ? ['@controls', R.lessonFig || '#lfig'] : []), out = [];
+    ks.forEach(function (s) { resolve(s).forEach(function (e) { if (out.indexOf(e) < 0) out.push(e); }); });
+    return out.filter(function (e) { return !out.some(function (o) { return o !== e && o.contains(e); }); });
+  }
+  function isolate() {
+    applying = true;
+    $$('.vz-hide, .vz-path, .vz-keep').forEach(function (e) { e.classList.remove('vz-hide', 'vz-path', 'vz-keep'); });
+    var keep = keepList(), path = [];
+    if (!keep.length) { applying = false; showUnknown('This widget\'s figure was not found on the page.'); return; }
+    keep.forEach(function (e) {
+      e.classList.add('vz-keep');
+      for (var p = e.parentElement; p && p !== document.body; p = p.parentElement) if (path.indexOf(p) < 0) path.push(p);
+    });
+    path.forEach(function (p) { p.classList.add('vz-path'); });
+    var nodes = keep.concat(path);
+    nodes.forEach(function (n) {
+      var par = n.parentElement; if (!par) return;
+      Array.prototype.forEach.call(par.children, function (c) {
+        if (c === head || nodes.indexOf(c) >= 0 || c.tagName === 'SCRIPT' || c.tagName === 'STYLE') return;
+        c.classList.add('vz-hide');
+      });
+    });
+    (spec.hide || []).forEach(function (s) { resolve(s).forEach(function (e) { e.classList.add('vz-hide'); }); });
+    var norm = function (t) { return String(t).replace(/\s+/g, ' ').trim().toLowerCase(); };
+    $$('.vz-keep .figtitle, .vz-keep h2, .vz-keep h3, .vz-keep summary').forEach(function (e) { if (norm(e.textContent) === norm(spec.title)) e.classList.add('vz-hide'); });   // the title bar already says it
+    applying = false;
+  }
+  var lock = null, MIN = spec.minScale || R.minScale || 0.6;
+  function fit(choose) {   // choose: pick the scale again (start, or the frame changed size); otherwise keep it, so nothing jumps
+    var b = document.body, vw = window.innerWidth, vh = window.innerHeight;
+    b.style.width = W + 'px';
+    var h = Math.max(b.scrollHeight, b.offsetHeight), sw = vw / W;
+    if (choose || !lock) {
+      var s = Math.min(sw, vh / h);
+      if (!isFinite(s) || s <= 0) s = 1;
+      s = Math.max(s, sw * MIN);   // never smaller than a readable size: a very tall figure scrolls instead
+      lock = { s: s, x: Math.max(0, (vw - W * s) / 2), y: Math.max(0, (vh - h * s) / 2), vw: vw, vh: vh };
+    }
+    b.style.transform = 'translate(' + lock.x + 'px,' + lock.y + 'px) scale(' + lock.s + ')';
+    var tall = lock.y + h * lock.s > vh + 1;
+    document.documentElement.style.overflowY = tall ? 'auto' : 'hidden';
+    window.VZ_FIT = { scale: lock.s, widthScale: sw, minScale: MIN, scrolls: tall };
+  }
+  function setParams() {
+    var q = new URLSearchParams(V.query.toString());
+    (spec.params || []).forEach(function (p) {   // "also": a value that only exists after another one is set (a second address needs its box ticked)
+      if (p.also && V.valid(p, q.get(p.key))) for (var k in p.also) if (q.get(k) === null) q.set(k, p.also[k]);
+    });
+    (spec.params || []).forEach(function (p) {
+      if (!p.input && !p.click) return;   // read by the app itself from the link
+      var raw = q.get(p.key);
+      if (raw === null || raw === '') return;
+      if (!V.valid(p, raw)) return;   // a bad value: the default stays, with no error message
+      if (p.click) {   // a choice made by clicking a chip or button: "click": "#cases [data-k=\"{v}\"]"
+        raw.split(p.multi ? /[-,]/ : /$^/).forEach(function (v) {
+          var b = null; try { b = resolve(p.click.split('{v}').join(String(v).replace(/["\\]/g, '')))[0]; } catch (er) { b = null; }
+          if (b) b.click();
+        });
+        return;
+      }
+      var e = $(p.input);
+      if (!e) return;
+      if (e.type === 'checkbox') e.checked = raw === '1'; else e.value = raw;
+      ['input', 'change'].forEach(function (t) { e.dispatchEvent(new Event(t, { bubbles: true })); });
+    });
+  }
+  function keyGuard(e) {   // a presenter remote's keys belong to PowerPoint, not to the widget
+    var k = e.key, t = e.target, tag = t && t.tagName, typ = (t && t.type || '').toLowerCase();
+    var texty = tag === 'TEXTAREA' || (tag === 'INPUT' && /^(text|number|search|url|email|tel|)$/.test(typ));
+    var slideKeys = { PageUp: 1, PageDown: 1, Home: 1, End: 1 };
+    var moveKeys = { ArrowLeft: 1, ArrowRight: 1, ArrowUp: 1, ArrowDown: 1, ' ': 1, Spacebar: 1, Enter: 1 };
+    var letter = k && k.length === 1 && /[bnpw.]/i.test(k);
+    if (slideKeys[k] || (!texty && (moveKeys[k] || letter))) { e.preventDefault(); e.stopImmediatePropagation(); }
+  }
+  function makeHead() {
+    head = document.createElement('div');
+    head.id = 'vzHead';
+    head.innerHTML = '<h1>' + esc(spec.title) + '<\/h1><button class="btn alt small" id="vzReset" type="button">↺ Reset<\/button>';
+    document.body.insertBefore(head, document.body.firstChild);
+    $('#vzReset').onclick = function () { location.reload(); };
+  }
+  function start() {
+    (spec.open || []).forEach(function (s) { resolve(s).forEach(function (d) { d.open = true; d.classList.add('vz-pinned'); }); });   // stays open: its heading cannot fold the figure away
+    (spec.click || []).forEach(function (s) { var e = $(s); if (e) e.click(); });
+    setParams();
+    makeHead();
+    document.body.classList.add('vz-stage');
+    isolate();
+    fit(true);
+    var settled = false;
+    setTimeout(function () { fit(true); settled = true; }, 1200);   // late drawing: choose the scale once more, then keep it
+    document.documentElement.classList.remove('vz-w-loading');
+    var pending = null;
+    new MutationObserver(function (muts) {
+      if (applying) return;
+      var outside = muts.some(function (m) {
+        var t = m.target.nodeType === 1 ? m.target : m.target.parentElement;
+        return t && !t.closest('.vz-keep') && t !== head && !(head && head.contains(t));
+      });
+      if (!outside) return;
+      clearTimeout(pending); pending = setTimeout(function () { isolate(); fit(!settled); }, 40);
+    }).observe(document.body, { childList: true, subtree: true });
+    if (window.ResizeObserver) new ResizeObserver(function () { fit(!settled); }).observe(document.body);
+    window.addEventListener('resize', function () { if (!lock || lock.vw !== window.innerWidth || lock.vh !== window.innerHeight) fit(true); });
+    window.addEventListener('keydown', keyGuard, true);
+    window.addEventListener('message', function (ev) {
+      if (ev.source !== window.parent) return;   // only the page this widget sits in may reset it
+      var d = ev.data || {};
+      if (d.type === 'vz-reset') location.reload();
+      if (d.type === 'vz-view') document.documentElement.classList.toggle('vz-presenting', !!d.presenting);
+    });
+    if (!ready) { ready = true; var ps = {}; (spec.params || []).forEach(function (p) {   // the values the widget really shows
+        var e = p.input ? $(p.input) : null, v = V.query.get(p.key);
+        ps[p.key] = e ? (e.type === 'checkbox' ? (e.checked ? '1' : '0') : e.value) : (V.valid(p, v) ? v : p['default']);
+      });
+      post({ type: 'vz-widget-ready', app: R.app, widget: spec.name, title: spec.title, params: ps }); }
+  }
+  function boot() { setTimeout(function () { requestAnimationFrame(function () { requestAnimationFrame(start); }); }, spec.wait || 30); }
+  if (document.readyState === 'complete') boot(); else window.addEventListener('load', boot);
+
+  /* ===================================================== page for a name that is not on the list */
+  function showUnknown(why) {
+    $$('body > *').forEach(function (e) { if (e.tagName !== 'SCRIPT' && e.tagName !== 'STYLE') e.classList.add('vz-hide'); });
+    var d = document.createElement('div');
+    d.className = 'card vz-note';
+    d.innerHTML = '<h2>No widget here<\/h2><p>' + esc(why || ('This app has no widget named "' + V.name + '".')) + '<\/p>' +
+      '<p><a href="' + esc(location.pathname) + '?widget=list">See all of this app\'s widgets<\/a><\/p>';
+    document.body.appendChild(d);
+    document.documentElement.classList.remove('vz-w-loading');
+    document.documentElement.style.overflow = 'auto';
+  }
+
+  /* ===================================================== the instructors' widget links page */
+  function showList() {
+    document.documentElement.classList.add('vz-list');
+    var data = listData();
+    if (V.data) post(data);
+    window.addEventListener('message', function (ev) { if (ev.source === window.parent && ev.data && ev.data.type === 'vz-get-list') post(data); });
+    function render() {
+      $$('body > *').forEach(function (e) { if (e.tagName !== 'SCRIPT' && e.tagName !== 'STYLE' && e.id !== 'vzList') e.classList.add('vz-hide'); });
+      var groups = [], by = {};
+      R.widgets.forEach(function (w) { if (!by[w.group]) { by[w.group] = []; groups.push(w.group); } by[w.group].push(w); });
+      var html = '<h1>' + esc(R.app) + ': slide widget links<\/h1>' +
+        '<div class="card vz-howto"><p>Each widget is one figure from this app with its own controls, sized to fill a slide. Copy a link and:<\/p><ul>' +
+        '<li><b>In PowerPoint:<\/b> insert the Visualizer Slides add-in on a slide, choose Change link, and paste it.<\/li>' +
+        '<li><b>Anywhere else:<\/b> open it in a browser, use it as a link on a slide, or put it in a QR (Quick Response) code.<\/li>' +
+        '<li><b>Starting values:<\/b> add them to the end of the link, for example <code>&amp;' + esc(exampleParam()) + '<\/code>. Values that are missing or out of range use the defaults.<\/li><\/ul>' +
+        '<div class="row"><button class="btn small" id="vzCopyAll" type="button">Copy all links<\/button><a class="btn alt small" href="' + esc(location.pathname) + '" id="vzBack">← Back to the app<\/a><\/div><\/div>';
+      groups.forEach(function (g) {
+        html += '<h2>' + esc(g) + '<\/h2>';
+        by[g].forEach(function (w) {
+          var ps = (w.params || []).map(function (p) {
+            var range = p.options ? 'one of ' + p.options.map(function (o) { return o.value; }).join(', ') : (p.min !== undefined ? p.min + ' to ' + p.max : '');
+            return '<code>' + esc(p.key) + '<\/code>: ' + esc(p.label) + ' (default ' + esc(p['default']) + (range ? '; ' + esc(range) : '') + ')';
+          });
+          html += '<div class="card vz-item" data-w="' + esc(w.name) + '"><h3>' + esc(w.title) + '<\/h3>' +
+            (ps.length ? '<p class="vz-params">Starting values: ' + ps.join('; ') + '<\/p>' : '<p class="vz-params">No starting values.<\/p>') +
+            '<span class="vz-link">' + esc(linkFor(w)) + '<\/span>' +
+            '<div class="row"><button class="btn small vz-copy" type="button">Copy link<\/button>' +
+            '<a class="btn alt small" target="_blank" rel="noopener" href="' + esc(linkFor(w, true)) + '">Open<\/a>' +
+            '<button class="btn alt small vz-pv" type="button" aria-expanded="false">Preview<\/button><\/div><\/div>';
+        });
+      });
+      var box = document.createElement('div'); box.id = 'vzList'; box.innerHTML = html;
+      document.body.appendChild(box);
+      $('#vzCopyAll').onclick = function () {
+        copy(R.widgets.map(function (w) { return w.group + ' / ' + w.title + '\n' + linkFor(w); }).join('\n\n'), $('#vzCopyAll'));
+      };
+      $$('.vz-item', box).forEach(function (it) {
+        var w = R.widgets.filter(function (x) { return x.name === it.getAttribute('data-w'); })[0];
+        $('.vz-copy', it).onclick = function () { copy(linkFor(w), $('.vz-copy', it)); };
+        $('.vz-pv', it).onclick = function () {
+          var b = $('.vz-pv', it), f = $('iframe', it);
+          if (f) { f.parentNode.removeChild(f); b.setAttribute('aria-expanded', 'false'); b.textContent = 'Preview'; return; }
+          f = document.createElement('iframe'); f.className = 'vz-prev'; f.title = 'Preview: ' + w.title; f.src = linkFor(w, true);
+          it.appendChild(f); b.setAttribute('aria-expanded', 'true'); b.textContent = 'Hide preview';
+        };
+      });
+      document.documentElement.classList.remove('vz-w-loading');
+    }
+    function exampleParam() {
+      for (var i = 0; i < R.widgets.length; i++) { var p = (R.widgets[i].params || [])[0]; if (p) return p.key + '=' + (p.options ? p.options[p.options.length - 1].value : p['default']); }
+      return 'name=value';
+    }
+    if (document.readyState === 'complete') setTimeout(render, 0); else window.addEventListener('load', function () { setTimeout(render, 0); });
+  }
+})();
+</script>
+<!-- vz-widgets:end body -->
 </body>
 </html>

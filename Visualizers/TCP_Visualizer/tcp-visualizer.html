@@ -2,6 +2,52 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<!-- vz-widgets:begin head -->
+<script id="vz-registry">window.VZ_WIDGETS = {"app":"TCP Visualizer","published":"https://asammoud-rh.github.io/Communication_Networks/Visualizers/TCP_Visualizer/tcp-visualizer.html","width":960,"widgets":[{"name":"header","title":"Pick a segment: the TCP (Transmission Control Protocol) header","group":"Learn, Lesson 1: A segment and its header","mode":"learn","lesson":1,"keep":["#l1hdr << .card"],"params":[{"key":"raw","label":"Raw 32-bit numbers (not relative)","input":"#l1raw","default":"0","options":[{"value":"0","label":"no"},{"value":"1","label":"yes"}]}]},{"name":"header-capture","title":"Wireshark-style capture at Host A (a short connection)","group":"Learn, Lesson 1: A segment and its header","mode":"learn","lesson":1,"keep":["#l1pk << details"],"open":["#l1pk << details"],"params":[{"key":"raw","label":"Raw 32-bit numbers (not relative)","input":"#l1raw","default":"0","options":[{"value":"0","label":"no"},{"value":"1","label":"yes"}]}]},{"name":"open-timeline","title":"Timeline: opening a connection","group":"Learn, Lesson 2: Opening a connection","mode":"learn","lesson":2,"keep":["#l2case","#ldr << .card"],"params":[{"key":"case","label":"Case","click":"#l2case [data-k=\"{v}\"]","check":"#l2case [data-k=\"{v}\"][aria-pressed=true]","default":"normal","options":[{"value":"normal","label":"Normal"},{"value":"closed","label":"Port closed"},{"value":"synlost","label":"SYN (synchronize) lost"},{"value":"salost","label":"SYN, ACK (acknowledgment) lost"},{"value":"silent","label":"No answer at all"},{"value":"simopen","label":"Both open at once"}]},{"key":"raw","label":"Raw numbers (not relative)","input":"#l2raw","default":"1","options":[{"value":"0","label":"no"},{"value":"1","label":"yes"}]},{"key":"isna","label":"A's ISN (initial sequence number)","input":"#l2a","default":3141592653,"min":0,"max":4294967295},{"key":"isnb","label":"B's ISN (initial sequence number)","input":"#l2b","default":2718281828,"min":0,"max":4294967295}]},{"name":"open-states","title":"The TCP (Transmission Control Protocol) state-transition diagram: opening","group":"Learn, Lesson 2: Opening a connection","mode":"learn","lesson":2,"keep":["#l2case","#smf << details"],"open":["#smf << details"],"params":[{"key":"case","label":"Case","click":"#l2case [data-k=\"{v}\"]","check":"#l2case [data-k=\"{v}\"][aria-pressed=true]","default":"normal","options":[{"value":"normal","label":"Normal"},{"value":"closed","label":"Port closed"},{"value":"synlost","label":"SYN (synchronize) lost"},{"value":"salost","label":"SYN, ACK lost"},{"value":"silent","label":"No answer at all"},{"value":"simopen","label":"Both open at once"}]},{"key":"raw","label":"Raw numbers (not relative)","input":"#l2raw","default":"1","options":[{"value":"0","label":"no"},{"value":"1","label":"yes"}]}],"hide":["#lfig details.fold > p.cmdnote"]},{"name":"open-capture","title":"Wireshark-style capture at Host A: opening","group":"Learn, Lesson 2: Opening a connection","mode":"learn","lesson":2,"keep":["#l2case","#pk << details"],"open":["#pk << details"],"params":[{"key":"case","label":"Case","click":"#l2case [data-k=\"{v}\"]","check":"#l2case [data-k=\"{v}\"][aria-pressed=true]","default":"normal","options":[{"value":"normal","label":"Normal"},{"value":"closed","label":"Port closed"},{"value":"synlost","label":"SYN (synchronize) lost"},{"value":"salost","label":"SYN, ACK lost"},{"value":"silent","label":"No answer at all"},{"value":"simopen","label":"Both open at once"}]},{"key":"raw","label":"Raw numbers (not relative)","input":"#l2raw","default":"1","options":[{"value":"0","label":"no"},{"value":"1","label":"yes"}]}]},{"name":"bytes-timeline","title":"Timeline: sequence and acknowledgment numbers","group":"Learn, Lesson 3: Numbering every byte","mode":"learn","lesson":3,"keep":["@controls","#ldr << .card"],"params":[{"key":"a","label":"Bytes A writes","input":"#l3a","default":250,"min":1,"max":900},{"key":"b","label":"Bytes B replies","input":"#l3b","default":60,"min":0,"max":400},{"key":"dack","label":"Delayed ACKs (acknowledgments)","input":"#l3d","default":"0","options":[{"value":"0","label":"off"},{"value":"1","label":"on"}]}]},{"name":"bytes-capture","title":"Wireshark-style capture at Host A: numbering every byte","group":"Learn, Lesson 3: Numbering every byte","mode":"learn","lesson":3,"keep":["@controls","#pk << details"],"open":["#pk << details"],"params":[{"key":"a","label":"Bytes A writes","input":"#l3a","default":250,"min":1,"max":900},{"key":"b","label":"Bytes B replies","input":"#l3b","default":60,"min":0,"max":400},{"key":"dack","label":"Delayed ACKs (acknowledgments)","input":"#l3d","default":"0","options":[{"value":"0","label":"off"},{"value":"1","label":"on"}]}]},{"name":"window-timeline","title":"Timeline: A sends 1000 bytes into B's window","group":"Learn, Lesson 4: Flow control: the sliding window","mode":"learn","lesson":4,"keep":["@controls","#ldr << .card"],"params":[{"key":"buf","label":"B's buffer in bytes","input":"#l4b","default":"400","options":[{"value":"300"},{"value":"400"},{"value":"600"},{"value":"1000"}]},{"key":"read","label":"B's application","input":"#l4r","default":"pause2","options":[{"value":"now","label":"reads at once"},{"value":"pause2","label":"pauses for 2 s"},{"value":"pause5","label":"pauses for 5 s"}]}]},{"name":"window-buffers","title":"Buffers and the window","group":"Learn, Lesson 4: Flow control: the sliding window","mode":"learn","lesson":4,"keep":["@controls","#rib << .card"],"params":[{"key":"buf","label":"B's buffer in bytes","input":"#l4b","default":"400","options":[{"value":"300"},{"value":"400"},{"value":"600"},{"value":"1000"}]},{"key":"read","label":"B's application","input":"#l4r","default":"pause2","options":[{"value":"now","label":"reads at once"},{"value":"pause2","label":"pauses for 2 s"},{"value":"pause5","label":"pauses for 5 s"}]}]},{"name":"window-capture","title":"Wireshark-style capture at Host A: the sliding window","group":"Learn, Lesson 4: Flow control: the sliding window","mode":"learn","lesson":4,"keep":["@controls","#pk << details"],"open":["#pk << details"],"params":[{"key":"buf","label":"B's buffer in bytes","input":"#l4b","default":"400","options":[{"value":"300"},{"value":"400"},{"value":"600"},{"value":"1000"}]},{"key":"read","label":"B's application","input":"#l4r","default":"pause2","options":[{"value":"now","label":"reads at once"},{"value":"pause2","label":"pauses for 2 s"},{"value":"pause5","label":"pauses for 5 s"}]}]},{"name":"loss-timeline","title":"Timeline: loss and retransmission","group":"Learn, Lesson 5: Loss and retransmission","mode":"learn","lesson":5,"keep":["@controls","#l5l","#l5ack","#ldr << .card"],"params":[{"key":"n","label":"Segments A sends","input":"#l5n","default":"8","options":[{"value":"4"},{"value":"6"},{"value":"8"}]},{"key":"sack","label":"SACK (Selective Acknowledgment)","input":"#l5s","default":"1","options":[{"value":"0","label":"off"},{"value":"1","label":"on"}]},{"key":"toggle","label":"Segments to switch between lost and delivered (segment 3 starts lost), joined by -","click":"#l5l [data-k=\"{v}\"]","multi":true,"default":"","pattern":"[1-8](-[1-8]){0,7}","example":"5"}]},{"name":"loss-gap","title":"The gap, step by step","group":"Learn, Lesson 5: Loss and retransmission","mode":"learn","lesson":5,"keep":["@controls","#l5l","#l5ack","#lossf << .card"],"params":[{"key":"n","label":"Segments A sends","input":"#l5n","default":"8","options":[{"value":"4"},{"value":"6"},{"value":"8"}]},{"key":"sack","label":"SACK (Selective Acknowledgment)","input":"#l5s","default":"1","options":[{"value":"0","label":"off"},{"value":"1","label":"on"}]},{"key":"toggle","label":"Segments to switch between lost and delivered (segment 3 starts lost), joined by -","click":"#l5l [data-k=\"{v}\"]","multi":true,"default":"","pattern":"[1-8](-[1-8]){0,7}","example":"5"}]},{"name":"loss-capture","title":"Wireshark-style capture at Host A: loss and retransmission","group":"Learn, Lesson 5: Loss and retransmission","mode":"learn","lesson":5,"keep":["@controls","#l5l","#l5ack","#pk << details"],"open":["#pk << details"],"params":[{"key":"n","label":"Segments A sends","input":"#l5n","default":"8","options":[{"value":"4"},{"value":"6"},{"value":"8"}]},{"key":"sack","label":"SACK (Selective Acknowledgment)","input":"#l5s","default":"1","options":[{"value":"0","label":"off"},{"value":"1","label":"on"}]},{"key":"toggle","label":"Segments to switch between lost and delivered (segment 3 starts lost), joined by -","click":"#l5l [data-k=\"{v}\"]","multi":true,"default":"","pattern":"[1-8](-[1-8]){0,7}","example":"5"}]},{"name":"timer","title":"SRTT (smoothed round-trip time) and RTO (retransmission timeout) after each sample","group":"Learn, Lesson 6: Setting the timer","mode":"learn","lesson":6,"keep":["@controls","#l6k","#l6p << .card"],"params":[{"key":"samples","label":"Round-trip time samples in ms (milliseconds), joined by commas","input":"#l6s","default":"100, 120, 300, 110, 90, 95","pattern":"\\d{1,6}( ?, ?\\d{1,6}){0,19}","example":"100,200,150,120"},{"key":"min","label":"Minimum RTO (retransmission timeout)","input":"#l6m","default":"0","options":[{"value":"0","label":"none (see the formula)"},{"value":"200","label":"200 ms (Linux)"},{"value":"1000","label":"1 s (standard)"}]}]},{"name":"close-timeline","title":"Timeline: closing and TIME_WAIT","group":"Learn, Lesson 7: Closing and TIME_WAIT","mode":"learn","lesson":7,"keep":["#l7case","#ldr << .card"],"params":[{"key":"case","label":"Case","click":"#l7case [data-k=\"{v}\"]","check":"#l7case [data-k=\"{v}\"][aria-pressed=true]","default":"aFirst","options":[{"value":"aFirst","label":"A closes first"},{"value":"bFirst","label":"B closes first"},{"value":"three","label":"B closes at once (3 segments)"},{"value":"both","label":"Both close at once"},{"value":"lastAck","label":"Last ACK (acknowledgment) lost"},{"value":"reset","label":"Close with unread data"}]}]},{"name":"close-states","title":"The TCP (Transmission Control Protocol) state-transition diagram: closing","group":"Learn, Lesson 7: Closing and TIME_WAIT","mode":"learn","lesson":7,"keep":["#l7case","#smf << details"],"open":["#smf << details"],"hide":["#lfig details.fold > p.cmdnote"],"params":[{"key":"case","label":"Case","click":"#l7case [data-k=\"{v}\"]","check":"#l7case [data-k=\"{v}\"][aria-pressed=true]","default":"aFirst","options":[{"value":"aFirst","label":"A closes first"},{"value":"bFirst","label":"B closes first"},{"value":"three","label":"B closes at once (3 segments)"},{"value":"both","label":"Both close at once"},{"value":"lastAck","label":"Last ACK (acknowledgment) lost"},{"value":"reset","label":"Close with unread data"}]}]},{"name":"close-capture","title":"Wireshark-style capture at Host A: closing","group":"Learn, Lesson 7: Closing and TIME_WAIT","mode":"learn","lesson":7,"keep":["#l7case","#pk << details"],"open":["#pk << details"],"params":[{"key":"case","label":"Case","click":"#l7case [data-k=\"{v}\"]","check":"#l7case [data-k=\"{v}\"][aria-pressed=true]","default":"aFirst","options":[{"value":"aFirst","label":"A closes first"},{"value":"bFirst","label":"B closes first"},{"value":"three","label":"B closes at once (3 segments)"},{"value":"both","label":"Both close at once"},{"value":"lastAck","label":"Last ACK (acknowledgment) lost"},{"value":"reset","label":"Close with unread data"}]}]},{"name":"state-diagram","title":"The TCP (Transmission Control Protocol) state diagram, step by step","group":"Learn, Lesson 8: The state diagram, step by step","mode":"learn","lesson":8,"width":1280,"keep":["#ltext > p.pp","#l8open","#l8close","@controls","#smf << .card"],"params":[{"key":"open","label":"How it opens","click":"#l8open [data-k=\"{v}\"]","check":"#l8open [data-k=\"{v}\"][aria-pressed=true]","default":"normal","options":[{"value":"normal","label":"B listens, A connects"},{"value":"listenQuit","label":"B listens, then quits"},{"value":"giveUp","label":"A gives up before an answer"},{"value":"simopen","label":"Both connect at once"},{"value":"sendFirst","label":"Both listen, B sends first"}]},{"key":"close","label":"How it closes","click":"#l8close [data-k=\"{v}\"]","check":"#l8close [data-k=\"{v}\"][aria-pressed=true]","default":"aFirst","options":[{"value":"aFirst","label":"A closes first"},{"value":"early","label":"A closes during the handshake (only with Both connect at once)"},{"value":"bFirst","label":"B closes first"},{"value":"three","label":"B closes as soon as A's FIN (finish) arrives"},{"value":"both","label":"Both close at once"}]},{"key":"lastack","label":"Lose the last ACK (acknowledgment)","input":"#l8last","default":"0","options":[{"value":"0","label":"no"},{"value":"1","label":"yes"}]}]},{"name":"state-path","title":"The TCP (Transmission Control Protocol) state-transition diagram: choose the path","group":"Learn, Lesson 8: The state diagram, step by step","mode":"learn","lesson":8,"width":960,"keep":["#ltext > p.pp","#l8open","#l8close","@controls","#smf << .card"],"params":[{"key":"open","label":"How it opens","click":"#l8open [data-k=\"{v}\"]","check":"#l8open [data-k=\"{v}\"][aria-pressed=true]","default":"normal","options":[{"value":"normal","label":"B listens, A connects"},{"value":"listenQuit","label":"B listens, then quits"},{"value":"giveUp","label":"A gives up before an answer"},{"value":"simopen","label":"Both connect at once"},{"value":"sendFirst","label":"Both listen, B sends first"}]},{"key":"close","label":"How it closes","click":"#l8close [data-k=\"{v}\"]","check":"#l8close [data-k=\"{v}\"][aria-pressed=true]","default":"aFirst","options":[{"value":"aFirst","label":"A closes first"},{"value":"early","label":"A closes during the handshake (only with Both connect at once)"},{"value":"bFirst","label":"B closes first"},{"value":"three","label":"B closes as soon as A's FIN (finish) arrives"},{"value":"both","label":"Both close at once"}]},{"key":"lastack","label":"Lose the last ACK (acknowledgment)","input":"#l8last","default":"0","options":[{"value":"0","label":"no"},{"value":"1","label":"yes"}]}],"hide":["#lfig .sbs > div:nth-child(2)"]},{"name":"state-path-timeline","title":"Timeline: the segments behind each step of the state diagram","group":"Learn, Lesson 8: The state diagram, step by step","mode":"learn","lesson":8,"width":960,"keep":["#ltext > p.pp","#l8open","#l8close","@controls","#smf << .card"],"params":[{"key":"open","label":"How it opens","click":"#l8open [data-k=\"{v}\"]","check":"#l8open [data-k=\"{v}\"][aria-pressed=true]","default":"normal","options":[{"value":"normal","label":"B listens, A connects"},{"value":"listenQuit","label":"B listens, then quits"},{"value":"giveUp","label":"A gives up before an answer"},{"value":"simopen","label":"Both connect at once"},{"value":"sendFirst","label":"Both listen, B sends first"}]},{"key":"close","label":"How it closes","click":"#l8close [data-k=\"{v}\"]","check":"#l8close [data-k=\"{v}\"][aria-pressed=true]","default":"aFirst","options":[{"value":"aFirst","label":"A closes first"},{"value":"early","label":"A closes during the handshake (only with Both connect at once)"},{"value":"bFirst","label":"B closes first"},{"value":"three","label":"B closes as soon as A's FIN (finish) arrives"},{"value":"both","label":"Both close at once"}]},{"key":"lastack","label":"Lose the last ACK (acknowledgment)","input":"#l8last","default":"0","options":[{"value":"0","label":"no"},{"value":"1","label":"yes"}]}],"hide":["#lfig .sbs > div:nth-child(1)"]},{"name":"calc-timeline","title":"Connection sandbox: timeline","group":"Calculator","mode":"calc","keep":["#c_preset << .row","#c_lose << .row","#c_ldr << .card"],"params":[{"key":"preset","label":"Preset","default":"clean","options":[{"value":"clean","label":"Clean transfer"},{"value":"echo","label":"Ethernet-sized echo"},{"value":"slow","label":"Slow reader (zero window)"},{"value":"fast","label":"One loss, fast retransmit"},{"value":"rto","label":"One loss, timeout"},{"value":"lostack","label":"Lost ACK (acknowledgment)"},{"value":"lostsyn","label":"Lost SYN (synchronize)"},{"value":"closed","label":"Port closed (RST, reset)"},{"value":"half","label":"Half-close"},{"value":"simclose","label":"Simultaneous close"},{"value":"wrap","label":"Sequence numbers wrap"},{"value":"unread","label":"Close with unread data"}]},{"key":"lose","label":"Segments to lose, joined by -","default":"","pattern":"\\d{1,3}(-\\d{1,3}){0,9}"},{"key":"raw","label":"Show raw numbers","default":"0","options":[{"value":"0","label":"no"},{"value":"1","label":"yes"}]}]},{"name":"calc-buffers","title":"Connection sandbox: buffers and the window (data from A to B)","group":"Calculator","mode":"calc","keep":["#c_preset << .row","#c_lose << .row","#c_rib << details"],"open":["#c_rib << details"],"params":[{"key":"preset","label":"Preset","default":"clean","options":[{"value":"clean","label":"Clean transfer"},{"value":"echo","label":"Ethernet-sized echo"},{"value":"slow","label":"Slow reader (zero window)"},{"value":"fast","label":"One loss, fast retransmit"},{"value":"rto","label":"One loss, timeout"},{"value":"lostack","label":"Lost ACK (acknowledgment)"},{"value":"lostsyn","label":"Lost SYN (synchronize)"},{"value":"closed","label":"Port closed (RST, reset)"},{"value":"half","label":"Half-close"},{"value":"simclose","label":"Simultaneous close"},{"value":"wrap","label":"Sequence numbers wrap"},{"value":"unread","label":"Close with unread data"}]},{"key":"lose","label":"Segments to lose, joined by -","default":"","pattern":"\\d{1,3}(-\\d{1,3}){0,9}"}]},{"name":"calc-states","title":"Connection sandbox: state-transition diagram","group":"Calculator","mode":"calc","keep":["#c_preset << .row","#c_lose << .row","#c_sm << details"],"open":["#c_sm << details"],"params":[{"key":"preset","label":"Preset","default":"clean","options":[{"value":"clean","label":"Clean transfer"},{"value":"echo","label":"Ethernet-sized echo"},{"value":"slow","label":"Slow reader (zero window)"},{"value":"fast","label":"One loss, fast retransmit"},{"value":"rto","label":"One loss, timeout"},{"value":"lostack","label":"Lost ACK (acknowledgment)"},{"value":"lostsyn","label":"Lost SYN (synchronize)"},{"value":"closed","label":"Port closed (RST, reset)"},{"value":"half","label":"Half-close"},{"value":"simclose","label":"Simultaneous close"},{"value":"wrap","label":"Sequence numbers wrap"},{"value":"unread","label":"Close with unread data"}]},{"key":"lose","label":"Segments to lose, joined by -","default":"","pattern":"\\d{1,3}(-\\d{1,3}){0,9}"}],"hide":["#calcRoot details.fold > p.cmdnote"]},{"name":"calc-capture","title":"Connection sandbox: Wireshark-style capture at Host A","group":"Calculator","mode":"calc","keep":["#c_preset << .row","#c_lose << .row","#c_pk << details"],"open":["#c_pk << details"],"params":[{"key":"preset","label":"Preset","default":"clean","options":[{"value":"clean","label":"Clean transfer"},{"value":"echo","label":"Ethernet-sized echo"},{"value":"slow","label":"Slow reader (zero window)"},{"value":"fast","label":"One loss, fast retransmit"},{"value":"rto","label":"One loss, timeout"},{"value":"lostack","label":"Lost ACK (acknowledgment)"},{"value":"lostsyn","label":"Lost SYN (synchronize)"},{"value":"closed","label":"Port closed (RST, reset)"},{"value":"half","label":"Half-close"},{"value":"simclose","label":"Simultaneous close"},{"value":"wrap","label":"Sequence numbers wrap"},{"value":"unread","label":"Close with unread data"}]},{"key":"lose","label":"Segments to lose, joined by -","default":"","pattern":"\\d{1,3}(-\\d{1,3}){0,9}"},{"key":"raw","label":"Show raw numbers","default":"0","options":[{"value":"0","label":"no"},{"value":"1","label":"yes"}]}]},{"name":"calc-decode","title":"Decode a TCP (Transmission Control Protocol) header","group":"Calculator","mode":"calc","keep":["#q_hex << details"],"open":["#q_hex << details"],"params":[]}]};</script>
+<script id="vz-guard">
+/* Slide widgets, part 1 of 2 (runs first, in <head>, right after the widget list).
+   With ?widget=<name> it opens the widget's mode and lesson through the app's own link
+   parameters, and it makes sure a widget never saves anything or rewrites its address. */
+(function () {
+  'use strict';
+  var R = window.VZ_WIDGETS || { widgets: [] }, q;
+  try { q = new URLSearchParams(location.search); } catch (e) { return; }
+  var w = q.get('widget');
+  if (!w) return;
+  var V = window.VZ_MODE = { name: w, list: w === 'list', data: q.get('format') === 'data', spec: null, query: q };
+  for (var i = 0; i < R.widgets.length; i++) if (R.widgets[i].name === w) V.spec = R.widgets[i];
+  V.valid = function (p, raw) {   // is this starting value one the widget (and the app) accepts?
+    if (raw === null || raw === undefined) return false;
+    raw = String(raw);
+    if (raw === '') return p['default'] === '' || !!p.blank;
+    if (p.options) return p.options.some(function (o) { return String(o.value) === raw; });
+    if (p.pattern) return new RegExp('^(?:' + p.pattern + ')$').test(raw);
+    var v = Number(raw);
+    if (!isFinite(v) || (p.min !== undefined && v < p.min) || (p.max !== undefined && v > p.max)) return false;
+    return p.integer === false || Math.round(v) === v;
+  };
+  try {   // a widget reads and writes no saved progress: the full app keeps the student's own
+    var S = Storage.prototype, nop = function () {};
+    S.getItem = function () { return null; }; S.setItem = nop; S.removeItem = nop; S.clear = nop;
+  } catch (e) { /* storage already blocked */ }
+  try {
+    var q2 = new URLSearchParams(location.search);
+    if (V.spec) (V.spec.params || []).forEach(function (p) {   // a bad value the app reads itself is dropped, so the app uses its default
+      if (!p.input && !p.click && q2.get(p.key) !== null && !V.valid(p, q2.get(p.key))) { q2['delete'](p.key); q['delete'](p.key); }
+    });
+    if (V.spec) { q2.set('mode', V.spec.mode); if (V.spec.lesson) q2.set('lesson', String(V.spec.lesson)); else q2['delete']('lesson'); }
+    else q2.set('mode', 'home');
+    history.replaceState(null, '', location.pathname + '?' + q2.toString());
+  } catch (e) { /* history blocked */ }
+  try { history.replaceState = function () {}; history.pushState = function () {}; } catch (e) { /* ignore */ }
+  document.documentElement.className += ' vz-w vz-w-loading';
+  var st = document.createElement('style');
+  st.textContent = 'html.vz-w-loading body{visibility:hidden}';
+  (document.head || document.documentElement).appendChild(st);
+})();
+</script>
+<!-- vz-widgets:end head -->
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TCP Visualizer</title>
 <meta name="description" content="See how TCP turns a lossy packet service into a reliable byte stream: the header, the handshake, sequence and acknowledgment numbers, the sliding window, retransmission, and closing.">
@@ -75,6 +121,9 @@ input[type=range] { accent-color: var(--brand); width: 200px; max-width: 100%; }
 .hero h1 { color: #fff; font-size: 32px; margin: 0 0 8px; }
 .hero p { font-size: 17px; max-width: 560px; }
 .hero svg { width: 100%; height: auto; max-height: 240px; }
+.sitehome { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; color: #fff; border: 2px solid rgba(255,255,255,.75); border-radius: 8px; padding: 6px 14px; font-weight: 600; text-decoration: none; }
+.sitehome:hover { background: rgba(255,255,255,.15); }
+.sitehome svg { width: 16px; height: 16px; }
 .modecards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 18px; }
 .modecard { display: flex; flex-direction: column; gap: 6px; }
 .modecard .icon { font-size: 30px; line-height: 1; }
@@ -263,6 +312,26 @@ p.lossnow { background: var(--panel-soft); border-radius: 8px; padding: 8px 12px
 .badges2 .sbadge { min-width: 13.5em; }
 #smf .arcbtn { cursor: pointer; pointer-events: stroke; }
 #smf .arcbtn:hover, #smf .arcbtn:focus { stroke: rgba(245, 165, 36, .35); outline: none; }
+/* controls on top of the figure they change */
+.figctls { background: var(--panel-soft); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; margin: 4px 0 10px; }
+.figctls > .row, .figctls > .chips2 { margin: 6px 0; }
+.figctls > p { margin: 6px 0 2px; }
+.figctls details.more { margin: 4px 0; }
+.srt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.relnote { color: var(--muted); font-style: italic; margin: 2px 0 8px; }
+.cmdnote.axes { margin-top: 6px; }
+.gt { text-decoration: underline dotted rgba(11,61,92,.45); text-underline-offset: 3px; cursor: help; }
+.gt:focus { outline: 2px solid var(--brand); outline-offset: 1px; border-radius: 2px; }
+.hero .gt { text-decoration-color: rgba(255,255,255,.6); }
+#gtip { position: fixed; z-index: 60; background: var(--navy); color: #fff; padding: 7px 10px; border-radius: 8px; font-size: 15px; line-height: 1.35; box-shadow: 0 4px 14px rgba(0,0,0,.2); pointer-events: none; }
+#gtip b { color: #BFE8F7; }
+.glossall li { margin: 4px 0; }
+/* slide widgets (html.vz-w): a widget shows one figure, so the sentence linking it to the figure above is hidden,
+   and side-by-side figures share the width as flex items, so hiding one lets the other fill it */
+html.vz-w .relnote, html.vz-w p.use { display: none; }
+html.vz-w .sbs { display: flex; gap: 18px; align-items: flex-start; }
+html.vz-w .sbs > div { flex: 1 1 0; min-width: 0; }
+html.vz-w .sbs .fig.tall.sbsl { max-height: none; }
 p.pp { font-weight: 600; color: var(--navy); margin: 10px 0 2px; }
 .chip2:disabled { opacity: .45; cursor: default; }
 .lesson.wide { grid-template-columns: minmax(0, 1fr); }
@@ -316,8 +385,9 @@ body.widepage main { max-width: 1400px; }
     <div>
       <h1>TCP Visualizer</h1>
       <p>Networks lose, delay, and reorder packets. TCP (Transmission Control Protocol) still delivers every byte, once, in order. See how, one step at a time.</p>
+      <a class="sitehome" id="siteHome" href="https://asammoud-rh.github.io/Communication_Networks/"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>All Visualizers</a>
     </div>
-    <svg id="heroFig" viewBox="0 0 360 200" role="img" aria-label="Two hosts exchanging a SYN, a SYN and ACK, and an ACK"></svg>
+    <svg id="heroFig" viewBox="0 0 360 200" role="img" aria-label="Two hosts exchanging a SYN, a SYN and ACK, an ACK, then data and its ACK, with a color key"></svg>
   </div>
   <div class="modecards">
     <div class="card modecard">
@@ -1058,6 +1128,8 @@ var store = {
 };
 /* one animation speed for every animated diagram; every player bar has the same slider */
 var SPEEDS = [0.25, 0.5, 1, 2, 4], SPEED_TXT = ['¼×', '½×', '1×', '2×', '4×'];
+/* ?autoplay=0 (for still pictures, such as the native slides): show each animated figure whole, without playing */
+try { if (/[?&]autoplay=0(?:&|$)/.test(location.search)) window.VZ_NOAUTOPLAY = true; } catch (e) { /* no location */ }
 var animSpeed = SPEEDS.indexOf(store.get('speed', 0.5)) >= 0 ? store.get('speed', 0.5) : 0.5;   // starts at half speed
 function speedCtl() {
   var k = SPEEDS.indexOf(animSpeed);
@@ -1149,6 +1221,7 @@ Fig.prototype.text = function (x, y, s, o) {
   var size = (o.fs || 9.5) * this.k / 72, lh = size * 1.3, lines = String(s).split('\n'), n = lines.length;
   var t = el('text', { 'font-size': r4(size), fill: o.color || C.ink, 'fill-opacity': o.opacity, 'text-anchor': o.ha === 'left' ? 'start' : o.ha === 'right' ? 'end' : 'middle',
     'font-style': o.italic ? 'italic' : null, 'font-weight': o.bold ? 'bold' : null, 'font-family': o.mono ? 'Consolas, SF Mono, Menlo, DejaVu Sans Mono, monospace' : null }, o.parent || this.root);
+  if (o.cls) t.setAttribute('class', o.cls);
   var yc = this.Y(y), self = this;
   lines.forEach(function (ln, i) { var ts = el('tspan', { x: self.X(x), y: r4(yc + (i - (n - 1) / 2) * lh + size * 0.35) }, t); ts.textContent = ln; });
   return t;
@@ -1277,7 +1350,8 @@ function drawLadder(svg, run, o) {
   var dEnd = L.end;
   f.line(xA, Yd(0.85), xA, Yd(dEnd), { color: C.navy, lw: 2 });
   f.line(xB, Yd(0.85), xB, Yd(dEnd), { color: C.navy, lw: 2 });
-  f.text(W / 2, Yd(0.8), 'time runs down ↓', { fs: 7, color: C.muted, italic: true });
+  f.text(W / 2, Yd(0.8), 'time runs down ↓', { fs: 7, color: C.muted, italic: true, cls: 'axis-y' });
+  f.text((xA + xB) / 2, H - 0.39, '← across the network →', { fs: 7, color: C.muted, italic: true, cls: 'axis-x' });
   L.breaks.forEach(function (b) {
     var ym = Yd((b.d0 + b.d1) / 2);
     [xA, xB].forEach(function (x) { f.rect(x - 0.08, ym - 0.1, 0.16, 0.2, { fill: '#fff', stroke: '#fff', lw: 0.1 }); f.line(x - 0.1, ym - 0.03, x + 0.1, ym + 0.05, { color: C.navy, lw: 1.2 }); f.line(x - 0.1, ym - 0.11, x + 0.1, ym - 0.03, { color: C.navy, lw: 1.2 }); });
@@ -1374,7 +1448,7 @@ function drawLadder(svg, run, o) {
   if (T < Infinity && T >= 0) { var yT = Yd(L.yNow(T)); f.line(0.1, yT, W - 0.1, yT, { color: C.amber, lw: 0.9, dash: [3, 3] }).setAttribute('class', 'nowline'); f.label(0.15, yT, ms(T), { fs: 6.8, ha: 'left', color: '#7a4c00', bg: C.amberSoft }); }
   return f;
 }
-var LADDER_LEGEND = '<ul class="legend"><li><i style="background:#00A2D7"></i>data</li><li><i style="background:#5B6B78"></i>ACK only</li><li><i style="background:#7B61FF"></i>SYN or FIN</li><li><i style="background:#E08B00"></i>resent</li><li><i style="background:#13A88A"></i>window probe or update</li><li><i style="background:#E5484D"></i>RST, or lost (✕)</li></ul>';
+var LADDER_LEGEND = '<ul class="legend"><li><i style="background:#00A2D7"></i>data</li><li><i style="background:#5B6B78"></i>ACK only</li><li><i style="background:#7B61FF"></i>SYN or FIN</li><li><i style="background:#E08B00"></i>resent</li><li><i style="background:#13A88A"></i>window probe or update</li><li><i style="background:#E5484D"></i>RST, or lost (✕)</li><li><i style="height:0;width:26px;border-top:3px dashed #F5A524;background:none;border-radius:0;vertical-align:4px"></i>now (this step)</li><li><i style="height:0;width:26px;border-top:3px dashed #E08B00;background:none;border-radius:0;vertical-align:4px"></i>timer running until a resend</li></ul>';
 
 /* ===================================================== the TCP state diagram */
 /* ===================================================== the TCP state-transition diagram
@@ -1557,8 +1631,8 @@ function drawStateMachine(svg, run, T, o) {
 }
 /* short meanings for the terms a student meets; a lesson lists the ones it uses */
 var GLOSS = [
-  ['TCP', /\bTCP\b/, 'Transmission Control Protocol: delivers a stream of bytes reliably and in order.'],
-  ['IP', /\bIP\b/, 'Internet Protocol: carries each packet from host to host, with no promise it arrives.'],
+  ['TCP', /\bTCP\b|\bTransmission Control Protocol\b/, 'Transmission Control Protocol: delivers a stream of bytes reliably and in order.'],
+  ['IP', /\bIP\b|\bInternet Protocol\b/, 'Internet Protocol: carries each packet from host to host, with no promise it arrives.'],
   ['SYN', /\bSYN/, 'synchronize: the flag of the segments that open a connection.'],
   ['ACK', /\bACK/, 'acknowledgment: the flag that says the Ack field is valid.'],
   ['FIN', /\bFIN/, 'finish: "no more data from me".'],
@@ -1567,26 +1641,165 @@ var GLOSS = [
   ['Seq', /\bSeq\b/, 'sequence number: the number of the first data byte in a segment.'],
   ['Ack', /\bAck\b/, 'acknowledgment number: the next byte the sender of this segment expects.'],
   ['Len', /\bLen\b/, 'data length: the number of data bytes in a segment.'],
-  ['ISN', /\bISN/, 'initial sequence number: the random number each side starts counting from.'],
-  ['MSS', /\bMSS\b/, 'Maximum Segment Size: the most data one segment may carry.'],
-  ['SACK', /\bSACK/, 'Selective Acknowledgment: lists blocks that arrived after a gap, so only the holes are resent.'],
-  ['RTT', /\bRTT\b/, 'round-trip time: from sending a segment to getting its ACK.'],
-  ['SRTT', /\bSRTT\b/, 'smoothed RTT: a running average of the round-trip times.'],
-  ['RTTVAR', /\bRTTVAR\b/, 'RTT variation: how much the round-trip times jump around.'],
-  ['RTO', /\bRTO\b/, 'retransmission timeout: how long the sender waits for an ACK before it resends.'],
-  ['MSL', /\bMSL\b/, 'Maximum Segment Lifetime: how long a segment may live in the network.'],
-  ['RFC', /\bRFC\b/, 'Request for Comments: the numbered documents that define Internet standards.'],
-  ['MTU', /\bMTU\b/, 'Maximum Transmission Unit: the biggest packet a link carries.'],
+  ['ISN', /\bISN|\b[Ii]nitial [Ss]equence [Nn]umbers?\b/, 'initial sequence number: the random number each side starts counting from.'],
+  ['MSS', /\bMSS\b|\b[Mm]aximum [Ss]egment [Ss]ize\b/, 'Maximum Segment Size: the most data one segment may carry.'],
+  ['SACK', /\bSACK|\b[Ss]elective [Aa]cknowledg(?:[Ee])?[Mm]ents?\b/, 'Selective Acknowledgment: lists blocks that arrived after a gap, so only the holes are resent.'],
+  ['RTT', /\bRTT\b|\b[Rr]ound-[Tt]rip [Tt]imes?\b/, 'round-trip time: from sending a segment to getting its ACK.'],
+  ['SRTT', /\bSRTT\b|\b[Ss]moothed (?:[Rr]TT|[Rr]ound-[Tt]rip [Tt]ime)\b/, 'smoothed RTT: a running average of the round-trip times.'],
+  ['RTTVAR', /\bRTTVAR\b|\b[Rr]TT [Vv]ariation\b/, 'RTT variation: how much the round-trip times jump around.'],
+  ['RTO', /\bRTO\b|\b[Rr]etransmission [Tt]ime-?[Oo]uts?\b/, 'retransmission timeout: how long the sender waits for an ACK before it resends.'],
+  ['MSL', /\bMSL\b|\b[Mm]aximum [Ss]egment [Ll]ifetime\b/, 'Maximum Segment Lifetime: how long a segment may live in the network.'],
+  ['RFC', /\bRFC\b|\b[Rr]equests? [Ff]or [Cc]omments\b/, 'Request for Comments: the numbered documents that define Internet standards.'],
+  ['MTU', /\bMTU\b|\b[Mm]aximum [Tt]ransmission [Uu]nit\b/, 'Maximum Transmission Unit: the biggest packet a link carries.'],
   ['SND.UNA', /SND\.UNA/, 'the oldest unacknowledged byte: sent, but not yet acknowledged.'],
   ['SND.NXT', /SND\.NXT/, 'the next byte to send.'],
   ['RCV.NXT', /RCV\.NXT/, 'the next byte the receiver expects.'],
+  ['Win', /\bWin\b/, 'window field: the free buffer space the sender of this segment advertises, in bytes (after Window Scale).'],
+  ['R', /\bR\b(?![\]=.])/, 'R: one new round-trip time sample, in milliseconds.'],
+  ['ms', /\bms\b/, 'milliseconds: thousandths of a second.'],
+  ['s', /\bs\b/, 's: seconds.', function (b) { return /\d\s?$/.test(b); }],
+  ['x', /\bx\b/, 'x: Host A\'s initial sequence number (ISN) in the handshake example.', function (b, a) { return /[=+−]\s*$/.test(b) || /^\s*[+=]/.test(a); }],
+  ['y', /\by\b/, 'y: Host B\'s initial sequence number (ISN) in the handshake example.', function (b, a) { return /[=+−]\s*$/.test(b) || /^\s*[+=]/.test(a); }],
+  ['MB', /\bMB\b/, 'megabytes: millions of bytes.'],
+  ['WS', /\bWS\b/, 'Window Scale as Wireshark shows it: the number the window field is multiplied by (2 to the shift count).'],
+  ['TSval', /\bTSval\b/, 'timestamp value: the sender\'s clock when it sent this segment (part of the Timestamps option).'],
+  ['TSecr', /\bTSecr\b/, 'timestamp echo reply: the TSval of the last segment received, sent back so the sender can measure the round trip.'],
+  ['SLE', /\bSLE\b/, 'SACK left edge: the first byte of a block the receiver holds beyond a gap.'],
+  ['SRE', /\bSRE\b/, 'SACK right edge: the byte just after that block.'],
+  ['ADDR', /\bADDR\b/, 'placeholder in a command: type the other computer\'s IP address here.'],
+  ['IFACE', /\bIFACE\b/, 'placeholder in a command: type your network interface name here, such as eth0 (ip link lists them).'],
+  ['LISTEN', /\bLISTEN(?:ING)?\b/, 'state: a server waits for connections on a port.'],
+  ['SYN_SENT', /\bSYN[_-]SENT\b/, 'state: this side sent a SYN and waits for SYN + ACK.'],
+  ['SYN_RCVD', /\bSYN[_-](?:RCVD|RECV|RECEIVED)\b/, 'state: this side received a SYN, answered with SYN + ACK, and waits for the last ACK of the handshake.'],
+  ['ESTABLISHED', /\bESTAB(?:LISHED)?\b/, 'state: the connection is open and both sides can send data.'],
+  ['FIN_WAIT_1', /\bFIN[_-]WAIT[_-]?1\b/, 'state: this side closed first and sent its FIN; it waits for that FIN to be acknowledged.'],
+  ['FIN_WAIT_2', /\bFIN[_-]WAIT[_-]?2\b/, 'state: this side\'s FIN was acknowledged; it waits for the other side\'s FIN.'],
+  ['CLOSE_WAIT', /\bCLOSE[_-]WAIT\b/, 'state: the other side closed; this side waits for its own program to close.'],
+  ['CLOSING', /\bCLOSING\b/, 'state: both sides sent FIN at the same time; this side waits for the ACK of its own FIN.'],
+  ['LAST_ACK', /\bLAST[_-]ACK\b/, 'state: this side closed second and waits for the ACK of its FIN.'],
+  ['TIME_WAIT', /\bTIME[_-]WAIT\b/, 'state: the side that closed first waits two segment lifetimes (2 × MSL) so that late segments die out.'],
+  ['CLOSED', /\bCLOSED\b/, 'state: there is no connection.'],
+  ['state', /\bstates?\b/, 'the stage one end of a connection is in, such as LISTEN, ESTABLISHED, or TIME_WAIT.'],
+  ['URG', /\bURG\b/, 'urgent: the urgent pointer field is valid (rarely used).'],
+  ['ECE', /\bECE\b/, 'ECN-Echo: tells the sender that a router marked congestion on the path.'],
+  ['CWR', /\bCWR\b/, 'Congestion Window Reduced: the sender\'s answer to ECE.'],
+  ['ECN', /\bECN\b/, 'Explicit Congestion Notification: routers mark packets instead of dropping them when queues grow.'],
+  ['NOP', /\bNOP\b/, 'no-operation: a 1-byte filler that lines the options up on 4-byte boundaries.'],
+  ['SACK_PERM', /\bSACK_PERM\b/, 'SACK permitted: the SYN option that says this side understands SACK blocks.'],
+  ['Timestamps', /\bTimestamps?\b/, 'an option that stamps each segment with a clock value: 10 bytes, padded to 12 with two NOP bytes.'],
+  ['Window Scale', /\bWindow Scale\b/, 'an option in the SYNs: the 16-bit window field is multiplied by 2 to the power of the shift count.'],
+  ['RACK', /\bRACK\b/, 'Recent ACKnowledgment: a Linux way to find losses by time instead of by counting duplicate ACKs.'],
+  ['duplicate ACK', /\bduplicate ACKs?\b|\bDup ACK\b/i, 'an ACK that repeats the last Ack number, because a later segment arrived while an earlier one is missing.'],
+  ['fast retransmit', /\bfast retransmi(?:t|ssion)s?\b/i, 'resending a segment after three duplicate ACKs, without waiting for the timer.'],
+  ['retransmission', /\bretransmi(?:ssion|t|tted)s?\b|\bresen(?:d|ds|t)\b/i, 'sending a segment again because it, or its ACK, seems lost.'],
+  ['timeout', /\btimeouts?\b/i, 'the retransmission timer ran out, so the sender resends the oldest unacknowledged segment.'],
+  ["Karn's rule", /Karn['’]s rule/, 'skip the round-trip sample of any segment that was sent more than once, because its ACK could belong to either copy.'],
+  ['backoff', /\bbackoff\b/i, 'after each timeout the RTO doubles, until an ACK for new data arrives.'],
+  ['delayed ACK', /\bdelayed ACKs?\b/i, 'the receiver waits for a second segment, or about 40 ms, before it sends an ACK.'],
+  ['piggybacking', /\bpiggyback(?:ed|ing|s)?\b/i, 'an ACK carried by a segment that also carries data the other way.'],
+  ['Nagle', /\bNagle(?:'s)?\b/, 'Nagle\'s algorithm: while earlier data is unacknowledged, hold small writes and send them together.'],
+  ['zero window', /\bzero window\b|\bZeroWindow\b/i, 'the receiver advertises Win=0: its buffer is full, so the sender must stop.'],
+  ['window probe', /\bwindow probes?\b|\bKeep-Alive\b/i, 'a tiny segment the sender sends during a zero window to ask whether space has opened.'],
+  ['window update', /\bwindow updates?\b|\bWindow Update\b/i, 'an ACK sent only to announce that the receive window has opened.'],
+  ['advertised window', /\badvertised window\b/i, 'the Win value the receiver last sent: its free buffer space.'],
+  ['usable window', /\busable window\b/i, 'how much more the sender may send now: the advertised window minus the bytes in flight.'],
+  ['bytes in flight', /\bbytes in flight\b/i, 'bytes sent but not yet acknowledged: SND.NXT − SND.UNA.'],
+  ['flow control', /\bflow control\b/i, 'keeping the sender from sending more than the receiver has room for.'],
+  ['handshake', /\b(?:three-way )?handshake\b/i, 'the SYN, SYN + ACK, ACK exchange that opens a connection.'],
+  ['segment', /\bsegments?\b/i, 'one TCP packet: a header plus up to MSS bytes of data.'],
+  ['header', /\bheaders?\b/i, 'the fields in front of the data that tell the receiver how to handle it.'],
+  ['payload', /\bpayload\b/i, 'the data a segment carries after its header.'],
+  ['port', /\bports?\b/i, 'a 16-bit number that names one program\'s end of a connection on a host.'],
+  ['checksum', /\bchecksum\b/i, 'a number computed over the segment so the receiver can detect damage.'],
+  ['socket', /\bsockets?\b/i, 'a program\'s handle for one end of a connection.'],
+  ['half-close', /\bhalf-clos(?:e|ed|ing)\b/i, 'one direction is closed (FIN sent) while the other can still send data.'],
+  ['relative numbers', /\brelative (?:sequence )?numbers?\b/i, 'sequence numbers counted from each side\'s ISN, so its SYN is 0; Wireshark shows these by default.'],
+  ['raw numbers', /\braw (?:32-bit )?(?:sequence )?numbers?\b/i, 'the real 32-bit sequence numbers on the wire, starting at the random ISN.'],
+  ['wraparound', /\bwrap(?:s|ped)?[ -]?around\b|\bwraparound\b/i, 'after 4,294,967,295 a 32-bit sequence number goes back to 0.'],
+  ['Ethernet', /\bEthernet\b/, 'the common wired link; its header adds 14 bytes to every frame.'],
+  ['Wireshark', /\bWireshark\b/, 'a free program that captures packets and shows every field.'],
+  ['ss', /\bss\b/, 'a Linux command that lists sockets and their TCP states.'],
+  ['netstat', /\bnetstat\b/, 'a Windows (and older Linux) command that lists connections and their states.'],
   ['Window', /\bwindow\b/i, 'the free buffer space a receiver advertises: how many more bytes it can take.']
 ];
-function termsList(text) {
-  var used = GLOSS.filter(function (g) { return g[1].test(text); });
-  return used.length ? '<ul class="list terms">' + used.map(function (g) { return '<li><b>' + g[0] + '</b>: ' + g[2] + '</li>'; }).join('') + '</ul>' : '';
+/* Hover definitions (rule of November 23, 2026): every glossary term in the lesson and Calculator text
+   gets a small popup on hover, tap, or keyboard focus, from this one glossary. Challenge questions are left
+   alone so a definition never gives an answer away. */
+var GL_RX = null, GL_SKIP = 'svg, button, input, select, textarea, option, code, pre, script, style, .gt, .cmd, .nogloss, .playbar, .now, #view-challenge';
+function glossRx() { if (!GL_RX) GL_RX = GLOSS.map(function (g) { return new RegExp(g[1].source, (g[1].ignoreCase ? 'i' : '') + 'g'); }); return GL_RX; }
+function glossify(root) {
+  if (!root || !document.createTreeWalker) return;
+  var w = document.createTreeWalker(root, 4, null, false), nodes = [], n, rx = glossRx();
+  while ((n = w.nextNode())) { var pe = n.parentNode; if (n.nodeValue.trim() && pe && pe.closest && !pe.closest(GL_SKIP)) nodes.push(n); }
+  /* text around a node, across inline tags such as <i>x</i>, for the symbol checks */
+  function around(tn, dir) {
+    var out = '', nd = tn;
+    while (nd && out.length < 12) {
+      var sib = dir < 0 ? nd.previousSibling : nd.nextSibling;
+      if (sib) { var t = sib.textContent || ''; out = dir < 0 ? t + out : out + t; nd = sib; }
+      else { nd = nd.parentNode; if (!nd || !/^(I|B|EM|STRONG|SPAN)$/.test(nd.tagName)) break; }
+    }
+    return out;
+  }
+  nodes.forEach(function (tn) {
+    var s = tn.nodeValue, hits = [], pre = null, post = null;
+    rx.forEach(function (r, gi) { var ok = GLOSS[gi][3]; r.lastIndex = 0; var m; while ((m = r.exec(s))) { if (!m[0].length) { r.lastIndex++; continue; } if (ok) { if (pre === null) { pre = around(tn, -1); post = around(tn, 1); } if (!ok(pre + s.slice(0, m.index), s.slice(m.index + m[0].length) + post)) continue; } hits.push([m.index, m.index + m[0].length, gi]); } });
+    if (!hits.length) return;
+    hits.sort(function (a, b) { return a[0] - b[0] || (b[1] - b[0]) - (a[1] - a[0]); });
+    var frag = document.createDocumentFragment(), pos = 0;
+    hits.forEach(function (h) {
+      if (h[0] < pos) return;
+      if (h[0] > pos) frag.appendChild(document.createTextNode(s.slice(pos, h[0])));
+      var sp = document.createElement('span'); sp.className = 'gt'; sp.setAttribute('data-g', h[2]);
+      if (!document.querySelector('.gt[data-g="' + h[2] + '"][tabindex]')) sp.setAttribute('tabindex', '0');
+      sp.textContent = s.slice(h[0], h[1]); frag.appendChild(sp); pos = h[1];
+    });
+    if (pos < s.length) frag.appendChild(document.createTextNode(s.slice(pos)));
+    var par = tn.parentNode, d = window.getComputedStyle ? getComputedStyle(par).display : '';
+    if (/flex|grid/.test(d)) { var one = document.createElement('span'); one.className = 'gtrun'; one.appendChild(frag); frag = one; }   // keep one flex item
+    par.replaceChild(frag, tn);
+  });
 }
-var SM_LEGEND = '<ul class="legend"><li><i style="background:#00A2D7"></i>path taken by Host A (marker A)</li><li><i style="background:#7B61FF"></i>path taken by Host B (marker B)</li><li><i style="background:#E08B00"></i>arc taken in this step</li></ul>';
+var gtip = null, gtipFor = null;
+function showTip(sp) {
+  if (!gtip) { gtip = document.createElement('div'); gtip.id = 'gtip'; gtip.setAttribute('role', 'tooltip'); document.body.appendChild(gtip); }
+  var g = GLOSS[+sp.getAttribute('data-g')]; if (!g) return;
+  gtip.innerHTML = '<b>' + g[0] + '</b>: ' + g[2]; gtip.hidden = false; gtipFor = sp; sp.setAttribute('aria-describedby', 'gtip');
+  var r = sp.getBoundingClientRect(), vw = document.documentElement.clientWidth, tw = Math.min(320, vw - 16);
+  gtip.style.maxWidth = tw + 'px'; gtip.style.left = '0px'; gtip.style.top = '0px';
+  var th = gtip.offsetHeight, w2 = gtip.offsetWidth, x = Math.max(8, Math.min(vw - w2 - 8, r.left + r.width / 2 - w2 / 2));
+  var y = r.bottom + 6 + th < window.innerHeight ? r.bottom + 6 : r.top - th - 6;
+  gtip.style.left = Math.round(x) + 'px'; gtip.style.top = Math.round(Math.max(4, y)) + 'px';
+}
+function hideTip() { if (gtip) gtip.hidden = true; if (gtipFor) gtipFor.removeAttribute('aria-describedby'); gtipFor = null; }
+(function () {
+  function gt(e) { return e.target && e.target.closest ? e.target.closest('.gt') : null; }
+  var shownAt = 0;
+  document.addEventListener('mouseover', function (e) { var sp = gt(e); if (sp && sp !== gtipFor) { showTip(sp); shownAt = Date.now(); } });
+  document.addEventListener('mouseout', function (e) { var sp = gt(e); if (sp && sp === gtipFor && !(e.relatedTarget && sp.contains(e.relatedTarget))) hideTip(); });
+  document.addEventListener('focusin', function (e) { var sp = gt(e); if (sp) showTip(sp); });
+  document.addEventListener('focusout', function (e) { if (gt(e)) hideTip(); });
+  document.addEventListener('click', function (e) { var sp = gt(e); if (sp) { if (sp === gtipFor && !gtip.hidden && Date.now() - shownAt > 400) hideTip(); else { showTip(sp); shownAt = Date.now(); } } else if (gtipFor) hideTip(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hideTip(); var sp = gt(e); if (sp && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); showTip(sp); } });
+  window.addEventListener('scroll', hideTip, true);
+})();
+var glossQueued = false;
+function glossLater() { if (glossQueued) return; glossQueued = true; (window.requestAnimationFrame || setTimeout)(function () { glossQueued = false; glossify(document.getElementById('main')); }); }
+function startGloss() { var m = document.getElementById('main'); if (!m) return; glossify(m); if (window.MutationObserver) new MutationObserver(glossLater).observe(m, { childList: true, subtree: true }); }
+function glossaryHTML() {
+  var list = GLOSS.slice().sort(function (a, b) { return a[0].toLowerCase() < b[0].toLowerCase() ? -1 : 1; });
+  return '<ul class="list terms nogloss glossall">' + list.map(function (g) { return '<li><b>' + g[0] + '</b>: ' + g[2] + '</li>'; }).join('') + '</ul>';
+}
+function termsList(text) {
+  var rx = glossRx(), used = GLOSS.filter(function (g, gi) {
+    var r = rx[gi], m; r.lastIndex = 0;
+    while ((m = r.exec(text))) { if (!m[0].length) { r.lastIndex++; continue; } if (!g[3] || g[3](text.slice(0, m.index), text.slice(m.index + m[0].length))) return true; }
+    return false;
+  });
+  return used.length ? '<ul class="list terms nogloss">' + used.map(function (g) { return '<li><b>' + g[0] + '</b>: ' + g[2] + '</li>'; }).join('') + '</ul>' : '';
+}
+var SM_READ = '<p class="cmdnote axes">How to read it: each box is a state and each arrow a move between states, labeled event / action. Opening is at the top and closing at the bottom; the side that closes first goes down the left, the other side down the right.</p>';
+var SM_LEGEND = '<ul class="legend"><li><i style="background:#BFE8F7;border:1px solid #00A2D7"></i>Host A\'s state (marker A)</li><li><i style="background:#E7E1FF;border:1px solid #7B61FF"></i>Host B\'s state (marker B)</li><li><i style="background:#DCD6FF;border:1px solid #7B61FF"></i>both hosts in this state</li><li><i style="height:0;border-top:3px solid #E08B00;background:none;vertical-align:4px"></i>arc taken in this step</li><li><i style="height:0;border-top:2px solid #1B2A35;background:none;vertical-align:4px"></i>arc taken earlier</li><li><i style="height:0;border-top:1px solid #8FA6B4;background:none;vertical-align:4px"></i>arc not used</li></ul>';
 var EV_TEXT = { 'Passive open': 'its program listens (passive open)', 'Active open': 'its program connects (active open)', Close: 'its program calls close', Send: 'its program sends data',
   SYN: 'a SYN arrives', ACK: 'an ACK arrives', 'SYN + ACK': 'a SYN + ACK arrives', FIN: 'a FIN arrives', 'ACK + FIN': 'a FIN arrives that also ACKs its own FIN', 'Timeout after two segment lifetimes': 'the TIME_WAIT timer (2 × MSL) runs out' };
 var ACT_TEXT = { SYN: 'it sends a SYN', 'SYN + ACK': 'it sends SYN + ACK', ACK: 'it sends an ACK', FIN: 'it sends a FIN' };
@@ -1659,7 +1872,8 @@ function drawLossView(svg, run, T) {
   var f = new Fig(svg, 0, W, 0, H, 1.3);
   svg.setAttribute('aria-label', 'Segments Host A sent and what Host B has received. ' + lossCaption(run, T).replace(/<[^>]+>/g, ''));
   var yA = 1.85, yB = 0.75, h = 0.5;
-  f.text(0.1, yA + h / 2, 'Host A\nsent', { fs: 8, ha: 'left', bold: true, color: C.navy });
+  f.text(0.1, yA + h / 2, 'Host A\nsent', { fs: 8, ha: 'left', bold: true, color: C.navy, cls: 'axis-y' });
+  f.text(x0, yA + h + 0.2, 'segments in the order Host A sent them →', { fs: 7, ha: 'left', color: C.muted, italic: true, cls: 'axis-x' });
   f.text(0.1, yB + h / 2, 'Host B\nhas', { fs: 8, ha: 'left', bold: true, color: C.navy });
   var AF = { acked: ['#E1F5EF', C.ok], wait: ['#D6F0FA', C.brand], notsent: ['#F1F4F6', '#B8C6CF'] };
   var BF = { inorder: ['#E1F5EF', C.ok], held: ['#EEEAFF', C.violet], missing: ['#FDE8E9', C.bad], notyet: ['#F1F4F6', '#B8C6CF'] };
@@ -1691,7 +1905,7 @@ function drawLossView(svg, run, T) {
   });
   return f;
 }
-var LOSS_LEGEND = '<ul class="legend"><li><i style="background:#E1F5EF;border:1px solid #13A88A"></i>acknowledged / arrived in order</li><li><i style="background:#D6F0FA;border:1px solid #00A2D7"></i>sent, waiting for an ACK</li><li><i style="background:#EEEAFF;border:1px solid #7B61FF"></i>held out of order</li><li><i style="background:#FDE8E9;border:1px dashed #E5484D"></i>missing (a gap)</li><li><i style="background:#fff;border:2px solid #E08B00"></i>↻ resent</li></ul>';
+var LOSS_LEGEND = '<ul class="legend"><li><i style="background:#E1F5EF;border:1px solid #13A88A"></i>acknowledged / arrived in order</li><li><i style="background:#D6F0FA;border:1px solid #00A2D7"></i>sent, waiting for an ACK</li><li><i style="background:#EEEAFF;border:1px solid #7B61FF"></i>held out of order</li><li><i style="background:#FDE8E9;border:1px dashed #E5484D"></i>missing (a gap)</li><li><i style="background:#fff;border:2px solid #E08B00"></i>↻ resent</li><li><i style="background:#F1F4F6;border:1px solid #B8C6CF"></i>not sent / not arrived yet</li></ul>';
 function lossStats(run, T) {
   var L = lossState(run, T);
   return '<div class="calcgrid">' + stat('B\'s Ack (next byte it needs)', String(L.rcvNxt)) + stat('Duplicate ACKs in a row', String(L.dup), L.dup >= 3) + stat('Segments resent', String(L.resent.length), L.resent.length > 0) + '</div>';
@@ -1705,7 +1919,8 @@ function drawRibbons(svg, run, T) {
   function X(b) { return x0 + (Math.max(1, Math.min(maxB, b)) - 1) * sc; }
   function seg(y, a, b, fill, stroke, txt, h) { if (b <= a) return; f.rect(X(a), y, X(b) - X(a), h || 0.42, { fill: fill, stroke: stroke || '#fff', lw: 0.8 }); if (txt && X(b) - X(a) > f.tw(txt, 7) + 0.08) f.text((X(a) + X(b)) / 2, y + (h || 0.42) / 2, txt, { fs: 7, bold: true }); }
   // sender
-  f.text(x0, 3.33, 'Host A send side (bytes 1 to ' + Math.max(0, A.dataEnd - 1) + ' written by the application)', { fs: 8, bold: true, ha: 'left', color: C.navy });
+  f.text(x0, 3.33, 'Host A send side (bytes 1 to ' + Math.max(0, A.dataEnd - 1) + ' written by the application)', { fs: 8, bold: true, ha: 'left', color: C.navy, cls: 'axis-y' });
+  f.text(x0 + w, 3.33, 'byte number →', { fs: 7, ha: 'right', color: C.muted, italic: true, cls: 'axis-x' });
   var yS = 2.55, una = Math.max(1, A.sndUna), nxt = Math.max(1, Math.min(A.sndNxt, A.dataEnd)), right = una + A.sndWnd, end = A.dataEnd;
   f.rect(x0, yS, w, 0.42, { fill: '#F6F8FA', stroke: '#C9D6DE', lw: 0.8 });
   seg(yS, 1, una, C.okSoft, null, 'ACKed');
@@ -1720,7 +1935,8 @@ function drawRibbons(svg, run, T) {
   var pA = [['SND.UNA = ' + una, X(una)], ['SND.NXT = ' + nxt, X(nxt)]];
   ptrLabels(f, pA, yS - 0.02, W);
   // receiver
-  f.text(x0, 1.45, 'Host B receive side (buffer of ' + B.rbuf + ' bytes)', { fs: 8, bold: true, ha: 'left', color: C.navy });
+  f.text(x0, 1.45, 'Host B receive side (buffer of ' + B.rbuf + ' bytes)', { fs: 8, bold: true, ha: 'left', color: C.navy, cls: 'axis-y' });
+  f.text(x0 + w, 1.45, 'byte number →', { fs: 7, ha: 'right', color: C.muted, italic: true, cls: 'axis-x' });
   var yR = 0.68, read = B.readTotal + 1, rn = Math.max(1, B.rcvNxt - (B.finRcvd ? 1 : 0)), rr = B.rcvNxt + B.free;
   f.rect(x0, yR, w, 0.42, { fill: '#F6F8FA', stroke: '#C9D6DE', lw: 0.8 });
   seg(yR, 1, read, C.gray, null, 'read by app');
@@ -1747,7 +1963,7 @@ function ptrLabels(f, list, y, W) {
     lastR = x + w / 2;
   });
 }
-var RIBBON_LEGEND = '<ul class="legend"><li><i style="background:#D3F1E8"></i>acknowledged</li><li><i style="background:#9ADCF2"></i>in flight or waiting for the app</li><li><i style="background:#FCE9C6"></i>may send now</li><li><i style="background:#E4E4E4"></i>must wait, or already read</li><li><i style="background:#E7E1FF;border:1px solid #7B61FF"></i>out of order</li></ul>';
+var RIBBON_LEGEND = '<ul class="legend"><li><i style="background:#D3F1E8"></i>acknowledged</li><li><i style="background:#9ADCF2"></i>in flight or waiting for the app</li><li><i style="background:#FCE9C6"></i>may send now</li><li><i style="background:#E4E4E4"></i>must wait, or already read</li><li><i style="background:#E7E1FF;border:1px solid #7B61FF"></i>out of order</li><li><i style="background:#fff;border:1px dashed #13A88A"></i>free space B can accept</li><li><i style="background:#F6F8FA;border:1px solid #C9D6DE"></i>empty</li><li><i style="height:0;border-top:2px solid #E08B00;background:none;vertical-align:4px"></i>window B advertised</li></ul>';
 function windowStats(run, T) {
   var s = snapAt(run, T === undefined || T === null ? Infinity : T), A = s.A, B = s.B, infl = Math.max(0, A.sndNxt - A.sndUna), usable = Math.max(0, A.sndUna + A.sndWnd - A.sndNxt);
   return '<p class="cmdnote">SND.UNA: the oldest unacknowledged byte. SND.NXT: the next byte to send. RCV.NXT: the next byte B expects.</p><div class="calcgrid">' + stat('Bytes in flight (SND.NXT − SND.UNA)', fmt(infl)) + stat('Window B last advertised', fmt(A.sndWnd)) +
@@ -1757,13 +1973,15 @@ function windowStats(run, T) {
 function stat(k, v, hl) { return '<div class="stat' + (hl ? ' hl' : '') + '"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>'; }
 
 /* ===================================================== the header figure */
+var HDR_LEGEND = '<ul class="legend"><li><i style="background:#EAF5FA;border:1px solid #00A2D7"></i>sequence and acknowledgment numbers</li><li><i style="background:#FCE9C6;border:1px solid #00A2D7"></i>header length</li><li><i style="background:#BFE8F7;border:1px solid #00A2D7"></i>flag set to 1</li><li><i style="background:#E7E1FF;border:1px solid #00A2D7"></i>options</li><li><i style="background:#F6F8FA;border:1px solid #00A2D7"></i>data (payload)</li><li><i style="background:#fff;border:1px solid #00A2D7"></i>other fields</li></ul>';
 function drawHeader(svg, h) {
-  var bw = 0.235, x0 = 0.5, W = x0 + 32 * bw + 0.3, optLines = wrapText(h.optText || '', 58), rows = 5 + (h.hdr > 20 ? 1 : 0) + 1, rh = 0.62, extra = h.hdr > 20 ? (optLines.length - 1) * 0.2 : 0, Ht = 0.55 + rows * rh + extra + 0.15;
+  var bw = 0.235, x0 = 0.75, W = x0 + 32 * bw + 0.3, optLines = wrapText(h.optText || '', 58), rows = 5 + (h.hdr > 20 ? 1 : 0) + 1, rh = 0.62, extra = h.hdr > 20 ? (optLines.length - 1) * 0.2 : 0, Ht = 0.55 + rows * rh + extra + 0.15;
   var f = new Fig(svg, 0, W, 0, Ht, 1.4);
   svg.setAttribute('aria-label', 'TCP header with field values');
   var top = Ht - 0.45;
   [0, 4, 8, 16, 24, 31].forEach(function (b) { f.text(x0 + (b + 0.5) * bw, top + 0.18, String(b), { fs: 6.8, color: C.muted }); });
-  f.text(x0 - 0.25, top + 0.18, 'bit', { fs: 6.8, color: C.muted });
+  f.text(x0 - 0.25, top + 0.18, 'bit →', { fs: 6.8, color: C.muted, cls: 'axis-x' });
+  f.text(x0 - 0.3, top - 1.5 * rh, 'rows\nof 32\nbits\n↓', { fs: 6.5, color: C.muted, cls: 'axis-y' });
   function cell(r, b0, nb, name, val, fill, o) {
     o = o || {};
     var y = top - (r + 1) * rh, x = x0 + b0 * bw, w = nb * bw;
@@ -1816,9 +2034,9 @@ function drawRtoPlot(svg, series, rtoMin) {
   function Y(v) { return y0 + v / mx * (y1 - y0); }
   for (var v = 0; v <= mx; v += step) { f.line(x0, Y(v), x1, Y(v), { color: '#E1EAF0', lw: 0.8 }); f.text(x0 - 0.08, Y(v), String(v), { fs: 7, ha: 'right', color: C.muted }); }
   f.line(x0, y0, x0, y1, { color: C.ink, lw: 1 }); f.line(x0, y0, x1, y0, { color: C.ink, lw: 1 });
-  f.text(0.22, (y0 + y1) / 2, 'ms', { fs: 7.5, color: C.muted });
+  f.text(0.3, (y0 + y1) / 2, 'time\n(ms) ↑', { fs: 7.5, color: C.muted, cls: 'axis-y' });
   series.forEach(function (s, i) { f.text(X(i), y0 - 0.17, String(i + 1), { fs: 7, color: C.muted }); });
-  f.text((x0 + x1) / 2, 0.12, 'sample number', { fs: 7.5, color: C.muted });
+  f.text((x0 + x1) / 2, 0.12, 'sample number →', { fs: 7.5, color: C.muted, cls: 'axis-x' });
   if (rtoMin) { f.line(x0, Y(rtoMin), x1, Y(rtoMin), { color: C.bad, lw: 1, dash: [4, 3] }); f.label(x1 - 0.9, Y(rtoMin) + 0.13, 'minimum RTO ' + rtoMin + ' ms', { fs: 6.8, color: C.bad }); }
   var ps = [], pr = [];
   series.forEach(function (s, i) { if (s.srtt !== null && s.srtt !== undefined) { ps.push([X(i), Y(s.srtt)]); pr.push([X(i), Y(s.rto)]); } });
@@ -1841,7 +2059,11 @@ function makePlayer(box, run, render, opt) {
   ['A', 'B'].forEach(function (sd) { run.states[sd].forEach(function (x) { times.push(x.t); }); });
   times.sort(function (a, b) { return a - b; });
   var u = []; times.forEach(function (t) { if (!u.length || t - u[u.length - 1] > 1e-6) u.push(t); }); times = u;
-  var i = opt.start === 'first' ? 0 : times.length - 1, timer = null, token = 0, bars = [];
+  /* rule of November 23, 2026: an animated figure starts at its first frame and plays once by itself,
+     when the student reaches it and again after any option changes (a new player is made then).
+     window.VZ_NOAUTOPLAY (tests only) keeps the old start on the whole timeline, with no auto-play. */
+  var noAuto = !!window.VZ_NOAUTOPLAY;
+  var i = noAuto && opt.start !== 'first' ? times.length - 1 : 0, timer = null, token = 0, bars = [];
   function label() { return i === times.length - 1 ? (opt.statesOnly ? 'the whole connection' : 'all ' + run.segs.length + ' segments') : (times[i] < 0 ? 'before the connection' : 't = ' + ms(times[i])) + ' (step ' + (i + 1) + ' of ' + times.length + ')'; }
   /* one set of controls; every figure that changes over time gets its own copy, all in step */
   function attach(bx) {
@@ -1872,6 +2094,14 @@ function makePlayer(box, run, render, opt) {
   }
   attach(box);
   show();
+  /* play once by itself, as soon as the figure is in view (on a phone it may start below the screen) */
+  if (!noAuto && !reduceMotion && times.length > 1) {
+    var t0 = token, go1 = function () { if (token === t0 && document.body.contains(box)) play(); };
+    if (window.IntersectionObserver) {
+      var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { io.disconnect(); setTimeout(go1, 400); } }, { threshold: 0.3 });
+      io.observe(box);
+    } else setTimeout(go1, 400);
+  }
   function seekTime(t, animate) {   // go to the step at time t; with animate, land one step before and then move
     var k = 0; while (k < times.length - 1 && times[k] < t - 1e-6) k++;
     stop(); i = Math.max(0, animate ? k - 1 : k); show();
@@ -1953,22 +2183,52 @@ function fold(title, inner, id) { return '<details class="card fold"' + (id ? ' 
 function figCard(title, inner, legend) { return '<div class="card"><p class="figtitle">' + title + '</p>' + inner + (legend || '') + '</div>'; }
 
 /* mount a run in the figure column: player, ladder, and any extra views */
+/* Controls on top of the figure they change (rule of November 20, 2026): the control rows a lesson
+   writes into its text are moved, once, into a light panel at the top of the first figure card, and
+   put back there every time the figure column is rebuilt. Elements marked .keep stay in the text. */
+var FIGCTLS = null;
+function pullControls() {
+  var t = $('#ltext'), box = null, state = 0;
+  t.setAttribute('data-pulled', '1');
+  [].slice.call(t.children).forEach(function (k) {
+    if (state === 2) return;
+    var stop = k.matches('.tryit, .seeit, .navrow, .keep') || (k.tagName === 'DETAILS' && !k.querySelector('input, select'));
+    var ctl = k.matches('.chips2, .pp') || !!k.querySelector('input, select, .chips2');
+    if (state === 0) { if (ctl && !stop) state = 1; else return; }
+    if (stop) { state = 2; return; }
+    if (!box) { box = document.createElement('div'); box.className = 'figctls'; box.id = 'figctls'; if (!/above the/.test(t.textContent)) { var u = document.createElement('p'); u.className = 'use cmdnote'; u.textContent = 'This lesson\u2019s settings sit above the figure, so you can change them and watch it at once.'; t.insertBefore(u, k); } }
+    box.appendChild(k);
+  });
+  return box;
+}
+function dockControls() {
+  if (!$('#ltext').getAttribute('data-pulled')) FIGCTLS = pullControls();
+  var card = $('#lfig .card');
+  if (!FIGCTLS || !card) return;
+  var t = card.querySelector('.figtitle');
+  if (t && t.parentNode === card) card.insertBefore(FIGCTLS, t.nextSibling); else card.insertBefore(FIGCTLS, card.firstChild);
+}
 function mountRun(run, o) {
   o = o || {};
   if (lessonState.player) lessonState.player.stop();
   var h = '';
   if (o.side) h += '<div class="card"><div id="pl"></div><div id="rb"></div><div class="sbs">' +
-    '<div><p class="figtitle">The TCP state-transition diagram</p><div class="fig fit"><svg id="smf" role="img"></svg></div><div class="soft" id="smstep" aria-live="polite"></div>' + SM_LEGEND + '</div>' +
+    '<div><p class="figtitle">The TCP state-transition diagram</p><div class="fig fit"><svg id="smf" role="img"></svg></div><div class="soft" id="smstep" aria-live="polite"></div>' + SM_LEGEND + SM_READ + '</div>' +
     '<div><p class="figtitle">' + (o.title || 'Timeline') + '</p><div class="fig tall sbsl"><div class="hosthdr" aria-hidden="true"><span style="left:33.2%">Host A</span><span style="left:66.8%">Host B</span></div><svg id="ldr" role="img"></svg></div>' + LADDER_LEGEND + seqNote(run) + '</div></div></div>';
-  else if (o.smFirst) h += '<div class="card"><p class="figtitle">The TCP state-transition diagram</p><div id="pl"></div><div id="rb"></div><div class="fig fit"><svg id="smf" role="img"></svg></div><div class="soft" id="smstep" aria-live="polite"></div>' + SM_LEGEND + '</div>';
+  else if (o.smFirst) h += '<div class="card"><p class="figtitle">The TCP state-transition diagram</p><div id="pl"></div><div id="rb"></div><div class="fig fit"><svg id="smf" role="img"></svg></div><div class="soft" id="smstep" aria-live="polite"></div>' + SM_LEGEND + SM_READ + '</div>';
   if (!o.side) h += '<div class="card"><p class="figtitle">' + (o.title || 'Timeline: Host A and Host B') + '</p>' + (o.smFirst ? '<div class="pl2"></div>' : '<div id="pl"></div>' + (o.badges !== false ? '<div id="rb"></div>' : '')) +
     '<div class="fig' + (o.tall || run.segs.length > 14 ? ' tall' : '') + '"><svg id="ldr" role="img"></svg></div>' + LADDER_LEGEND + seqNote(run) + (o.click ? '<p class="cmdnote">Click a segment to lose it, or click a lost one to deliver it.</p>' : '') + '</div>';
-  if (o.loss) h += '<div class="card"><p class="figtitle">The gap, step by step</p><div class="pl2"></div><div class="fig"><svg id="lossf" role="img"></svg></div><p class="lossnow" id="lossc" aria-live="polite"></p>' + LOSS_LEGEND + '<div id="losst"></div></div>';
-  if (o.ribbons) h += '<div class="card"><p class="figtitle">Buffers and the window</p><div class="pl2"></div><div class="fig"><svg id="rib" role="img"></svg></div>' + RIBBON_LEGEND + '<div id="wst"></div></div>';
-  if (o.events) h += fold('What happened, in words', '<div id="ev"></div>', 'evc');
-  if (o.sm && !o.smFirst) h += fold('The TCP state-transition diagram', '<p class="cmdnote">Each end of a connection is always in one <b>state</b>, shown as a box. The markers A and B show where each host is; each arrow is labeled event/action: what moves a host along it, then what that host sends. Lesson 8 walks through the whole diagram.</p><div class="pl2"></div><div class="fig fit"><svg id="smf" role="img"></svg></div><div class="soft" id="smstep" aria-live="polite"></div>' + SM_LEGEND);
-  if (o.pkts !== false) h += fold('Wireshark-style capture at Host A', '<div id="pk"></div>');
+  if (o.loss) h += '<div class="card"><p class="figtitle">The gap, step by step</p><p class="relnote">The same moment as the timeline above, shown as segments: what Host A sent and what Host B has.</p><div class="pl2"></div><div class="fig"><svg id="lossf" role="img"></svg></div><p class="lossnow" id="lossc" aria-live="polite"></p>' + LOSS_LEGEND + '<div id="losst"></div></div>';
+  if (o.ribbons) h += '<div class="card"><p class="figtitle">Buffers and the window</p><p class="relnote">The same moment as the timeline above, shown as the bytes in Host A&rsquo;s send buffer and Host B&rsquo;s receive buffer.</p><div class="pl2"></div><div class="fig"><svg id="rib" role="img"></svg></div>' + RIBBON_LEGEND + '<div id="wst"></div></div>';
+  if (o.events) h += fold('What happened, in words', '<p class="relnote">The same timeline as above, told in words, one line per event.</p><div id="ev"></div>', 'evc');
+  if (o.sm && !o.smFirst) h += fold('The TCP state-transition diagram', '<p class="relnote">The same connection as the timeline above, on the state diagram.</p><p class="cmdnote">Each end of a connection is always in one <b>state</b>, shown as a box. The markers A and B show where each host is; each arrow is labeled event/action: what moves a host along it, then what that host sends. Lesson 8 walks through the whole diagram.</p><div class="pl2"></div><div class="fig fit"><svg id="smf" role="img"></svg></div><div class="soft" id="smstep" aria-live="polite"></div>' + SM_LEGEND + SM_READ);
+  if (o.pkts !== false) h += fold('Wireshark-style capture at Host A', '<p class="relnote">The same segments as the timeline above, as Wireshark would list them if it ran on Host A.</p><div id="pk"></div>');
+  var fa = FIGCTLS && FIGCTLS.contains(document.activeElement) ? document.activeElement : null;
+  var openFolds = $$('#lfig details.fold').filter(function (d) { return d.open; }).map(function (d) { return d.querySelector('summary').textContent; });
   $('#lfig').innerHTML = h;
+  dockControls();
+  $$('#lfig details.fold').forEach(function (d) { if (openFolds.indexOf(d.querySelector('summary').textContent) >= 0) d.open = true; });   // a new case keeps the student's open folds open
+  if (fa) { try { fa.focus({ preventScroll: true }); } catch (e) { fa.focus(); } }
   var lastT = null;
   /* a timeline that scrolls inside its box keeps the current moment in view */
   function keepNowInView() {
@@ -2031,8 +2291,8 @@ var LESSONS = [
     tryBox('l1', '<p>Here is a TCP header in hexadecimal, from a packet whose IP (Internet Protocol) total length is <b id="l1tot"></b> bytes (with a 20-byte IP header).</p><div class="term" id="l1hex"></div>' +
       '<div class="fields">' + numIn('l1h', 'TCP header length (bytes)') + '<label>Flags set <select id="l1f"><option value="">choose…</option><option>SYN</option><option>SYN, ACK</option><option>ACK</option><option>PSH, ACK</option><option>FIN, ACK</option><option>RST, ACK</option></select></label>' + numIn('l1p', 'Data length (bytes)') + '</div>' +
       '<div class="row"><button class="btn small" id="l1c">Check</button><button class="btn alt small" id="l1n">New header</button></div>') + seeBox();
-  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">Pick a segment</p><div class="chips2" id="l1segs"></div><div class="row"><label><input type="checkbox" id="l1raw"> Raw 32-bit numbers (not relative)</label></div><div class="fig"><svg id="l1hdr" role="img"></svg></div><div id="l1sz"></div></div>' +
-    fold('Wireshark-style capture at Host A', '<div id="l1pk"></div>');
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">Pick a segment</p><div class="chips2" id="l1segs"></div><div class="row"><label><input type="checkbox" id="l1raw"> Raw 32-bit numbers (not relative)</label></div><div class="fig"><svg id="l1hdr" role="img"></svg></div>' + HDR_LEGEND + '<div id="l1sz"></div></div>' +
+    fold('Wireshark-style capture at Host A', '<p class="relnote">The same short connection as the segment buttons above, as Wireshark would list it on Host A.</p><div id="l1pk"></div>');
   function draw() {
     var sg = run.segs[sel - 1];
     $('#l1segs').innerHTML = run.segs.map(function (s) { return '<button class="chip2" data-s="' + s.n + '" aria-pressed="' + (s.n === sel) + '" style="' + (s.n === sel ? 'background:var(--panel);border-color:var(--brand);color:var(--navy)' : '') + '">#' + s.n + ' ' + s.from + '→' + s.to + ' [' + flagText(s.f) + ']' + (s.len ? ' ' + s.len + ' B' : '') + '</button>'; }).join('');
@@ -2076,7 +2336,7 @@ var LESSONS = [
     '<p>Each host is always in a named <b>state</b>, such as LISTEN (waiting for a connection) or ESTABLISHED (connected). The two badges above the timeline show both states as you step.</p>' +
     more('Random starting numbers, options, and failures', '<p>Each SYN uses one sequence number, so the first data byte is ISN + 1. Each side picks its ISN at random, so an old segment from an earlier connection is unlikely to fit. Wireshark hides this by showing <b>relative</b> numbers: it subtracts the ISN, so every SYN shows Seq=0. The raw numbers are 32 bits and wrap around after 4,294,967,295.</p>' +
     '<p>The SYNs also carry options: each side\'s MSS (Maximum Segment Size, the most data in one segment), whether it can use SACK (Selective Acknowledgment), and its Window Scale. When nothing listens on the port, B answers with <b>RST</b> (reset): "connection refused" at once. When nothing answers at all, A resends the SYN after 1 s, then 2 s, 4 s, and so on, and finally gives up: "connection timed out".</p>') +
-    '<p class="lead">Pick a case, then step through it.</p>' +
+    '<p class="lead">Pick a case above the timeline, then step through it.</p>' +
     '<div class="chips2" id="l2case">' + [['normal', 'Normal'], ['closed', 'Port closed'], ['synlost', 'SYN lost'], ['salost', 'SYN, ACK lost'], ['silent', 'No answer at all'], ['simopen', 'Both open at once']].map(function (x) { return '<button class="chip2" data-k="' + x[0] + '">' + x[1] + '</button>'; }).join('') + '</div>' +
     more('Starting numbers', '<div class="row"><label>A\'s ISN <input type="number" id="l2a" class="wide" min="0" max="4294967295" value="' + c.isnA + '"></label><label>B\'s ISN <input type="number" id="l2b" class="wide" min="0" max="4294967295" value="' + c.isnB + '"></label><label><input type="checkbox" id="l2raw" checked> Raw numbers</label></div>') +
     tryBox('l2', '<p>A picks ISN <b class="addr" id="l2x"></b> and B picks <b class="addr" id="l2y"></b>. Fill in the raw numbers.</p><div class="fields">' + numIn('l2s1', 'SYN: Seq', 1) + numIn('l2s2', 'SYN, ACK: Seq', 1) + numIn('l2a2', 'SYN, ACK: Ack', 1) + numIn('l2s3', 'ACK: Seq', 1) + numIn('l2a3', 'ACK: Ack', 1) + '</div><div class="row"><button class="btn small" id="l2c">Check</button><button class="btn alt small" id="l2n">New numbers</button></div>') + seeBox();
@@ -2166,9 +2426,9 @@ var LESSONS = [
     '<p>A may have at most one window of bytes in flight (sent but not yet acknowledged). With SND.UNA, the oldest unacknowledged byte, and SND.NXT, the next byte to send:</p>' +
     '<ul class="list"><li>bytes in flight = SND.NXT − SND.UNA</li><li>usable window = SND.UNA + advertised window − SND.NXT</li></ul>' +
     more('Zero window, probes, and Window Scale', '<p>If B\'s application stops reading, the window shrinks to <b>0</b> and A must stop. A then sends a small <b>window probe</b> now and then (Linux sends one with Seq one below SND.UNA and no data; Wireshark labels it Keep-Alive) so it learns when the window opens. When the application reads, B sends a <b>window update</b>.</p>' +
-    '<p>The window field has 16 bits, so it stops at 65,535 bytes. The <b>Window Scale</b> option, agreed in the SYNs, multiplies it by 2<sup>shift</sup>. Wireshark shows the result.</p>') +
+    '<p>The window field has 16 bits, so it stops at 65,535 bytes. The <b>Window Scale</b> option, agreed in the SYN (synchronize) segments, multiplies it by 2<sup>shift</sup>. Wireshark shows the result.</p>') +
     '<div class="row"><label>B\'s buffer <select id="l4b"><option>300</option><option selected>400</option><option>600</option><option>1000</option></select> bytes</label><label>B\'s application <select id="l4r"><option value="now">reads at once</option><option value="pause2" selected>pauses for 2 s</option><option value="pause5">pauses for 5 s</option></select></label></div>' +
-    more('Window Scale calculator', '<div class="soft"><b>Window Scale</b>: field <input type="number" id="l4f" value="502" min="0" max="65535"> × 2<sup><input type="number" id="l4s" value="7" min="0" max="14" style="width:4em"></sup> = <b id="l4w" class="mono"></b> bytes</div>') +
+    more('Window Scale calculator', '<div class="soft"><b>Window Scale</b>: field <input type="number" id="l4f" value="502" min="0" max="65535"> × 2<sup><input type="number" id="l4s" value="7" min="0" max="14" style="width:4em"></sup> = <b id="l4w" class="mono"></b> bytes</div>').replace('class="more"', 'class="more keep"') +
     tryBox('l4', '<p id="l4qt"></p><div class="fields">' + numIn('l4q1', 'Advertised window (bytes)') + numIn('l4q2', 'Usable window (bytes)') + '<label>May A send a 100-byte segment? <select id="l4q3"><option value="">choose…</option><option>yes</option><option>no</option></select></label></div><div class="row"><button class="btn small" id="l4c">Check</button><button class="btn alt small" id="l4n">New numbers</button></div>') + seeBox();
   function ws() { var f = Math.max(0, Math.min(65535, Math.floor(+$('#l4f').value || 0))), s = Math.max(0, Math.min(14, Math.floor(+$('#l4s').value || 0))); $('#l4w').textContent = fmt(f * Math.pow(2, s)); }
   $('#l4f').oninput = ws; $('#l4s').oninput = ws; ws();
@@ -2205,7 +2465,7 @@ var LESSONS = [
     '<p>The sender finds the loss in one of two ways:</p><ul class="list"><li><b>Three duplicate ACKs</b>: it resends the missing segment at once. This is <b>fast retransmit</b>.</li><li><b>Timeout</b>: no ACK comes before the retransmission timer (RTO) expires, so it resends the oldest unacknowledged segment and doubles the timer. This happens when too few segments follow the loss, for example when the last one is lost.</li></ul>' +
     more('Selective acknowledgment, lost ACKs, and what is left out', '<p>With <b>SACK</b> (Selective Acknowledgment), duplicate ACKs also list the blocks that did arrive, so the sender can resend just the holes. A lost <b>ACK</b> usually costs nothing: the next ACK is cumulative and covers it.</p>' +
     '<p>When the sender resends, it also slows down. That part is congestion control, which this tool leaves out.</p>') +
-    '<div class="row"><label>A sends <select id="l5n"><option>4</option><option>6</option><option selected>8</option></select> segments of 100 bytes</label><label><input type="checkbox" id="l5s" checked> SACK</label></div>' +
+    '<div class="row"><label>A sends <select id="l5n"><option>4</option><option>6</option><option selected>8</option></select> segments of 100 bytes</label><label><input type="checkbox" id="l5s" checked> SACK (Selective Acknowledgment)</label></div>' +
     '<p style="margin-bottom:2px"><b>Lose these data segments</b> (Seq is each one\'s sequence number):</p><div class="chips2" id="l5l"></div><div class="chips2" id="l5ack"></div>' +
     tryBox('l5', '<p id="l5qt"></p><div class="fields">' + numIn('l5q1', 'Ack number in those duplicate ACKs') + numIn('l5q2', 'How many duplicate ACKs?') + '<label>How is the lost segment resent? <select id="l5q3"><option value="">choose…</option><option value="fast">fast retransmit</option><option value="rto">timeout</option></select></label></div><div class="row"><button class="btn small" id="l5c">Check</button><button class="btn alt small" id="l5x">New loss</button></div>') + seeBox();
   function chips() {
@@ -2229,7 +2489,7 @@ var LESSONS = [
   var q;
   function gen() {
     var N = rnd(5, 9), k = rnd(1, N - 1); q = { N: N, k: k, ack: 1 + 100 * (k - 1), dups: N - k, how: N - k >= 3 ? 'fast' : 'rto' };
-    $('#l5qt').innerHTML = 'A sends <b>' + N + '</b> segments of 100 bytes (Seq=1, 101, 201, …), and only segment <b>' + k + '</b> is lost. B ACKs every segment at once.';
+    $('#l5qt').innerHTML = 'A sends <b>' + N + '</b> segments of 100 bytes (sequence numbers Seq=1, 101, 201, …), and only segment <b>' + k + '</b> is lost. B ACKs every segment at once.';
     lessonState.solve = function () { $('#l5q1').value = q.ack; $('#l5q2').value = q.dups; $('#l5q3').value = q.how; };
     ['l5q1', 'l5q2'].forEach(function (i) { $('#' + i).value = ''; }); $('#l5q3').value = ''; $('#l5fb').innerHTML = ''; $('#l5fb').className = 'feedback';
   }
@@ -2252,8 +2512,9 @@ var LESSONS = [
     '<div class="row"><label>Round-trip time samples in ms <input type="text" id="l6s" size="28" value="' + c.samples + '"></label><label>Minimum RTO <select id="l6m"><option value="0">none (see the formula)</option><option value="200">200 ms (Linux)</option><option value="1000">1 s (standard)</option></select></label></div>' +
     '<p style="margin-bottom:2px"><b>Sent twice?</b> (Karn\'s rule skips these)</p><div class="chips2" id="l6k"></div>' +
     tryBox('l6', '<p id="l6qt"></p><div class="fields">' + numIn('l6q1', 'New RTTVAR (ms)') + numIn('l6q2', 'New SRTT (ms)') + numIn('l6q3', 'New RTO (ms)') + '</div><div class="row"><button class="btn small" id="l6c">Check</button><button class="btn alt small" id="l6n">New numbers</button></div>') + seeBox();
-  $('#lfig').innerHTML = figCard('SRTT and RTO after each sample', '<div class="fig"><svg id="l6p" role="img"></svg></div>', RTO_LEGEND) + fold('The working, sample by sample', '<ol class="events" id="l6w"></ol>') +
-    fold('Backoff: timeouts in a row', '<ol class="events" id="l6b"></ol>');
+  $('#lfig').innerHTML = figCard('SRTT and RTO after each sample', '<div class="fig"><svg id="l6p" role="img"></svg></div>', RTO_LEGEND) + fold('The working, sample by sample', '<p class="relnote">The numbers behind the plot above, one sample at a time.</p><ol class="events" id="l6w"></ol>') +
+    fold('Backoff: timeouts in a row', '<p class="relnote">A separate example, not the samples above: what happens to the RTO (retransmission timeout) when timeouts come one after another.</p><ol class="events" id="l6b"></ol>');
+  dockControls();
   function parse() { return ($('#l6s').value.match(/\d+(\.\d+)?/g) || []).map(Number).filter(function (v) { return v > 0 && v < 100000; }).slice(0, 12); }
   function r1(v) { return Math.round(v * 10) / 10; }
   function draw() {
@@ -2358,7 +2619,7 @@ var LESSONS = [
   var seen = lessonState.arcsSeen || (lessonState.arcsSeen = {});
   $('#ltext').innerHTML = lessonHead(7, 'The state diagram, step by step') +
     '<p>Each end of a connection keeps its own <b>state</b>, drawn as a box. Each arc is labeled <b>event/action</b>: what moves that end along the arc (a segment arriving, or its program calling open or close), then what it sends: SYN (synchronize), ACK (acknowledgment), or FIN (finish).</p>' +
-    '<p class="lead">Choose how the connection opens and closes, or click any arrow in the diagram. Then press ▶ to take one step at a time.</p>' +
+    '<p class="lead">Choose how the connection opens and closes above the diagram, or click any arrow in it. Then press ▶ to take one step at a time.</p>' +
     '<p class="pp">How it opens</p><div class="chips2" id="l8open">' + OPENS.map(function (x) { return '<button class="chip2" data-k="' + x[0] + '">' + x[1] + '</button>'; }).join('') + '</div>' +
     '<p class="pp">How it closes</p><div class="chips2" id="l8close">' + CLOSES.map(function (x) { return '<button class="chip2" data-k="' + x[0] + '">' + x[1] + '</button>'; }).join('') + '</div>' +
     '<p class="cmdnote" id="l8why"></p>' +
@@ -2451,8 +2712,20 @@ var MAP_DESC = ['Read every field of a TCP (Transmission Control Protocol) heade
   'Work out how long the sender waits before it resends, from measured round-trip times.',
   'Close a connection from either side, and see why one side waits in TIME_WAIT.',
   'Walk both hosts through every state of the state diagram, from setup to close.'];
+function openGlossary() {
+  lessonState.map = true; lessonState.gloss = true; lessonState.token++;
+  if (lessonState.player) { lessonState.player.stop(); lessonState.player = null; }
+  renderStepper();
+  $('#lmap').innerHTML = '<h2>Glossary</h2><p>Every term and symbol used in this app, A to Z. In the lessons, point at (or tap) any underlined word to see its meaning.</p>' + '<p><label>Find a term: <input type="text" id="gfind" placeholder="for example, window"></label></p>' + glossaryHTML() +
+    '<div class="row"><button class="btn alt" id="lgback">← Back to lesson ' + (lessonState.i + 1) + '</button><button class="btn alt" id="lgmap">Lesson map</button></div>';
+  $('#lgback').onclick = function () { openLesson(lessonState.i); window.scrollTo(0, 0); };
+  $('#lgmap').onclick = function () { openMap(); window.scrollTo(0, 0); };
+  $('#gfind').oninput = function () { var q = this.value.trim().toLowerCase(); $$('.glossall li').forEach(function (li) { li.hidden = q && li.textContent.toLowerCase().indexOf(q) < 0; }); };
+  $('#lmap').hidden = false; $('#view-learn .lesson').hidden = true;
+  writeLink();
+}
 function openMap() {
-  lessonState.map = true; lessonState.token++;
+  lessonState.map = true; lessonState.gloss = false; lessonState.token++;
   if (lessonState.player) { lessonState.player.stop(); lessonState.player = null; }
   renderStepper();
   var next = 0; while (next < LESSONS.length - 1 && progress.lessons[next]) next++;
@@ -2461,7 +2734,7 @@ function openMap() {
     MAP_PARTS.map(function (p, k) {
       return '<h3>Part ' + (k + 1) + ': ' + p[0] + '</h3><ol class="lmap" start="' + (p[1] + 1) + '">' + LESSONS.slice(p[1], p[2]).map(function (L, j) {
         var i = p[1] + j;
-        return '<li><button data-l="' + i + '" class="' + (progress.lessons[i] ? 'done' : '') + '"><span class="num">' + (progress.lessons[i] ? '✓' : i + 1) + '</span><span><b>' + L.t + '</b><span class="d">' + MAP_DESC[i] + '</span></span></button></li>';
+        return '<li><button data-l="' + i + '" class="' + (progress.lessons[i] ? 'done' : '') + '"><span class="num" aria-hidden="true">' + (progress.lessons[i] ? '✓' : i + 1) + '</span><span><b><span class="srt">Lesson ' + (i + 1) + (progress.lessons[i] ? ' (done)' : '') + ': </span>' + L.t + '</b><span class="d">' + MAP_DESC[i] + '</span></span></button></li>';
       }).join('') + '</ol>';
     }).join('') +
     '<div class="row"><button class="btn" id="lnext">' + (any ? 'Continue with lesson ' + (next + 1) + ' →' : 'Start lesson 1 →') + '</button></div>';
@@ -2471,14 +2744,14 @@ function openMap() {
   writeLink();
 }
 function renderStepper() {
-  $('#mapslot').innerHTML = '<button data-map class="mapbtn"' + (lessonState.map ? ' aria-current="step"' : '') + ' aria-label="Lesson map: all eight lessons" title="Lesson map"><span class="num">☰</span><span class="lt">Lesson map</span></button>';
+  $('#mapslot').innerHTML = '<button data-map class="mapbtn"' + (lessonState.map && !lessonState.gloss ? ' aria-current="step"' : '') + ' aria-label="Lesson map: all eight lessons" title="Lesson map"><span class="num">☰</span><span class="lt">Lesson map</span></button><button data-gloss class="mapbtn"' + (lessonState.gloss ? ' aria-current="step"' : '') + ' aria-label="Glossary: every term" title="Glossary"><span class="num">Aa</span><span class="lt">Glossary</span></button>';
   $('#stepper').innerHTML = LESSONS.map(function (L, i) { return '<button data-l="' + i + '" class="' + (progress.lessons[i] ? 'done' : '') + '"' + (i === lessonState.i && !lessonState.map ? ' aria-current="step"' : '') + ' title="Lesson ' + (i + 1) + ': ' + L.t + '" aria-label="Lesson ' + (i + 1) + ': ' + L.t + (progress.lessons[i] ? ', done' : '') + '"><span class="num">' + (progress.lessons[i] ? '✓' : i + 1) + '</span><span class="lt">' + L.t + '</span></button>'; }).join('');
   $$('#stepper [data-l]').forEach(function (b) { b.onclick = function () { openLesson(+b.getAttribute('data-l')); }; });
   $('#mapslot [data-map]').onclick = openMap;
   $('#lprog').style.width = (Object.keys(progress.lessons).length / LESSONS.length * 100) + '%';
 }
 function openLesson(i) {
-  lessonState.i = Math.max(0, Math.min(LESSONS.length - 1, i)); lessonState.token++; lessonState.map = false;
+  lessonState.i = Math.max(0, Math.min(LESSONS.length - 1, i)); lessonState.token++; lessonState.map = false; lessonState.gloss = false;
   $('#lmap').hidden = true; $('#lmap').innerHTML = ''; $('#view-learn .lesson').hidden = false;
   lessonState.wide = !!LESSONS[lessonState.i].wide; $('#view-learn .lesson').className = 'lesson' + (lessonState.wide ? ' wide' : '');
   document.body.classList.toggle('widepage', lessonState.wide);
@@ -2486,6 +2759,7 @@ function openLesson(i) {
   renderStepper(); $('#lfig').innerHTML = ''; LESSONS[lessonState.i].setup();
   var tl = termsList($('#ltext').textContent + ' ' + $('#lfig').textContent);
   if (tl) $('#ltext').insertAdjacentHTML('beforeend', more('Terms in this lesson', tl));
+  $('#ltext').insertAdjacentHTML('beforeend', '<p class="glink"><button class="btn alt small" data-gloss>Glossary: every term in this app</button></p>');
   var last = lessonState.i === LESSONS.length - 1;
   $('#ltext').insertAdjacentHTML('beforeend', '<div class="navrow"><button class="btn alt" id="lprev"' + (lessonState.i ? '' : ' disabled') + '>← Back</button><button class="btn' + (last ? ' amber' : '') + '" id="lnext">' + (last ? 'Take the challenge →' : 'Next lesson →') + '</button></div>');
   $('#lprev').onclick = function () { openLesson(lessonState.i - 1); window.scrollTo(0, 0); };
@@ -2501,7 +2775,7 @@ try { narrowMQ = window.matchMedia('(max-width: 980px)'); } catch (e) { narrowMQ
 function placeTask() {
   var narrow = !!(narrowMQ && narrowMQ.matches) || !!lessonState.wide, from = narrow ? $('#ltext') : $('#ltask'), to = narrow ? $('#ltask') : $('#ltext');
   if (!from || !to) return;
-  Array.prototype.slice.call(from.children).forEach(function (n) { if (/(^| )(tryit|seeit|navrow)( |$)/.test(n.className)) to.appendChild(n); });
+  Array.prototype.slice.call(from.children).forEach(function (n) { if (/(^| )(tryit|seeit|navrow|glink)( |$)/.test(n.className)) to.appendChild(n); });
   $('#ltask').hidden = !$('#ltask').children.length;
 }
 if (narrowMQ) { if (narrowMQ.addEventListener) narrowMQ.addEventListener('change', placeTask); else if (narrowMQ.addListener) narrowMQ.addListener(placeTask); }
@@ -2568,19 +2842,19 @@ function calcInit() {
     '<details class="more"><summary>All settings</summary><div class="inputs" id="c_fields"></div></details>' +
     '<p id="c_err" class="no" aria-live="polite"></p><div class="calcgrid" id="c_stats"></div><details class="more"><summary>More numbers</summary><div class="calcgrid" id="c_stats2"></div></details><div id="c_badges"></div><div id="c_sum"></div></div>' +
     '<div class="card"><p class="figtitle">Timeline</p><div id="c_pl"></div><div class="fig tall capped"><svg id="c_ldr" role="img"></svg></div>' + LADDER_LEGEND + '</div>' +
-    fold('What happened, in words', '<div id="c_ev"></div>') +
-    fold('Buffers and the window (data from A to B)', '<div class="pl2"></div><div class="fig capped"><svg id="c_rib" role="img"></svg></div>' + RIBBON_LEGEND + '<div id="c_wst"></div>') +
-    fold('State-transition diagram', '<p class="cmdnote">Each box is a state. The markers A and B show where each host is; each arrow is labeled event/action.</p><div class="pl2"></div><div class="fig capped fit"><svg id="c_sm" role="img"></svg></div><div class="soft" id="c_smstep" aria-live="polite"></div>' + SM_LEGEND) +
-    fold('Wireshark-style capture at Host A', '<div id="c_pk"></div>') +
+    fold('What happened, in words', '<p class="relnote">The same timeline as above, told in words.</p><div id="c_ev"></div>') +
+    fold('Buffers and the window (data from A to B)', '<p class="relnote">The same connection as the timeline above, shown as the bytes in the two buffers.</p><div class="pl2"></div><div class="fig capped"><svg id="c_rib" role="img"></svg></div>' + RIBBON_LEGEND + '<div id="c_wst"></div>') +
+    fold('State-transition diagram', '<p class="relnote">The same connection as the timeline above, on the state diagram.</p><p class="cmdnote">Each box is a state. The markers A and B show where each host is; each arrow is labeled event/action.</p><div class="pl2"></div><div class="fig capped fit"><svg id="c_sm" role="img"></svg></div><div class="soft" id="c_smstep" aria-live="polite"></div>' + SM_LEGEND + SM_READ) +
+    fold('Wireshark-style capture at Host A', '<p class="relnote">The same segments as the timeline above, as Wireshark would list them on Host A.</p><div id="c_pk"></div>') +
     '<div class="card"><h2>Quick calculators</h2><p class="cmdnote">Open one to use it.</p>' +
-      '<details class="qc"><summary>Decode a TCP header</summary><p class="cmdnote">Paste the TCP header bytes in hexadecimal (for example from Wireshark: right-click the TCP layer, Copy, …as Hex Stream).</p><textarea id="q_hex" rows="3" style="width:100%;font-family:var(--mono)" spellcheck="false">bb 54 13 88 6d 70 1e 8f 00 00 00 00 a0 02 fa f0 9f 2e 00 00 02 04 05 b4 04 02 08 0a 0d cb 04 6b 00 00 00 00 01 03 03 07</textarea><div id="q_hexout"></div><div class="fig capped"><svg id="q_hexfig" role="img"></svg></div>' +
+      '<details class="qc"><summary>Decode a TCP header</summary><p class="cmdnote">Paste the TCP header bytes in hexadecimal (for example from Wireshark: right-click the TCP layer, Copy, …as Hex Stream).</p><textarea id="q_hex" rows="3" style="width:100%;font-family:var(--mono)" spellcheck="false">bb 54 13 88 6d 70 1e 8f 00 00 00 00 a0 02 fa f0 9f 2e 00 00 02 04 05 b4 04 02 08 0a 0d cb 04 6b 00 00 00 00 01 03 03 07</textarea><div id="q_hexout"></div><div class="fig capped"><svg id="q_hexfig" role="img"></svg></div>' + HDR_LEGEND + '' +
       '</details><details class="qc"><summary>Sequence and acknowledgment numbers</summary><div class="row"><label>Seq, the sequence number (raw) <input type="number" id="q_seq" class="wide" value="4294967200"></label><label>Len, the data length <input type="number" id="q_len" value="300"></label><label><input type="checkbox" id="q_syn"> SYN</label><label><input type="checkbox" id="q_fin"> FIN</label><label>Sender\'s ISN (initial sequence number) <input type="number" id="q_isn" class="wide" value="4294967100"></label></div><div class="calcgrid" id="q_seqout"></div>' +
       '</details><details class="qc"><summary>Windows and throughput</summary><div class="row"><label>Buffer <input type="number" id="q_buf" value="65536"></label><label>Unread <input type="number" id="q_unr" value="16384"></label><label>In flight <input type="number" id="q_inf" value="20000"></label><label>RTT, round-trip time (ms) <input type="number" id="q_rtt" value="40"></label></div><div class="row"><label>Or a window field <input type="number" id="q_wf" value="502"></label><label>scale shift <input type="number" id="q_ws" value="7" min="0" max="14"></label></div><div class="calcgrid" id="q_winout"></div>' +
       '</details><details class="qc"><summary>Retransmission timer (standard RFC 6298, Request for Comments)</summary><div class="row"><label>Round-trip time (RTT) samples (ms) <input type="text" id="q_rtts" size="28" value="100, 120, 300, 110"></label><label>Minimum <select id="q_min"><option value="1000">1 s</option><option value="200">200 ms</option><option value="0">none</option></select></label></div><div id="q_rtoout"></div>' +
       '</details><details class="qc"><summary>MSS (Maximum Segment Size) from the MTU (Maximum Transmission Unit)</summary><div class="row"><label>MTU (Maximum Transmission Unit) <input type="number" id="q_mtu" value="1500"></label><label>IP (Internet Protocol) <select id="q_ipv"><option value="20">IPv4 (20-byte header)</option><option value="40">IPv6 (40-byte header)</option></select></label><label><input type="checkbox" id="q_mts" checked> Timestamps</label></div><div class="calcgrid" id="q_mssout"></div>' +
     '</details></div>' +
     fold('Commands for Linux and Windows', '<div id="c_cmds"></div>') +
-    fold('Terms used here', termsList(GLOSS.map(function (g) { return g[0]; }).join(' ')));
+    fold('Terms used here', '<p class="cmdnote">Point at (or tap) any underlined word above to see its meaning.</p>' + glossaryHTML() + '<p><button class="btn alt small" data-gloss>Open the glossary page</button></p>');
   var h = '';
   CALC_FIELDS.forEach(function (f) {
     if (f[2] === 'num') h += '<label>' + f[1] + '<input type="number" data-f="' + f[0] + '" min="' + f[3] + '" max="' + f[4] + '"></label>';
@@ -2983,13 +3257,17 @@ function setLevel(l) { $$('.level').forEach(function (b) { b.setAttribute('aria-
 
 /* ===================================================== hero figure on the start screen */
 function drawHero() {
-  var f = new Fig($('#heroFig'), 0, 7.2, 0, 4, 1.6), xa = 1.4, xb = 5.8;
+  var f = new Fig($('#heroFig'), 0, 7.2, -0.55, 4, 1.6), xa = 1.4, xb = 5.8;
   f.slab(xa - 0.75, 3.35, 1.5, 0.5, { text: 'Host A', fill: '#fff', fs: 9.5, bold: true });
   f.slab(xb - 0.75, 3.35, 1.5, 0.5, { text: 'Host B', fill: '#fff', fs: 9.5, bold: true });
   f.line(xa, 3.3, xa, 0.15, { color: '#fff', lw: 2.2 }); f.line(xb, 3.3, xb, 0.15, { color: '#fff', lw: 2.2 });
-  [[xa, 3.0, xb, 2.55, 'SYN  Seq=0', '#E7E1FF', 'w'], [xb, 2.55, xa, 2.1, 'SYN, ACK  Ack=1', '#E7E1FF', 'w'], [xa, 2.1, xb, 1.65, 'ACK  Ack=1', '#CFE6F0', 'w'], [xa, 1.55, xb, 1.1, 'Seq=1 Len=100', '#F5A524', 'w'], [xb, 1.1, xa, 0.65, 'ACK  Ack=101', '#CFE6F0', 'w']].forEach(function (a) {
+  [[xa, 3.0, xb, 2.55, 'SYN  Seq=0', '#B9A8FF', 'w'], [xb, 2.55, xa, 2.1, 'SYN, ACK  Ack=1', '#B9A8FF', 'w'], [xa, 2.1, xb, 1.65, 'ACK  Ack=1', '#FFFFFF', 'w'], [xa, 1.55, xb, 1.1, 'Seq=1 Len=100', '#F5A524', 'w'], [xb, 1.1, xa, 0.65, 'ACK  Ack=101', '#FFFFFF', 'w']].forEach(function (a) {
     f.arrow(a[0], a[1], a[2], a[3], { color: a[5], lw: 2, mk: a[6] });
     f.text((a[0] + a[2]) / 2, (a[1] + a[3]) / 2 + 0.17, a[4], { fs: 8, color: '#fff', bold: true });
+  });
+  // color key
+  [['#B9A8FF', 'opening (SYN)', 0.2], ['#FFFFFF', 'acknowledgment', 2.65], ['#F5A524', 'data', 5.45]].forEach(function (k) {
+    f.line(k[2], -0.3, k[2] + 0.45, -0.3, { color: k[0], lw: 3.5 }); f.text(k[2] + 0.55, -0.3, k[1], { fs: 9.5, color: '#fff', ha: 'left' });
   });
 }
 
@@ -3002,7 +3280,7 @@ function go(mode) {
   VIEWS.forEach(function (v) { $('#view-' + v).hidden = v !== current; });
   if (current !== 'learn') document.body.classList.remove('widepage');
   $$('.modes button[data-mode]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === current)); });
-  if (current === 'learn') { if (lessonState.map === undefined) lessonState.map = !Object.keys(progress.lessons).length; if (lessonState.map) openMap(); else openLesson(lessonState.i); }
+  if (current === 'learn') { if (lessonState.map === undefined) lessonState.map = !Object.keys(progress.lessons).length; if (lessonState.map) { if (lessonState.gloss) openGlossary(); else openMap(); } else openLesson(lessonState.i); }
   if (current === 'challenge') { if (game) { clearInterval(game.timer); game = null; } $('#ch-setup').hidden = false; $('#ch-play').hidden = true; $('#ch-end').hidden = true; renderShelf(); }
   if (current === 'calc') { if (!calcReady) { calcInit(); calcReady = true; } calc(); }
   window.scrollTo(0, 0); writeLink();
@@ -3010,7 +3288,7 @@ function go(mode) {
 function writeLink() {
   try {
     var q = new URLSearchParams(); q.set('mode', current);
-    if (current === 'learn') q.set('lesson', lessonState.map ? 'map' : lessonState.i + 1);
+    if (current === 'learn') q.set('lesson', lessonState.map ? (lessonState.gloss ? 'glossary' : 'map') : lessonState.i + 1);
     if (current === 'calc' && calcState) {
       var s = calcState; q.set('preset', s.preset); q.set('mss', s.mss); q.set('rbuf', s.rbufB); q.set('sack', s.sack); q.set('dack', s.dack); q.set('ws', s.ws); q.set('close', s.close);
       if (s.lose.length) q.set('lose', s.lose.join('-')); if (s.raw) q.set('raw', 1);
@@ -3022,7 +3300,7 @@ function writeLink() {
 }
 function readLink() {
   var q; try { q = new URLSearchParams(location.search); } catch (e) { return null; }
-  if (q.get('lesson')) { lessonState.map = q.get('lesson') === 'map'; lessonState.i = Math.max(0, Math.min(LESSONS.length - 1, (+q.get('lesson') || 1) - 1)); }
+  if (q.get('lesson')) { lessonState.map = q.get('lesson') === 'map' || q.get('lesson') === 'glossary'; lessonState.gloss = q.get('lesson') === 'glossary'; lessonState.i = Math.max(0, Math.min(LESSONS.length - 1, (+q.get('lesson') || 1) - 1)); }
   if (/^[EMH]$/.test(q.get('level') || '')) setLevel(q.get('level'));
   if (q.get('os') === 'windows' || q.get('os') === 'linux') OS = q.get('os');
   var p = q.get('preset'), touched = false;
@@ -3048,12 +3326,305 @@ function init() {
   $('#q_quit').onclick = function () { endRound(); };
   $('#resetProgress').onclick = function () { progress = { xp: 0, lessons: {}, badges: {}, best: {} }; store.set('progress', progress); showXP(false); renderShelf(); if (current === 'learn') renderStepper(); };
   $('#verifyBtn').onclick = function () { var r = checkCode($('#verifyIn').value); $('#verifyOut').innerHTML = r ? '<span class="yes">Valid:</span> ' + { E: 'Easy', M: 'Medium', H: 'Hard', S: 'Sprint' }[r.level] + ', ' + r.score + ' points, ' + r.right + ' of ' + r.total + ' right.' : '<span class="no">Not a valid code.</span>'; };
+  document.addEventListener('click', function (e) { var b = e.target && e.target.closest ? e.target.closest('[data-gloss]') : null; if (b) { e.preventDefault(); if (current !== 'learn') go('learn'); openGlossary(); window.scrollTo(0, 0); } });
   go(mode || 'home');
+  startGloss();
 }
 init();
-window.TCPVisualizer = { lossState: lossState, lossCaption: lossCaption, simulate: simulate, capture: capture, rtoSeries: rtoSeries, decodeHeader: decodeHeader, headerBytes: headerBytes, m32: m32, snapAt: snapAt, stateAt: stateAt, SPELL: SPELL,
+window.TCPVisualizer = { GLOSS: GLOSS, glossKey: function (w) { var hit = null; GLOSS.forEach(function (g) { var m = w.match(g[1]); if (!hit && m && m[0] === w) hit = g[0]; }); return hit; }, lossState: lossState, lossCaption: lossCaption, simulate: simulate, capture: capture, rtoSeries: rtoSeries, decodeHeader: decodeHeader, headerBytes: headerBytes, m32: m32, snapAt: snapAt, stateAt: stateAt, SPELL: SPELL,
   GEN: GEN, makeRound: makeRound, solveLesson: function () { if (lessonState.solve) lessonState.solve(); }, code: code, checkCode: checkCode, LESSONS: LESSONS, PRESETS: PRESETS, calcCfg: calcCfg, calcReset: calcReset };
 })();
 </script>
+
+<!-- vz-widgets:begin body -->
+<script id="vz-shell">
+/* Slide widgets, part 2 of 2 (runs last, after the app's own script).
+   Normal page: adds "For instructors: slide widget links" to the footer.
+   ?widget=<name>: shows only that figure and its controls, scaled to fill the frame.
+   ?widget=list: the instructors' page of widget links (&format=data also sends the list to a parent page).
+   One figure per widget; the list of widgets is window.VZ_WIDGETS (written by patch_widgets.py). */
+(function () {
+  'use strict';
+  var R = window.VZ_WIDGETS, V = window.VZ_MODE;
+  if (!R || !R.widgets) return;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function addStyle(css) { var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st); }
+  function linkFor(w, rel) { return (rel ? location.pathname : R.published) + '?widget=' + encodeURIComponent(w.name); }
+  function post(msg) { try { if (window.parent && window.parent !== window) window.parent.postMessage(msg, '*'); } catch (e) { /* no parent */ } }
+  function listData() {
+    return { type: 'vz-widget-list', app: R.app, published: R.published, widgets: R.widgets.map(function (w) {
+      return { name: w.name, title: w.title, group: w.group, link: linkFor(w), params: (w.params || []).map(function (p) {
+        return { key: p.key, label: p.label, type: p.options ? 'select' : p.pattern ? 'text' : 'number', pattern: p.pattern || null, 'default': p['default'], min: p.min, max: p.max,
+          integer: p.integer !== false, multi: !!p.multi, blank: p['default'] === '' || !!p.blank, options: p.options || null };
+      }) };
+    }) };
+  }
+  function copy(text, btn) {
+    function done(ok) { var o = btn.textContent; btn.textContent = ok ? 'Copied' : 'Select and copy'; setTimeout(function () { btn.textContent = o; }, 1300); }
+    function fallback() {
+      var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); var ok = false; try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      document.body.removeChild(ta); done(ok);
+    }
+    try { if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(function () { done(true); }, fallback); return; } } catch (e) { /* fall back */ }
+    fallback();
+  }
+
+  /* ===================================================== normal page: the footer link */
+  if (!V) {
+    var addFooterLink = function () {
+      if ($('#vzInstr')) return;
+      var foot = $('footer'), anchor = null;
+      if (!foot) return;
+      $$('details', foot).forEach(function (d) { var s = $('summary', d); if (s && /for instructors/i.test(s.textContent)) anchor = d; });
+      var p = document.createElement('p');
+      p.id = 'vzInstr'; p.className = 'vz-instr';
+      p.innerHTML = '<a href="?widget=list">For instructors: slide widget links<\/a> (put one figure at a time on a lecture slide)';
+      if (anchor) anchor.parentNode.insertBefore(p, anchor.nextSibling);
+      else ($('.card', foot) || foot).appendChild(p);
+    };
+    addStyle('.vz-instr{margin:8px 0 0;font-size:14px}.vz-instr a{font-weight:600}');
+    addFooterLink();
+    return;
+  }
+
+  /* ===================================================== shared look for widget and list pages */
+  addStyle(
+    'html.vz-w,html.vz-w body{overflow:hidden;background:#fff}' +
+    'html.vz-w body{margin:0}' +
+    '.vz-hide{display:none!important}' +
+    '.vz-path{display:block!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;' +
+      'max-width:none!important;width:auto!important;min-height:0!important;height:auto!important;position:static!important;transform:none!important;overflow:visible!important;top:auto!important}' +
+    '.vz-keep{margin:0 0 10px!important;max-width:none!important;position:static!important;top:auto!important}' +
+    '.vz-pinned>summary{pointer-events:none;cursor:default;list-style:none}.vz-pinned>summary::-webkit-details-marker{display:none}' +
+    '#vzHead{display:flex;align-items:center;gap:10px;padding:0 0 8px;margin:0 0 10px;border-bottom:2px solid #CFE6F0}' +
+    '#vzHead h1{margin:0;font-size:22px;color:#0B3D5C;flex:1;line-height:1.25}' +
+    '#vzHead .vz-name{font-size:12px;color:#5B6B78}' +
+    'body.vz-stage{position:absolute!important;left:0;top:0;transform-origin:0 0;padding:14px 18px!important;box-sizing:border-box}' +
+    '.vz-note{max-width:640px;margin:40px auto;padding:16px 20px}' +
+    /* list page */
+    'html.vz-list,html.vz-list body{overflow:auto}' +
+    '#vzList{max-width:980px;margin:0 auto;padding:18px 16px 40px}' +
+    '#vzList h1{font-size:26px;margin:0 0 6px}#vzList h2{font-size:19px;margin:22px 0 8px}' +
+    '#vzList .vz-item{margin:10px 0}#vzList .vz-item h3{margin:0 0 4px;font-size:17px}' +
+    '#vzList .vz-link{display:block;font-family:Consolas,Menlo,monospace;font-size:13px;background:#EAF5FA;border:1px solid #D3E3EC;border-radius:6px;padding:6px 8px;overflow-wrap:anywhere;margin:6px 0}' +
+    '#vzList .vz-params{font-size:14px;color:#5B6B78;margin:4px 0}' +
+    '#vzList .vz-prev{margin-top:8px;width:100%;max-width:560px;aspect-ratio:16/9;border:1px solid #D3E3EC;border-radius:8px;background:#fff}' +
+    '#vzList .vz-howto{font-size:15px}#vzList .vz-howto li{margin:3px 0}#vzList a.btn{text-decoration:none;display:inline-block}'
+  );
+
+  if (V.list) { showList(); return; }
+  if (!V.spec) { showUnknown(); return; }
+
+  /* ===================================================== one widget */
+  var spec = V.spec, W = spec.width || R.width || 960, applying = false, head = null, ready = false;
+
+  function controlRows() {   // the lesson's own controls: rows in the lesson text that hold an input, a menu, or a button
+    var box = $(R.lessonText || '#ltext');
+    if (!box) return [];
+    return $$('.row', box).filter(function (r) {
+      if (r.closest('.tryit, #ltry, .navrow, details')) return false;
+      if ($('#lprev, #lnext', r)) return false;
+      return !!$('input, select, button, textarea', r);
+    }).filter(function (r, i, all) { return !all.some(function (o) { return o !== r && o.contains(r); }); });
+  }
+  function resolve(sel) {   // "#a" or "#a << .card" (the closest .card around #a); "@controls" = the lesson's controls
+    if (sel === '@controls') return controlRows();
+    var parts = sel.split('<<'), out = $$(parts[0].trim());
+    if (parts[1]) out = out.map(function (e) { return e.closest(parts[1].trim()); }).filter(Boolean);
+    return out;
+  }
+  function keepList() {
+    var ks = spec.keep || (spec.mode === 'learn' ? ['@controls', R.lessonFig || '#lfig'] : []), out = [];
+    ks.forEach(function (s) { resolve(s).forEach(function (e) { if (out.indexOf(e) < 0) out.push(e); }); });
+    return out.filter(function (e) { return !out.some(function (o) { return o !== e && o.contains(e); }); });
+  }
+  function isolate() {
+    applying = true;
+    $$('.vz-hide, .vz-path, .vz-keep').forEach(function (e) { e.classList.remove('vz-hide', 'vz-path', 'vz-keep'); });
+    var keep = keepList(), path = [];
+    if (!keep.length) { applying = false; showUnknown('This widget\'s figure was not found on the page.'); return; }
+    keep.forEach(function (e) {
+      e.classList.add('vz-keep');
+      for (var p = e.parentElement; p && p !== document.body; p = p.parentElement) if (path.indexOf(p) < 0) path.push(p);
+    });
+    path.forEach(function (p) { p.classList.add('vz-path'); });
+    var nodes = keep.concat(path);
+    nodes.forEach(function (n) {
+      var par = n.parentElement; if (!par) return;
+      Array.prototype.forEach.call(par.children, function (c) {
+        if (c === head || nodes.indexOf(c) >= 0 || c.tagName === 'SCRIPT' || c.tagName === 'STYLE') return;
+        c.classList.add('vz-hide');
+      });
+    });
+    (spec.hide || []).forEach(function (s) { resolve(s).forEach(function (e) { e.classList.add('vz-hide'); }); });
+    var norm = function (t) { return String(t).replace(/\s+/g, ' ').trim().toLowerCase(); };
+    $$('.vz-keep .figtitle, .vz-keep h2, .vz-keep h3, .vz-keep summary').forEach(function (e) { if (norm(e.textContent) === norm(spec.title)) e.classList.add('vz-hide'); });   // the title bar already says it
+    applying = false;
+  }
+  var lock = null, MIN = spec.minScale || R.minScale || 0.6;
+  function fit(choose) {   // choose: pick the scale again (start, or the frame changed size); otherwise keep it, so nothing jumps
+    var b = document.body, vw = window.innerWidth, vh = window.innerHeight;
+    b.style.width = W + 'px';
+    var h = Math.max(b.scrollHeight, b.offsetHeight), sw = vw / W;
+    if (choose || !lock) {
+      var s = Math.min(sw, vh / h);
+      if (!isFinite(s) || s <= 0) s = 1;
+      s = Math.max(s, sw * MIN);   // never smaller than a readable size: a very tall figure scrolls instead
+      lock = { s: s, x: Math.max(0, (vw - W * s) / 2), y: Math.max(0, (vh - h * s) / 2), vw: vw, vh: vh };
+    }
+    b.style.transform = 'translate(' + lock.x + 'px,' + lock.y + 'px) scale(' + lock.s + ')';
+    var tall = lock.y + h * lock.s > vh + 1;
+    document.documentElement.style.overflowY = tall ? 'auto' : 'hidden';
+    window.VZ_FIT = { scale: lock.s, widthScale: sw, minScale: MIN, scrolls: tall };
+  }
+  function setParams() {
+    var q = new URLSearchParams(V.query.toString());
+    (spec.params || []).forEach(function (p) {   // "also": a value that only exists after another one is set (a second address needs its box ticked)
+      if (p.also && V.valid(p, q.get(p.key))) for (var k in p.also) if (q.get(k) === null) q.set(k, p.also[k]);
+    });
+    (spec.params || []).forEach(function (p) {
+      if (!p.input && !p.click) return;   // read by the app itself from the link
+      var raw = q.get(p.key);
+      if (raw === null || raw === '') return;
+      if (!V.valid(p, raw)) return;   // a bad value: the default stays, with no error message
+      if (p.click) {   // a choice made by clicking a chip or button: "click": "#cases [data-k=\"{v}\"]"
+        raw.split(p.multi ? /[-,]/ : /$^/).forEach(function (v) {
+          var b = null; try { b = resolve(p.click.split('{v}').join(String(v).replace(/["\\]/g, '')))[0]; } catch (er) { b = null; }
+          if (b) b.click();
+        });
+        return;
+      }
+      var e = $(p.input);
+      if (!e) return;
+      if (e.type === 'checkbox') e.checked = raw === '1'; else e.value = raw;
+      ['input', 'change'].forEach(function (t) { e.dispatchEvent(new Event(t, { bubbles: true })); });
+    });
+  }
+  function keyGuard(e) {   // a presenter remote's keys belong to PowerPoint, not to the widget
+    var k = e.key, t = e.target, tag = t && t.tagName, typ = (t && t.type || '').toLowerCase();
+    var texty = tag === 'TEXTAREA' || (tag === 'INPUT' && /^(text|number|search|url|email|tel|)$/.test(typ));
+    var slideKeys = { PageUp: 1, PageDown: 1, Home: 1, End: 1 };
+    var moveKeys = { ArrowLeft: 1, ArrowRight: 1, ArrowUp: 1, ArrowDown: 1, ' ': 1, Spacebar: 1, Enter: 1 };
+    var letter = k && k.length === 1 && /[bnpw.]/i.test(k);
+    if (slideKeys[k] || (!texty && (moveKeys[k] || letter))) { e.preventDefault(); e.stopImmediatePropagation(); }
+  }
+  function makeHead() {
+    head = document.createElement('div');
+    head.id = 'vzHead';
+    head.innerHTML = '<h1>' + esc(spec.title) + '<\/h1><button class="btn alt small" id="vzReset" type="button">↺ Reset<\/button>';
+    document.body.insertBefore(head, document.body.firstChild);
+    $('#vzReset').onclick = function () { location.reload(); };
+  }
+  function start() {
+    (spec.open || []).forEach(function (s) { resolve(s).forEach(function (d) { d.open = true; d.classList.add('vz-pinned'); }); });   // stays open: its heading cannot fold the figure away
+    (spec.click || []).forEach(function (s) { var e = $(s); if (e) e.click(); });
+    setParams();
+    makeHead();
+    document.body.classList.add('vz-stage');
+    isolate();
+    fit(true);
+    var settled = false;
+    setTimeout(function () { fit(true); settled = true; }, 1200);   // late drawing: choose the scale once more, then keep it
+    document.documentElement.classList.remove('vz-w-loading');
+    var pending = null;
+    new MutationObserver(function (muts) {
+      if (applying) return;
+      var outside = muts.some(function (m) {
+        var t = m.target.nodeType === 1 ? m.target : m.target.parentElement;
+        return t && !t.closest('.vz-keep') && t !== head && !(head && head.contains(t));
+      });
+      if (!outside) return;
+      clearTimeout(pending); pending = setTimeout(function () { isolate(); fit(!settled); }, 40);
+    }).observe(document.body, { childList: true, subtree: true });
+    if (window.ResizeObserver) new ResizeObserver(function () { fit(!settled); }).observe(document.body);
+    window.addEventListener('resize', function () { if (!lock || lock.vw !== window.innerWidth || lock.vh !== window.innerHeight) fit(true); });
+    window.addEventListener('keydown', keyGuard, true);
+    window.addEventListener('message', function (ev) {
+      if (ev.source !== window.parent) return;   // only the page this widget sits in may reset it
+      var d = ev.data || {};
+      if (d.type === 'vz-reset') location.reload();
+      if (d.type === 'vz-view') document.documentElement.classList.toggle('vz-presenting', !!d.presenting);
+    });
+    if (!ready) { ready = true; var ps = {}; (spec.params || []).forEach(function (p) {   // the values the widget really shows
+        var e = p.input ? $(p.input) : null, v = V.query.get(p.key);
+        ps[p.key] = e ? (e.type === 'checkbox' ? (e.checked ? '1' : '0') : e.value) : (V.valid(p, v) ? v : p['default']);
+      });
+      post({ type: 'vz-widget-ready', app: R.app, widget: spec.name, title: spec.title, params: ps }); }
+  }
+  function boot() { setTimeout(function () { requestAnimationFrame(function () { requestAnimationFrame(start); }); }, spec.wait || 30); }
+  if (document.readyState === 'complete') boot(); else window.addEventListener('load', boot);
+
+  /* ===================================================== page for a name that is not on the list */
+  function showUnknown(why) {
+    $$('body > *').forEach(function (e) { if (e.tagName !== 'SCRIPT' && e.tagName !== 'STYLE') e.classList.add('vz-hide'); });
+    var d = document.createElement('div');
+    d.className = 'card vz-note';
+    d.innerHTML = '<h2>No widget here<\/h2><p>' + esc(why || ('This app has no widget named "' + V.name + '".')) + '<\/p>' +
+      '<p><a href="' + esc(location.pathname) + '?widget=list">See all of this app\'s widgets<\/a><\/p>';
+    document.body.appendChild(d);
+    document.documentElement.classList.remove('vz-w-loading');
+    document.documentElement.style.overflow = 'auto';
+  }
+
+  /* ===================================================== the instructors' widget links page */
+  function showList() {
+    document.documentElement.classList.add('vz-list');
+    var data = listData();
+    if (V.data) post(data);
+    window.addEventListener('message', function (ev) { if (ev.source === window.parent && ev.data && ev.data.type === 'vz-get-list') post(data); });
+    function render() {
+      $$('body > *').forEach(function (e) { if (e.tagName !== 'SCRIPT' && e.tagName !== 'STYLE' && e.id !== 'vzList') e.classList.add('vz-hide'); });
+      var groups = [], by = {};
+      R.widgets.forEach(function (w) { if (!by[w.group]) { by[w.group] = []; groups.push(w.group); } by[w.group].push(w); });
+      var html = '<h1>' + esc(R.app) + ': slide widget links<\/h1>' +
+        '<div class="card vz-howto"><p>Each widget is one figure from this app with its own controls, sized to fill a slide. Copy a link and:<\/p><ul>' +
+        '<li><b>In PowerPoint:<\/b> insert the Visualizer Slides add-in on a slide, choose Change link, and paste it.<\/li>' +
+        '<li><b>Anywhere else:<\/b> open it in a browser, use it as a link on a slide, or put it in a QR (Quick Response) code.<\/li>' +
+        '<li><b>Starting values:<\/b> add them to the end of the link, for example <code>&amp;' + esc(exampleParam()) + '<\/code>. Values that are missing or out of range use the defaults.<\/li><\/ul>' +
+        '<div class="row"><button class="btn small" id="vzCopyAll" type="button">Copy all links<\/button><a class="btn alt small" href="' + esc(location.pathname) + '" id="vzBack">← Back to the app<\/a><\/div><\/div>';
+      groups.forEach(function (g) {
+        html += '<h2>' + esc(g) + '<\/h2>';
+        by[g].forEach(function (w) {
+          var ps = (w.params || []).map(function (p) {
+            var range = p.options ? 'one of ' + p.options.map(function (o) { return o.value; }).join(', ') : (p.min !== undefined ? p.min + ' to ' + p.max : '');
+            return '<code>' + esc(p.key) + '<\/code>: ' + esc(p.label) + ' (default ' + esc(p['default']) + (range ? '; ' + esc(range) : '') + ')';
+          });
+          html += '<div class="card vz-item" data-w="' + esc(w.name) + '"><h3>' + esc(w.title) + '<\/h3>' +
+            (ps.length ? '<p class="vz-params">Starting values: ' + ps.join('; ') + '<\/p>' : '<p class="vz-params">No starting values.<\/p>') +
+            '<span class="vz-link">' + esc(linkFor(w)) + '<\/span>' +
+            '<div class="row"><button class="btn small vz-copy" type="button">Copy link<\/button>' +
+            '<a class="btn alt small" target="_blank" rel="noopener" href="' + esc(linkFor(w, true)) + '">Open<\/a>' +
+            '<button class="btn alt small vz-pv" type="button" aria-expanded="false">Preview<\/button><\/div><\/div>';
+        });
+      });
+      var box = document.createElement('div'); box.id = 'vzList'; box.innerHTML = html;
+      document.body.appendChild(box);
+      $('#vzCopyAll').onclick = function () {
+        copy(R.widgets.map(function (w) { return w.group + ' / ' + w.title + '\n' + linkFor(w); }).join('\n\n'), $('#vzCopyAll'));
+      };
+      $$('.vz-item', box).forEach(function (it) {
+        var w = R.widgets.filter(function (x) { return x.name === it.getAttribute('data-w'); })[0];
+        $('.vz-copy', it).onclick = function () { copy(linkFor(w), $('.vz-copy', it)); };
+        $('.vz-pv', it).onclick = function () {
+          var b = $('.vz-pv', it), f = $('iframe', it);
+          if (f) { f.parentNode.removeChild(f); b.setAttribute('aria-expanded', 'false'); b.textContent = 'Preview'; return; }
+          f = document.createElement('iframe'); f.className = 'vz-prev'; f.title = 'Preview: ' + w.title; f.src = linkFor(w, true);
+          it.appendChild(f); b.setAttribute('aria-expanded', 'true'); b.textContent = 'Hide preview';
+        };
+      });
+      document.documentElement.classList.remove('vz-w-loading');
+    }
+    function exampleParam() {
+      for (var i = 0; i < R.widgets.length; i++) { var p = (R.widgets[i].params || [])[0]; if (p) return p.key + '=' + (p.options ? p.options[p.options.length - 1].value : p['default']); }
+      return 'name=value';
+    }
+    if (document.readyState === 'complete') setTimeout(render, 0); else window.addEventListener('load', function () { setTimeout(render, 0); });
+  }
+})();
+</script>
+<!-- vz-widgets:end body -->
 </body>
 </html>

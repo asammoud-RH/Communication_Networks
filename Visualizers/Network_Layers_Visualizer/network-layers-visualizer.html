@@ -2,6 +2,52 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<!-- vz-widgets:begin head -->
+<script id="vz-registry">window.VZ_WIDGETS = {"app":"Network Layers Visualizer","published":"https://asammoud-rh.github.io/Communication_Networks/Visualizers/Network_Layers_Visualizer/network-layers-visualizer.html","width":960,"widgets":[{"name":"models","title":"The OSI (Open Systems Interconnection) model and the TCP/IP (Transmission Control Protocol/Internet Protocol) model, side by side","group":"Learn, Lesson 1: One stack, two models (OSI: Open Systems Interconnection; TCP/IP: Transmission Control Protocol/Internet Protocol)","mode":"learn","lesson":1,"keep":["#lfig .figctls","#l1svg << .fig","#lfig .legend"],"width":840},{"name":"encapsulation","title":"Each layer wraps what it gets from above","group":"Learn, Lesson 2: Headers on the way down","mode":"learn","lesson":2,"params":[{"key":"l4","label":"Transport","input":"#l2l4","default":"tcp","options":[{"value":"tcp","label":"TCP (Transmission Control Protocol)"},{"value":"udp","label":"UDP (User Datagram Protocol)"}]},{"key":"ip","label":"Network","input":"#l2ip","default":"4","options":[{"value":"4","label":"IPv4 (Internet Protocol version 4)"},{"value":"6","label":"IPv6 (Internet Protocol version 6)"}]}],"keep":["#lfig .figctls","#l2play << .playbar","#l2svg << .fig","#lfig .legend"],"width":840},{"name":"wireshark","title":"Wireshark's packet details, one line per layer","group":"Learn, Lesson 3: Unwrapping on the way up","mode":"learn","lesson":3,"params":[{"key":"sent","label":"What was sent","input":"#l3app","default":"http","options":[{"value":"http","label":"A web request (HTTP, HyperText Transfer Protocol, over TCP)"},{"value":"dns","label":"A name lookup (DNS, Domain Name System, over UDP)"},{"value":"ping","label":"A ping (ICMP)"},{"value":"arp","label":"An ARP (Address Resolution Protocol) request"}]},{"key":"ip","label":"Network","input":"#l3ip","default":"4","options":[{"value":"4","label":"IPv4"},{"value":"6","label":"IPv6"}]}],"keep":["#lfig .figctls","#lfig .axnote","#l3pane"]},{"name":"wireshark-layer","title":"The picked line's layer in both models","group":"Learn, Lesson 3: Unwrapping on the way up","mode":"learn","lesson":3,"open":["#l3svg << details"],"params":[{"key":"sent","label":"What was sent","input":"#l3app","default":"http","options":[{"value":"http","label":"A web request (HTTP over TCP)"},{"value":"dns","label":"A name lookup (DNS over UDP)"},{"value":"ping","label":"A ping (ICMP)"},{"value":"arp","label":"An ARP request"}]},{"key":"ip","label":"Network","input":"#l3ip","default":"4","options":[{"value":"4","label":"IPv4"},{"value":"6","label":"IPv6"}]}],"keep":["#lfig .figctls","#l3chip","#l3svg << details"],"width":840},{"name":"trip","title":"One packet's trip: each device drawn with the layers it uses","group":"Learn, Lesson 4: What each device rewrites","mode":"learn","lesson":4,"params":[{"key":"ip","label":"Network","input":"#l4ip","default":"4","options":[{"value":"4","label":"IPv4 (Internet Protocol version 4)"},{"value":"6","label":"IPv6 (Internet Protocol version 6)"}]},{"key":"l4","label":"Transport","input":"#l4l4","default":"tcp","options":[{"value":"tcp","label":"TCP (Transmission Control Protocol)"},{"value":"udp","label":"UDP (User Datagram Protocol)"}]},{"key":"nat","label":"The router does NAT (Network Address Translation)","input":"#l4nat","default":"0","options":[{"value":"0","label":"no"},{"value":"1","label":"yes"}]}],"keep":["#lfig .figctls","#l4next << .playbar","#l4box","#l4cap"]},{"name":"trip-fields","title":"Every field, compared with what Host A sent","group":"Learn, Lesson 4: What each device rewrites","mode":"learn","lesson":4,"keep":["#lfig .figctls","#l4next << .playbar","#l4striptitle","#l4strip","#l4fields << details"],"open":["#l4fields << details"],"params":[{"key":"ip","label":"Network","input":"#l4ip","default":"4","options":[{"value":"4","label":"IPv4 (Internet Protocol version 4)"},{"value":"6","label":"IPv6 (Internet Protocol version 6)"}]},{"key":"l4","label":"Transport","input":"#l4l4","default":"tcp","options":[{"value":"tcp","label":"TCP (Transmission Control Protocol)"},{"value":"udp","label":"UDP (User Datagram Protocol)"}]},{"key":"nat","label":"The router does NAT (Network Address Translation)","input":"#l4nat","default":"0","options":[{"value":"0","label":"no"},{"value":"1","label":"yes"}]}]},{"name":"hourglass","title":"The Internet's hourglass","group":"Learn, Lesson 5: Where does it really sit?","mode":"learn","lesson":5,"params":[{"key":"protocol","label":"Protocol","input":"#l5p","default":"ospf","options":[{"value":"ip4","label":"IPv4 (Internet Protocol version 4)"},{"value":"ip6","label":"IPv6 (Internet Protocol version 6)"},{"value":"tcp","label":"TCP (Transmission Control Protocol)"},{"value":"udp","label":"UDP (User Datagram Protocol)"},{"value":"arp","label":"ARP (Address Resolution Protocol)"},{"value":"icmp","label":"ICMP (Internet Control Message Protocol)"},{"value":"icmp6","label":"ICMPv6 (ICMP for IPv6)"},{"value":"ospf","label":"OSPF (Open Shortest Path First)"},{"value":"dns","label":"DNS (Domain Name System)"},{"value":"dhcp","label":"DHCP (Dynamic Host Configuration Protocol)"},{"value":"rip","label":"RIP (Routing Information Protocol)"},{"value":"quic","label":"QUIC (a transport protocol built on UDP)"},{"value":"bgp","label":"BGP (Border Gateway Protocol)"},{"value":"ssh","label":"SSH (Secure Shell)"},{"value":"http","label":"HTTP (HyperText Transfer Protocol)"},{"value":"tls","label":"TLS (Transport Layer Security)"}]}],"keep":["#lfig .figctls","#l5svg << .fig"],"width":840},{"name":"ladder","title":"The ladder: climb from the bottom","group":"Learn, Lesson 6: Troubleshoot layer by layer","mode":"learn","lesson":6,"keep":["#l6svg << .fig","#lfig .legtitle","#l6key"]},{"name":"calc-frame","title":"Where the bytes of the frame go","group":"Calculator","mode":"calc","keep":["#c_bar << .card"],"hide":["#view-calc > .card:first-child > h2","#view-calc > .card:first-child > h2 + p","#c_stats << details","#c_figtitle"],"params":[{"key":"msg","label":"Message size in bytes","default":100,"min":1,"max":65000},{"key":"l4","label":"Transport","default":"tcp","options":[{"value":"tcp","label":"TCP (Transmission Control Protocol), 20-byte header"},{"value":"tcpts","label":"TCP with timestamps, 32-byte header"},{"value":"udp","label":"UDP (User Datagram Protocol), 8-byte header"}]},{"key":"ip","label":"Network","default":"4","options":[{"value":"4","label":"IPv4 (Internet Protocol version 4)"},{"value":"6","label":"IPv6 (Internet Protocol version 6)"}]},{"key":"tag","label":"Add an 802.1Q VLAN (Virtual Local Area Network) tag","default":"0","options":[{"value":"0","label":"no"},{"value":"1","label":"yes"}]}]},{"name":"calc-protocol","title":"Protocol lookup: what carries a protocol","group":"Calculator","mode":"calc","keep":["#c_proto << details"],"open":["#c_proto << details"],"params":[{"key":"protocol","label":"Protocol","input":"#c_proto","default":"dns","options":[{"value":"eth","label":"Ethernet"},{"value":"arp","label":"ARP (Address Resolution Protocol)"},{"value":"ip4","label":"IPv4 (Internet Protocol version 4)"},{"value":"ip6","label":"IPv6 (Internet Protocol version 6)"},{"value":"icmp","label":"ICMP (Internet Control Message Protocol)"},{"value":"icmp6","label":"ICMPv6 (ICMP for IPv6)"},{"value":"ospf","label":"OSPF (Open Shortest Path First)"},{"value":"tcp","label":"TCP (Transmission Control Protocol)"},{"value":"udp","label":"UDP (User Datagram Protocol)"},{"value":"quic","label":"QUIC (a transport protocol built on UDP)"},{"value":"tls","label":"TLS (Transport Layer Security)"},{"value":"http","label":"HTTP (HyperText Transfer Protocol)"},{"value":"ssh","label":"SSH (Secure Shell)"},{"value":"bgp","label":"BGP (Border Gateway Protocol)"},{"value":"dns","label":"DNS (Domain Name System)"},{"value":"dhcp","label":"DHCP (Dynamic Host Configuration Protocol)"},{"value":"rip","label":"RIP (Routing Information Protocol)"}]}],"hide":["#view-calc > .card:nth-of-type(2) > details:nth-of-type(1) > summary"]},{"name":"calc-device","title":"Device inspector: what a device reads and rewrites","group":"Calculator","mode":"calc","keep":["#c_dev << details"],"open":["#c_dev << details"],"params":[{"key":"device","label":"Device","input":"#c_dev","default":"router","options":[{"value":"hub","label":"Hub or repeater"},{"value":"switch","label":"Switch"},{"value":"router","label":"Router"},{"value":"nat","label":"NAT (Network Address Translation) router"}]}],"hide":["#view-calc > .card:nth-of-type(2) > details:nth-of-type(2) > summary"]}]};</script>
+<script id="vz-guard">
+/* Slide widgets, part 1 of 2 (runs first, in <head>, right after the widget list).
+   With ?widget=<name> it opens the widget's mode and lesson through the app's own link
+   parameters, and it makes sure a widget never saves anything or rewrites its address. */
+(function () {
+  'use strict';
+  var R = window.VZ_WIDGETS || { widgets: [] }, q;
+  try { q = new URLSearchParams(location.search); } catch (e) { return; }
+  var w = q.get('widget');
+  if (!w) return;
+  var V = window.VZ_MODE = { name: w, list: w === 'list', data: q.get('format') === 'data', spec: null, query: q };
+  for (var i = 0; i < R.widgets.length; i++) if (R.widgets[i].name === w) V.spec = R.widgets[i];
+  V.valid = function (p, raw) {   // is this starting value one the widget (and the app) accepts?
+    if (raw === null || raw === undefined) return false;
+    raw = String(raw);
+    if (raw === '') return p['default'] === '' || !!p.blank;
+    if (p.options) return p.options.some(function (o) { return String(o.value) === raw; });
+    if (p.pattern) return new RegExp('^(?:' + p.pattern + ')$').test(raw);
+    var v = Number(raw);
+    if (!isFinite(v) || (p.min !== undefined && v < p.min) || (p.max !== undefined && v > p.max)) return false;
+    return p.integer === false || Math.round(v) === v;
+  };
+  try {   // a widget reads and writes no saved progress: the full app keeps the student's own
+    var S = Storage.prototype, nop = function () {};
+    S.getItem = function () { return null; }; S.setItem = nop; S.removeItem = nop; S.clear = nop;
+  } catch (e) { /* storage already blocked */ }
+  try {
+    var q2 = new URLSearchParams(location.search);
+    if (V.spec) (V.spec.params || []).forEach(function (p) {   // a bad value the app reads itself is dropped, so the app uses its default
+      if (!p.input && !p.click && q2.get(p.key) !== null && !V.valid(p, q2.get(p.key))) { q2['delete'](p.key); q['delete'](p.key); }
+    });
+    if (V.spec) { q2.set('mode', V.spec.mode); if (V.spec.lesson) q2.set('lesson', String(V.spec.lesson)); else q2['delete']('lesson'); }
+    else q2.set('mode', 'home');
+    history.replaceState(null, '', location.pathname + '?' + q2.toString());
+  } catch (e) { /* history blocked */ }
+  try { history.replaceState = function () {}; history.pushState = function () {}; } catch (e) { /* ignore */ }
+  document.documentElement.className += ' vz-w vz-w-loading';
+  var st = document.createElement('style');
+  st.textContent = 'html.vz-w-loading body{visibility:hidden}';
+  (document.head || document.documentElement).appendChild(st);
+})();
+</script>
+<!-- vz-widgets:end head -->
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Network Layers Visualizer</title>
 <meta name="description" content="See the OSI model and the TCP/IP model side by side, watch a message gain its headers, find out what each device reads and rewrites, and troubleshoot one layer at a time.">
@@ -135,6 +181,26 @@ details.more, details.terms { border-top: 1px solid var(--line); padding-top: 6p
 .fig svg .hit { cursor: pointer; }
 .figtitle { font-weight: 600; color: var(--navy); margin: 4px 0; }
 .legtitle { font-size: 14px; font-weight: 600; color: var(--muted); margin: 8px 0 0; }
+/* controls that change a figure: a light panel at the top of the figure's card, above the figure */
+.figctls { background: var(--panel-soft); border: 1px solid var(--line); border-radius: 8px; padding: 4px 12px; margin: 6px 0 8px; }
+.figctls .row, .figctls .bandsel { margin: 6px 0; }
+.figctls .hint { font-size: 14px; color: var(--muted); margin: 6px 0 0; }
+.figctls details.more { border-top: 0; margin-top: 2px; padding-top: 0; }
+/* what a figure's two directions mean, for figures that are not drawn in SVG */
+.axnote { font-size: 13.5px; color: var(--muted); font-style: italic; margin: 2px 0 6px; }
+/* hover definitions from the glossary */
+.gl { text-decoration: underline dotted var(--brand-dark); text-underline-offset: 3px; cursor: help; }
+.gl:focus-visible { outline: 2px solid var(--amber); outline-offset: 1px; border-radius: 2px; }
+#gpop { position: fixed; z-index: 30; max-width: 320px; background: var(--navy); color: #fff; border-radius: 8px; padding: 8px 12px; font-size: 14px; line-height: 1.45; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
+#gpop b { color: #fff; display: block; margin-bottom: 2px; }
+.glink { margin: 14px 0 0; font-size: 14.5px; }
+.glossary dl { margin: 8px 0 0; columns: 2; column-gap: 28px; }
+.glossary dt { font-weight: 700; color: var(--navy); margin-top: 8px; break-after: avoid; }
+.glossary dd { margin: 0 0 0 14px; font-size: 14.5px; break-inside: avoid; }
+.glossary .letter { color: var(--brand-dark); font-size: 18px; margin: 14px 0 0; border-bottom: 1px solid var(--line); column-span: all; }
+@media (max-width: 760px) { .glossary dl { columns: 1; } }
+.stepper button.glpill .ttl { display: inline; }
+@media (max-width: 640px) { .stepper button.glpill .ttl { display: none; } }
 .legend b { color: var(--ink); }
 .legend { list-style: none; padding: 0; margin: 6px 0; display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 14px; color: var(--muted); }
 .legend i { display: inline-block; width: 22px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; }
@@ -277,7 +343,7 @@ footer .card { border-top-width: 1px; border-right-width: 1px; }
       <p>Every message you send is wrapped in layers, like an onion. There is more than one way to name those layers: the seven-layer OSI (Open Systems Interconnection) model, and the four-layer TCP/IP model the Internet uses. See both side by side, watch the headers go on and come off, and find out what every switch and router reads and rewrites.</p>
       <a class="sitehome" id="siteHome" href="https://asammoud-rh.github.io/Communication_Networks/"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>All Visualizers</a>
     </div>
-    <svg id="heroFig" viewBox="0 0 360 200" role="img" aria-label="The OSI model and the TCP/IP model side by side, next to a frame with its headers"></svg>
+    <svg id="heroFig" data-noaxes="start-screen picture" viewBox="0 0 360 200" role="img" aria-label="The OSI model and the TCP/IP model side by side, next to a frame with its headers"></svg>
   </div>
   <div class="modecards">
     <div class="card modecard">
@@ -330,27 +396,29 @@ footer .card { border-top-width: 1px; border-right-width: 1px; }
 <section id="view-calc" hidden>
   <div class="card">
     <h2>Ethernet frame calculator</h2>
-    <p>Type a message size and pick the protocols. You get the frame size Wireshark shows, and how much of the wire time is your data. Every frame ends with a 4-byte FCS (Frame Check Sequence) and is sent after an 8-byte preamble that ends with the SFD (Start Frame Delimiter).</p>
-    <div class="row">
-      <label>Message size (bytes) <input type="number" id="c_msg" min="1" max="65000" value="100"></label>
-      <label>Transport <select id="c_l4">
-        <option value="tcp">TCP (Transmission Control Protocol), 20-byte header</option>
-        <option value="tcpts">TCP with timestamps, 32-byte header</option>
-        <option value="udp">UDP (User Datagram Protocol), 8-byte header</option>
-      </select></label>
-      <label>Network <select id="c_ip">
-        <option value="4">IPv4 (Internet Protocol version 4), 20 bytes</option>
-        <option value="6">IPv6 (Internet Protocol version 6), 40 bytes</option>
-      </select></label>
+    <p>Type a message size and pick the protocols above the figure. You get the frame size Wireshark shows, and how much of the wire time is your data. Every frame ends with a 4-byte FCS (Frame Check Sequence) and is sent after an 8-byte preamble that ends with the SFD (Start Frame Delimiter).</p>
+    <p class="figtitle" id="c_figtitle">Where the bytes of one frame go</p>
+    <div class="figctls">
+      <div class="row">
+        <label>Message size (bytes) <input type="number" id="c_msg" min="1" max="65000" value="100"></label>
+        <label>Transport <select id="c_l4">
+          <option value="tcp">TCP (Transmission Control Protocol), 20-byte header</option>
+          <option value="tcpts">TCP with timestamps, 32-byte header</option>
+          <option value="udp">UDP (User Datagram Protocol), 8-byte header</option>
+        </select></label>
+        <label>Network <select id="c_ip">
+          <option value="4">IPv4 (Internet Protocol version 4), 20 bytes</option>
+          <option value="6">IPv6 (Internet Protocol version 6), 40 bytes</option>
+        </select></label>
+      </div>
+      <details class="more"><summary>More settings: an 802.1Q VLAN (Virtual Local Area Network) tag</summary>
+        <div class="row"><label class="chk"><input type="checkbox" id="c_tag"><span>Add an 802.1Q VLAN tag, 4 bytes</span></label></div>
+      </details>
     </div>
     <p id="c_err" class="no" aria-live="polite"></p>
-    <div class="keytiles" id="c_key"></div>
-    <p class="figtitle" id="c_figtitle">Where the bytes of one frame go</p>
     <div class="fig"><svg id="c_bar" role="img" aria-label="The bytes of one frame, split by layer"></svg></div>
     <ul class="legend" id="c_legend"></ul>
-    <details class="more"><summary>More settings: an 802.1Q VLAN (Virtual LAN) tag</summary>
-      <div class="row"><label class="chk"><input type="checkbox" id="c_tag"><span>Add an 802.1Q VLAN tag, 4 bytes</span></label></div>
-    </details>
+    <div class="keytiles" id="c_key"></div>
     <details class="more"><summary>Every number, and the working</summary>
       <div class="calcgrid" id="c_stats"></div>
       <div id="c_notes"></div>
@@ -498,6 +566,11 @@ Fig.prototype.text = function (x, y, s, o) {   // centered on y; no dominant-bas
   var yc = this.Y(y), self = this;
   lines.forEach(function (ln, i) { var ts = el('tspan', { x: self.X(x), y: r4(yc + (i - (n - 1) / 2) * lh + size * 0.35) }, t); ts.textContent = ln; });
   return t;
+};
+Fig.prototype.ax = function (which, x, y, s, o) {   // what an axis means, written on the figure (marked for the axes test)
+  o = o || {};
+  var t = this.text(x, y, s, { fs: o.fs || 8.2, ha: o.ha || 'left', italic: true, color: o.color || C.muted });
+  t.setAttribute('data-axis', which); return t;
 };
 Fig.prototype.tw = function (s, fs) { return String(s).length * (fs * this.k / 72) * 0.55; };
 Fig.prototype.label = function (x, y, s, o) {   // text on a white patch, for labels that sit on lines
@@ -671,7 +744,7 @@ function hopModel(o) {   // o: { ip: 4|6, l4: tcp|udp, nat: bool, text }
 }
 var DEVICE_INFO = {
   hub: { name: 'Hub or repeater', top: 'phys', reads: ['the bits (it regenerates the signal)'], rewrites: [], note: 'It repeats every bit out of every other port. It never looks at addresses.' },
-  'switch': { name: 'Switch', top: 'link', reads: ['destination MAC address (where to forward)', 'source MAC address (to learn which port the sender is on)', 'FCS (a store-and-forward switch drops a damaged frame)'], rewrites: [], note: 'It forwards the frame unchanged. The only exception is a VLAN (Virtual LAN) tag, which a switch may add or remove on a trunk port.' },
+  'switch': { name: 'Switch', top: 'link', reads: ['destination MAC address (where to forward)', 'source MAC address (to learn which port the sender is on)', 'FCS (a store-and-forward switch drops a damaged frame)'], rewrites: [], note: 'It forwards the frame unchanged. The only exception is a VLAN (Virtual Local Area Network) tag, which a switch may add or remove on a trunk port.' },
   router: { name: 'Router', top: 'net', reads: ['destination MAC address (is the frame for me?)', 'FCS', 'destination IP address (route lookup)', 'TTL (Time to Live) or IPv6 hop limit'], rewrites: ['a new Ethernet header: source MAC = its own outgoing port, destination MAC = the next hop', 'TTL or hop limit, minus 1', 'IPv4 header checksum (IPv6 has none)', 'a new FCS for the new frame'], note: 'It never changes TCP, UDP, or the data. The IP addresses stay the same from end to end.' },
   nat: { name: 'NAT (Network Address Translation) router', top: 'net', reads: ['everything a router reads', 'source IP address and source port (to build its translation table)'], rewrites: ['everything a router rewrites', 'source IP address, to its own outside address', 'source port, when it must keep connections apart', 'the TCP or UDP checksum, because it covers the IP addresses and ports'], note: 'This is why NAT is sometimes said to "break" layering: a network-layer device rewrites transport-layer fields.' }
 };
@@ -743,6 +816,9 @@ var SYMPTOMS = [
 ];
 function rungCmds(r, os, vars) { return (os === 'win' ? r.win : r.lx).map(function (c) { return [c[0].replace(/\{IF\}/g, vars.IF).replace(/\{WIF\}/g, vars.WIF).replace(/\{ADDR\}/g, vars.ADDR).replace(/\{PORT\}/g, vars.PORT), c[1]]; }); }
 var cmdState = { os: 'lx', IF: 'eth0', WIF: 'Ethernet', ADDR: '192.168.20.20', PORT: '80' };
+function outWords(h) {   // words a command prints, such as "state UP" or REACHABLE, shown as output (code), not as terms
+  return h.replace(/(^|[^\w\-])([A-Z][A-Z0-9_]+(?:-[A-Z0-9]+)*)(?![\w\-])/g, function (m, p, w) { return typeof glossKey === 'function' && glossKey(w) ? m : p + '<code>' + w + '</code>'; });
+}
 function renderCmds(box, opts) {   // the ladder with Linux and Windows tabs, editable names, and Copy buttons
   opts = opts || {};
   box.innerHTML = '<p class="cmdnote">These commands only look; they change nothing, so there is nothing to undo. Replace the names with your own. Step 4 checks ARP (Address Resolution Protocol), which finds the MAC (Media Access Control) address of the next hop.</p>' +
@@ -753,7 +829,7 @@ function renderCmds(box, opts) {   // the ladder with Linux and Windows tabs, ed
     chipSeen = false;   // the first rung spells out OSI
     $('.rungs', box).innerHTML = RUNGS.map(function (r) {
       return '<div class="rung' + (opts.hl === r.id ? ' hl' : opts.hl ? ' off' : '') + '" data-r="' + r.id + '"><h4>' + esc(r.t) + '</h4>' + chip([r.band]) + rungCmds(r, cmdState.os, cmdState).map(function (c) {
-        return '<div class="cmd"><code>' + esc(c[0]) + '</code><button type="button" data-copy="' + esc(c[0]) + '">Copy</button></div><p class="cmdnote">' + esc(c[1]) + '</p>';
+        return '<div class="cmd"><code>' + esc(c[0]) + '</code><button type="button" data-copy="' + esc(c[0]) + '">Copy</button></div><p class="cmdnote">' + outWords(esc(c[1])) + '</p>';
       }).join('') + '</div>';
     }).join('');
     $$('[data-copy]', box).forEach(function (b) { b.onclick = function () { copyText(b.getAttribute('data-copy'), b); }; });
@@ -775,7 +851,9 @@ function layerRows(mk, L) {   // OSI gives every layer its own row; the TCP/IP l
   return [Math.min.apply(null, rs.map(function (r) { return r[0]; })), Math.max.apply(null, rs.map(function (r) { return r[1]; }))];
 }
 function drawStacks(svg, sel, onPick) {
-  var f = new Fig(svg, 0, 11.1, 0, ROW_Y0 + 7 * ROW_H + 0.75, 1.55), top = ROW_Y0 + 7 * ROW_H;
+  var f = new Fig(svg, 0, 11.1, -0.32, ROW_Y0 + 7 * ROW_H + 0.75, 1.55), top = ROW_Y0 + 7 * ROW_H;
+  f.ax('y', 0.12, top + 0.42, '↑ layers, numbered from the bottom\n(1 = nearest the wire)');
+  f.ax('x', 5.55, -0.14, '→ across: the job (colored band), then that job in the OSI model and in the TCP/IP model', { ha: 'middle' });
   BANDS.forEach(function (b) {   // band backgrounds and names
     var r = BAND_ROWS[b.id], y = ROW_Y0 + r[0] * ROW_H, h = (r[1] - r[0] + 1) * ROW_H, on = sel.indexOf(b.id) >= 0, off = sel.length && !on;   // jobs not picked turn gray
     f.rect(0.05, y + 0.02, 11.0, h - 0.04, { fill: off ? OFF.fill : b.col.fill, stroke: on ? C.navy : off ? OFF.fill : b.col.fill, lw: on ? 2 : 0.5, rx: 0.06 });
@@ -809,9 +887,11 @@ function encapRows(s, f0) {   // f0: one frame from sizes()
   ].map(function (r) { r.app = app; return r; });
 }
 function drawEncap(svg, s, step, dir) {
-  var f0 = s.frames[0], rows = encapRows(s, f0), RH = 0.6, GAPY = 0.55, H = rows.length * (RH + GAPY) + 0.2;
+  var f0 = s.frames[0], rows = encapRows(s, f0), RH = 0.56, GAPY = 0.47, H = rows.length * (RH + GAPY) + 0.2;
   var full = rows[4], xd = 0.15 + full.L.reduce(function (a, p) { return a + wid(p.b); }, 0), wTot = xd + wid(f0.app) + full.R.reduce(function (a, p) { return a + wid(p.b); }, 0) + 0.15;
-  var W = Math.max(wTot, 9.5), f = new Fig(svg, 0, W, 0, H, 1.95);
+  var W = Math.max(wTot, 9.5), f = new Fig(svg, 0, W, -0.34, H + 0.36, 1.95);
+  f.ax('y', 0.15, H + 0.17, '↓ one row per layer, from the program at the top down to the wire', { fs: 7.6 });
+  f.ax('x', 0.15, -0.16, '→ the bytes in the order they are sent (box widths not to scale; B = bytes)', { fs: 7.6 });
   rows.forEach(function (r, i) {
     var shown = dir === 'up' ? i >= 4 - step : i <= step, yb = H - (i + 1) * (RH + GAPY) + 0.05;
     if (!shown) { f.rect(0.15, yb, W - 0.3, RH, { fill: '#fff', stroke: '#B8C9D3', lw: 0.8, dash: [3, 3], rx: 0.06 }); f.text(W / 2, yb + RH / 2, r.name + ' layer: press "Add the next header"', { fs: 7.5, color: C.muted, italic: true }); return; }
@@ -830,24 +910,31 @@ function drawEncap(svg, s, step, dir) {
   return f;
 }
 /* 3. The hourglass: many applications on top, IP at the waist, many links below */
-var HG = [
-  { y: 5, items: ['http', 'ssh', 'bgp', 'dns', 'dhcp', 'rip'] },
-  { y: 4, items: ['tls', 'quic'] },
-  { y: 3, items: ['tcp', 'udp', 'ospf', 'icmp'] },
-  { y: 2, items: ['ip4', 'arp'] },
-  { y: 1, items: ['eth', 'wifi', 'ppp'] },
-  { y: 0, items: ['copper', 'fiber', 'radio'] }
+var HG_C = 5.5, HG_Y = 3.75, HG_H = 3.6, HG_WAIST = 1.75, HG_TOP = 4.9;   // center line, waist height, half height, half widths
+var HG = [   // rows, top to bottom; across: rides on TCP on the left, on UDP on the right, directly on IP in the middle
+  { y: HG_Y + 3.05, label: 'Applications', items: [['http', -3.6], ['ssh', -2.15], ['bgp', -0.72], ['dns', 0.72], ['dhcp', 2.15], ['rip', 3.6]] },
+  { y: HG_Y + 2.1, label: 'Above TCP and UDP', items: [['tls', -2.15], ['quic', 2.15]] },
+  { y: HG_Y + 1.15, label: 'Transport, or directly on IP', items: [['tcp', -2.15], ['ospf', -0.72], ['icmp', 0.72], ['udp', 2.15]] },
+  { y: HG_Y, label: 'Network: the narrow waist', items: [['ip4', 0], ['arp', 3.05]] },
+  { y: HG_Y - 1.45, label: 'Links', items: [['eth', -2.0], ['ppp', 0], ['wifi', 2.0]] },
+  { y: HG_Y - 2.9, label: 'Media', items: [['copper', -2.0], ['fiber', 0], ['radio', 2.0]] }
 ];
-var HG_X = { http: 1.3, ssh: 2.7, bgp: 4.1, dns: 6.3, dhcp: 7.7, rip: 9.1, tls: 2.7, quic: 6.3, tcp: 2.7, udp: 6.3, ospf: 8.25, icmp: 9.65, ip4: 4.5, arp: 8.25, eth: 3.0, wifi: 5.5, ppp: 8.0, copper: 3.0, fiber: 5.5, radio: 8.0 };
 var HG_LABEL = { wifi: 'Wi-Fi', ppp: 'PPP', copper: 'Copper', fiber: 'Fiber', radio: 'Radio', ip4: 'IP (v4 and v6)' };
+function hgHalf(y) {   // the glass bulges out from a rounded waist
+  var u = Math.min(1, Math.abs(y - HG_Y) / HG_H), e = 0.12, g = (Math.sqrt(u * u + e * e) - e) / (Math.sqrt(1 + e * e) - e);
+  return HG_WAIST + (HG_TOP - HG_WAIST) * Math.pow(g, 0.7);
+}
 function drawHourglass(svg, selId) {
-  var f = new Fig(svg, 0, 11, 0, 6.6, 1.55), RY = 0.95, BW = 1.25, BH = 0.5;
+  var f = new Fig(svg, 0, 11, -0.34, HG_Y + HG_H + 0.55, 1.55), BW = 1.25, BH = 0.5, top = HG_Y + HG_H, bot = HG_Y - HG_H, L = [], R = [];
+  f.ax('y', 0.12, top + 0.33, '↑ layers: the media (cables and radio) at the bottom, applications at the top');
+  f.ax('x', HG_C, -0.17, '↔ across: what rides on TCP on the left, on UDP on the right, and directly on IP in the middle', { ha: 'middle' });
   var chain = (selId ? carrierChain(selId) : []).map(function (id) { return id === 'ip6' ? 'ip4' : id === 'icmp6' ? 'icmp' : id; });
-  f.poly([[0.3, 6.1], [10.7, 6.1], [6.2, 2.6], [10.7, 0.0], [0.3, 0.0], [2.8, 2.6]], { closed: true, fill: C.soft, color: C.panel, lw: 1 });
-  [['Applications', 5], ['Above TCP and UDP', 4], ['Transport, or directly on IP', 3], ['Network: the narrow waist', 2], ['Links', 1], ['Media', 0]].forEach(function (r) { f.text(0.12, r[1] * RY + 0.18 + BH + 0.14, r[0], { fs: 7.5, ha: 'left', color: C.muted, italic: true }); });
+  for (var k = 0; k <= 80; k++) { var y = top - (top - bot) * k / 80, h = hgHalf(y); L.push([HG_C - h, y]); R.push([HG_C + h, y]); }
+  f.poly(R.concat(L.reverse()), { closed: true, fill: C.soft, color: C.panel, lw: 1 });   // the same on both sides of the center line
   HG.forEach(function (row) {
-    row.items.forEach(function (id) {
-      var x = HG_X[id], y = row.y * RY + 0.18, w = id === 'ip4' ? 2.6 : BW, on = chain.indexOf(id) >= 0, p = PROTO[id], b = p ? BAND[p.band] : (row.y === 0 ? BAND.phys : BAND.link);
+    f.text(0.12, row.y + BH / 2 + 0.17, row.label, { fs: 7.5, ha: 'left', color: C.muted, italic: true });
+    row.items.forEach(function (it) {
+      var id = it[0], x = HG_C + it[1], y = row.y - BH / 2, w = id === 'ip4' ? 2.6 : BW, on = chain.indexOf(id) >= 0, p = PROTO[id], b = p ? BAND[p.band] : (row === HG[5] ? BAND.phys : BAND.link);
       if (id === 'ip4') on = on || chain.indexOf('ip6') >= 0;
       if (id === 'copper' || id === 'fiber') on = chain.indexOf('eth') >= 0;   // an Ethernet frame goes out on copper or fiber
       var off = selId && !on;   // a protocol is picked: everything that does not carry it turns gray
@@ -879,7 +966,9 @@ function pathPoint(pts, t) {   // t from 0 to pts.length - 1
 /* active: { dev: device index or -1, level: layer index or -1, link: link number or 0 } */
 function drawDevices(svg, pos, active) {
   active = active || { dev: -1, level: -1, link: 0 };
-  var f = new Fig(svg, 0.1, 11.8, -0.25, 3.3, 1.8), P = tripPath();
+  var f = new Fig(svg, 0.1, 11.8, -0.6, 3.3, 1.8), P = tripPath();
+  f.ax('y', 5.75, 3.05, '↑ each device\'s layers, Physical at the bottom', { ha: 'middle' });
+  f.ax('x', 5.95, -0.45, '→ the packet\'s path, from Host A over Links 1 to 4 to Host B', { ha: 'middle' });
   f.poly(P.pts, { color: C.navy, lw: 0.9, dash: [3, 3] });   // drawn first, so the boxes cover it
   DEVS.forEach(function (d, i) {
     var x = DEV_X[i], top = devTop(d);
@@ -903,7 +992,9 @@ function drawBar(svg, s, fr) {
   var parts = [['Preamble + SFD', 8, 'phys'], [s.o.tag ? 'Ethernet + tag' : 'Ethernet header', s.ethh, 'link'], [(s.o.ip === 6 ? 'IPv6' : 'IPv4') + ' header' + (fr.fh ? ' + fragment header' : ''), s.iph + (fr.fh || 0), 'net']];
   if (fr.l4) parts.push([L4NAME[s.o.l4] + ' header', fr.l4, 'e2e']);
   parts.push(['Application data', fr.app, 'app']); if (fr.pad) parts.push(['Padding', fr.pad, 'pad']); parts.push(['FCS', 4, 'link'], ['Gap', 12, 'phys']);
-  var tot = parts.reduce(function (a, p) { return a + p[1]; }, 0), W = 10.6, f = new Fig(svg, 0, 11, 0, 1.55, 1.55), x = 0.2;
+  var tot = parts.reduce(function (a, p) { return a + p[1]; }, 0), W = 10.6, f = new Fig(svg, 0, 11, 0, 1.85, 1.55), x = 0.2;
+  f.ax('y', 0.2, 1.68, '↑ one row: a single frame, from its preamble to the gap after it');
+  f.ax('x', 5.4, 1.38, '→ time on the wire, in bytes, to scale (B = bytes)', { ha: 'middle' });
   parts.forEach(function (p) {
     var w = p[1] / tot * W, col = p[2] === 'pad' ? { line: '#8A9AA6', fill: C.gray } : BAND[p[2]].col;
     if (w > 0.002) f.rect(x, 0.55, w, 0.6, { fill: col.fill, stroke: col.line, lw: 0.8 });
@@ -1000,10 +1091,15 @@ var TERMS = [
   ['TLS', 'Transport Layer Security. Encrypts data between TCP and the application.'],
   ['QUIC', 'A transport protocol that runs inside UDP. HTTP/3 uses it.'],
   ['IETF', 'Internet Engineering Task Force. The group that writes the Internet\'s standards.'],
-  ['VLAN', 'Virtual LAN (Local Area Network). An 802.1Q tag in the frame says which VLAN it belongs to.'],
+  ['VLAN', 'Virtual Local Area Network. An 802.1Q tag in the frame says which VLAN it belongs to.'],
   ['Ping', 'A command that sends ICMP echo requests and waits for the replies.'],
   ['Next hop', 'The next device a packet goes to: the destination itself, or a router.'],
-  ['Default gateway', 'The router a host sends packets to when the destination is not on its own network.']
+  ['Default gateway', 'The router a host sends packets to when the destination is not on its own network.'],
+  ['Ethernet', 'The most common wired link. Its frames carry a 14-byte header, the packet, and a 4-byte FCS (Frame Check Sequence).'],
+  ['Wi-Fi', 'Wireless local networking, a link that carries the same packets as Ethernet.'],
+  ['MTU', 'Maximum Transmission Unit. The largest packet one frame of a link can carry: 1500 bytes on Ethernet.'],
+  ['LAN', 'Local Area Network. The network in one building or home, such as the hosts on one Ethernet switch.'],
+  ['MSS', 'Maximum Segment Size. The most data TCP puts in one segment: the MTU minus the IP and TCP headers.']
 ];
 var TERM = {}; TERMS.forEach(function (t) { TERM[t[0]] = t[1]; });
 function termRe(k) { return new RegExp('(^|[^A-Za-z0-9/])' + k.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&') + '(?![A-Za-z0-9])'); }
@@ -1040,6 +1136,18 @@ function bandInfo(bands) {
 function bandButtons(sel) {
   return '<div class="bandsel" role="group" aria-label="Pick a job">' + BANDS.map(function (b) { return '<button type="button" data-band="' + b.id + '" aria-pressed="' + (sel.length === 1 && sel[0] === b.id) + '"><i style="background:' + b.col.line + '"></i>' + esc(b.short) + '</button>'; }).join('') + '</div>';
 }
+function ctls(html) { return '<div class="figctls">' + html + '</div>'; }   // controls that change a figure sit on top of it
+/* an animated figure plays once by itself, 0.4 s after at least half of it is in view; using a control first cancels that */
+function noAuto() { return reduceMotion || window.__NLV_NOAUTO; }
+function autoOnce(el, fn) {
+  var my = lessonState.token, done = false, timer = null, io = null;
+  var h = { cancel: function () { done = true; clearTimeout(timer); if (io) io.disconnect(); } };
+  if (noAuto() || !el) return h;
+  function go() { if (!done && lessonState.token === my && document.body.contains(el)) { h.cancel(); fn(); } }
+  if (!window.IntersectionObserver) { timer = setTimeout(go, 400); return h; }
+  io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.intersectionRatio >= 0.5 && !timer && !done) timer = setTimeout(go, 400); }); }, { threshold: [0, 0.5, 1] });
+  io.observe(el); return h;
+}
 function bandLegend(short) { return '<ul class="legend">' + BANDS.map(function (b) { return '<li><i style="background:' + b.col.fill + ';border:1px solid ' + b.col.line + '"></i>' + esc(short ? b.short : b.name) + '</li>'; }).join(''); }
 
 var PARTS = ['The two models', 'One packet\'s journey', 'Layers at work'];
@@ -1051,20 +1159,20 @@ var LESSONS = [
   $('#ltext').innerHTML = head(0, 'One stack, two models') +
     '<p>Networks are built in <b>layers</b>. Each layer does one job for the layer above it, using the layer below it.</p>' +
     '<p>People cut the stack in different places, so you will meet two models: the seven-layer <b>OSI (Open Systems Interconnection) model</b>, and the four-layer <b>TCP/IP model</b> the Internet uses, named after TCP (Transmission Control Protocol) and IP (Internet Protocol).</p>' +
-    '<p>In the figure, each colored band is one job. Read across a band to find that job in both models. Layers are numbered from the bottom. Click a layer, or pick a job:</p>' + bandButtons(sel) +
+    '<p>In the figure, each colored band is one job. Read across a band to find that job in both models. Layers are numbered from the bottom.</p><p class="use">Click a layer in the figure, or pick a job with the buttons above it.</p>' +
     more('Show more: why are there two models?', '<ul class="list"><li>OSI was written as a reference before most of its protocols existed. People still say "layer 2 switch" and "layer 7 firewall" because of it.</li>' +
       '<li>The TCP/IP model grew out of the protocols the Internet actually runs. Its four layers come from the Internet\'s own standards.</li>' +
       '<li>Both agree in the middle (Transport, and Network, which TCP/IP calls Internet). OSI splits the application work into three layers, and TCP/IP joins the link and the signals into one Link layer. Some books draw a five-layer version that splits Link into Data link and Physical, as OSI does.</li></ul>') + TERMS_BOX;
-  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">The OSI model and the TCP/IP model, side by side</p><div class="fig"><svg id="l1svg" role="img" aria-label="Two layer models side by side; each colored band is one job"></svg></div>' +
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">The OSI model and the TCP/IP model, side by side</p>' + ctls('<p class="hint">Pick a job:</p>' + bandButtons(sel)) + '<div class="fig"><svg id="l1svg" role="img" aria-label="Two layer models side by side; each colored band is one job"></svg></div>' +
     bandLegend(false) + '</ul><div id="l1info"></div></div>';
   $('#ltry').innerHTML = tryBox('l1', '', '<div id="l1q"></div><div class="row"><button class="btn small" id="l1c">Check</button><button class="btn alt small" id="l1n">New layers</button></div>');
   function pickBands(b) { sel = b; draw(); }
   function draw() {
     drawStacks($('#l1svg'), sel, function (b) { pickBands(b); });
     $('#l1info').innerHTML = bandInfo(sel); fillTerms(LESSONS[0].terms);
-    $$('#ltext [data-band]').forEach(function (x) { x.setAttribute('aria-pressed', String(sel.length === 1 && sel[0] === x.getAttribute('data-band'))); });
+    $$('#lfig [data-band]').forEach(function (x) { x.setAttribute('aria-pressed', String(sel.length === 1 && sel[0] === x.getAttribute('data-band'))); });
   }
-  $$('#ltext [data-band]').forEach(function (x) { x.onclick = function () { pickBands([x.getAttribute('data-band')]); }; });
+  $$('#lfig [data-band]').forEach(function (x) { x.onclick = function () { pickBands([x.getAttribute('data-band')]); }; });
   function newTask() {
     var used = {}, items = [];
     while (items.length < 3) {
@@ -1100,11 +1208,11 @@ var LESSONS = [
   $('#ltext').innerHTML = head(1, 'Encapsulation: headers on the way down') +
     '<p>When a program sends a message, each layer below it adds a <b>header</b> in front. This is <b>encapsulation</b>: a letter goes into an envelope, and that envelope into a bigger one.</p>' +
     '<p>Ethernet frames must be at least 64 bytes, so the network adapter adds <b>padding</b> to a short one, then a 4-byte FCS (Frame Check Sequence). <b>Wireshark</b>, the capture program, sees the sender\'s frame before both, so it shows neither.</p>' +
-    '<div class="row"><label>Message <input type="text" id="l2t" value="hello" size="16" maxlength="300" spellcheck="false"></label><label>Transport <select id="l2l4">' + opts([['tcp', 'TCP (Transmission Control Protocol)'], ['udp', 'UDP (User Datagram Protocol)']], 'tcp') + '</select></label><label>Network <select id="l2ip">' + opts([['4', 'IPv4 (Internet Protocol version 4)'], ['6', 'IPv6 (Internet Protocol version 6)']], '4') + '</select></label></div>' +
-    more('Show more: what each layer adds', '<ul class="list"><li>Transport adds a TCP header (20 bytes) or a UDP header (8 bytes). The result is a <b>segment</b> or a <b>datagram</b>.</li><li>Network adds an IP (Internet Protocol) header: 20 bytes for IPv4, 40 for IPv6. The result is a <b>packet</b>.</li>' +
+    '<p class="use">Change the message, the transport, or the network above the figure. The figure plays once when you reach it, and again from the start whenever you change one of them.</p>' +
+    more('Show more: what each layer adds', '<ul class="list"><li>Transport adds a TCP (Transmission Control Protocol) header (20 bytes) or a UDP (User Datagram Protocol) header (8 bytes). The result is a <b>segment</b> or a <b>datagram</b>.</li><li>Network adds an IP (Internet Protocol) header: 20 bytes for IPv4 (Internet Protocol version 4), 40 for IPv6 (version 6). The result is a <b>packet</b>.</li>' +
       '<li>Data link adds a 14-byte Ethernet header in front and the FCS at the end. The result is a <b>frame</b>. If the packet is under 46 bytes, padding fills it up to 46, so the frame reaches 64.</li><li>Physical sends the bits, after an 8-byte <b>preamble</b> that ends with the SFD (Start Frame Delimiter), and leaves a 12-byte gap before the next frame.</li></ul>' +
       '<p>The receiver\'s Wireshark shows the padding, but still no FCS. Neither side shows the preamble or the gap.</p><p class="cmdnote">Real TCP on Linux usually adds 12 bytes of timestamp options, so captures often show a 32-byte TCP header. This lesson uses the plain 20-byte header.</p>') + TERMS_BOX;
-  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">Each layer wraps what it gets from above (widths not to scale)</p>' +
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">Each layer wraps what it gets from above (widths not to scale)</p>' + ctls('<div class="row"><label>Message <input type="text" id="l2t" value="hello" size="16" maxlength="300" spellcheck="false"></label><label>Transport <select id="l2l4">' + opts([['tcp', 'TCP (Transmission Control Protocol)'], ['udp', 'UDP (User Datagram Protocol)']], 'tcp') + '</select></label><label>Network <select id="l2ip">' + opts([['4', 'IPv4 (Internet Protocol version 4)'], ['6', 'IPv6 (Internet Protocol version 6)']], '4') + '</select></label></div>') +
     '<div class="playbar"><button class="btn alt small" id="l2prev">◀ Step back</button><button class="btn" id="l2go">Add the next header ▼</button><button class="btn amber small" id="l2play">▶ Play</button><button class="btn alt small" id="l2r">Start over</button><span class="count" id="l2count"></span>' + speedBar() + '</div>' +
     '<div class="fig"><svg id="l2svg" role="img" aria-label="Encapsulation, one row per layer"></svg></div>' +
     bandLegend(true) + '<li><i style="background:#E4E4E4;border:1px solid #8A9AA6"></i>Padding</li></ul><div id="l2stats" class="keytiles"></div><div id="l2chip"></div>' +
@@ -1124,16 +1232,19 @@ var LESSONS = [
   }
   function anim() { if (reduceMotion) return; var svg = $('#l2svg'); svg.classList.remove('pop'); void svg.getBoundingClientRect(); svg.classList.add('pop'); }
   function stop() { st.tok++; }
-  $('#l2t').oninput = function () { st.text = $('#l2t').value; draw(); };
-  $('#l2l4').onchange = function () { st.l4 = $('#l2l4').value; draw(); };
-  $('#l2ip').onchange = function () { st.ip = +$('#l2ip').value; draw(); };
-  $('#l2go').onclick = function () { stop(); if (st.step < 4) { st.step++; draw(); anim(); } };
-  $('#l2prev').onclick = function () { stop(); if (st.step > 0) { st.step--; draw(); } };
-  $('#l2r').onclick = function () { stop(); st.step = 0; draw(); };
-  $('#l2play').onclick = function () {
+  function playAll() {   // from the first frame (only the message) to the last
     var tok = ++st.tok; st.step = 0; draw();
     (function next() { setTimeout(function () { if (st.tok !== tok || lessonState.token !== my || !$('#l2svg')) return; st.step++; draw(); anim(); if (st.step < 4) next(); }, 1400 / speed); })();
-  };
+  }
+  var ap = autoOnce($('#l2svg').parentNode, playAll), typing = null;
+  function replay() { ap.cancel(); clearTimeout(typing); stop(); st.step = 0; draw(); if (!window.__NLV_NOAUTO) playAll(); }   // a new setting: back to the first frame, then play once
+  $('#l2t').oninput = function () { st.text = $('#l2t').value; ap.cancel(); stop(); st.step = 0; draw(); clearTimeout(typing); typing = setTimeout(replay, 600); };
+  $('#l2l4').onchange = function () { st.l4 = $('#l2l4').value; replay(); };
+  $('#l2ip').onchange = function () { st.ip = +$('#l2ip').value; replay(); };
+  $('#l2go').onclick = function () { ap.cancel(); stop(); if (st.step < 4) { st.step++; draw(); anim(); } };
+  $('#l2prev').onclick = function () { ap.cancel(); stop(); if (st.step > 0) { st.step--; draw(); } };
+  $('#l2r').onclick = function () { ap.cancel(); stop(); st.step = 0; draw(); };   // Start over: the first frame, without playing
+  $('#l2play').onclick = function () { ap.cancel(); playAll(); };
   wireSpeed();
   function newTask() {
     task = { n: pick([rnd(1, 20), rnd(21, 120), rnd(121, 900)]), l4: pick(['tcp', 'udp']), ip: pick([4, 6]) };
@@ -1160,10 +1271,9 @@ var LESSONS = [
   $('#ltext').innerHTML = head(2, 'Demultiplexing: unwrapping on the way up') +
     '<p>The receiver peels the headers off in the opposite order. Each header has a field that names the protocol inside it, so the receiver knows who gets the rest. This is <b>demultiplexing</b>. The fields to know:</p>' +
     '<ul class="list"><li>Ethernet\'s <b>EtherType</b>: 0x0800 is IPv4 (Internet Protocol version 4), 0x86DD is IPv6 (version 6), 0x0806 is ARP (Address Resolution Protocol).</li><li>IP\'s <b>Protocol</b> field (<b>Next Header</b> in IPv6): 1 is ICMP (Internet Control Message Protocol), 6 is TCP (Transmission Control Protocol), 17 is UDP (User Datagram Protocol), and 58 is ICMPv6, ICMP for IPv6.</li><li>The destination <b>port</b>: TCP 80 is a web server (HTTP, Hypertext Transfer Protocol), UDP 53 is DNS (Domain Name System).</li></ul>' +
-    '<p>The figure is Wireshark\'s packet details pane: one line per layer, top to bottom. The amber lines are those fields. Click a line to see its layer.</p>' +
-    '<div class="row"><label>What was sent <select id="l3app">' + opts([['http', 'A web request (HTTP over TCP)'], ['dns', 'A name lookup (DNS over UDP)'], ['ping', 'A ping (ICMP)'], ['arp', 'An ARP request']], 'http') + '</select></label><label>Network <select id="l3ip">' + opts([['4', 'IPv4'], ['6', 'IPv6']], '4') + '</select></label></div>' + TERMS_BOX;
-  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">Wireshark\'s packet details, one line per layer</p><div class="pane" id="l3pane"></div><div id="l3chip" style="margin-top:8px"></div>' +
-    more('This line\'s layer in both models', '<div class="fig"><svg id="l3svg" role="img" aria-label="The two models with the picked layer outlined"></svg></div>') + '</div>';
+    '<p>The figure is Wireshark\'s packet details pane: one line per layer, top to bottom. The amber lines are those fields. Click a line to see its layer.</p><p class="use">Pick what was sent, and IPv4 or IPv6, above the pane.</p>' + TERMS_BOX;
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">Wireshark\'s packet details, one line per layer</p>' + ctls('<div class="row"><label>What was sent <select id="l3app">' + opts([['http', 'A web request (HTTP over TCP)'], ['dns', 'A name lookup (DNS over UDP)'], ['ping', 'A ping (ICMP)'], ['arp', 'An ARP request']], 'http') + '</select></label><label>Network <select id="l3ip">' + opts([['4', 'IPv4'], ['6', 'IPv6']], '4') + '</select></label></div>') + '<p class="axnote" data-axis="xy">↓ one line per header, in the order Wireshark lists them (first on the wire at the top) · → each line names its header; indented lines are fields of that header</p><div class="pane" id="l3pane"></div><div id="l3chip" style="margin-top:8px"></div>' +
+    more('This line\'s layer in both models', '<p class="cmdnote">The same line you picked in the pane above, shown as a job in the two models.</p><div class="fig"><svg id="l3svg" role="img" aria-label="The two models with the picked layer outlined"></svg></div>') + '</div>';
   $('#ltry').innerHTML = tryBox('l3', '', '<div class="row"><select id="l3a" aria-label="Your answer"></select><button class="btn small" id="l3c">Check</button><button class="btn alt small" id="l3n">New field</button></div>');
   function lines() {
     var v6 = st.ip === 6 && st.app !== 'arp', a = v6 ? ADDR[6] : ADDR[4], L = [], l4, appLen, ipName = v6 ? 'Internet Protocol Version 6' : 'Internet Protocol Version 4';
@@ -1227,33 +1337,32 @@ var LESSONS = [
   var st = { ip: 4, l4: 'tcp', nat: false, step: -1, tok: 0 }, P = tripPath(), model;
   $('#ltext').innerHTML = head(3, 'What each device reads and rewrites') +
     '<p>A device only opens the layers it needs. A <b>switch</b> works up to the data link layer, a <b>router</b> up to the network layer, and only the two <b>hosts</b> use all five.</p>' +
-    '<p>Step through one packet\'s trip from Host A to Host B with the buttons above the figure. The colored strip under it shows the packet\'s headers at that moment; a red outline marks a field rewritten on the way.</p>' +
-    '<div class="row"><label>Network <select id="l4ip">' + opts([['4', 'IPv4 (Internet Protocol version 4)'], ['6', 'IPv6 (Internet Protocol version 6)']], '4') + '</select></label><label>Transport <select id="l4l4">' + opts([['tcp', 'TCP (Transmission Control Protocol)'], ['udp', 'UDP (User Datagram Protocol)']], 'tcp') + '</select></label><label class="chk"><input type="checkbox" id="l4nat"><span>The router does NAT (Network Address Translation)</span></label></div>' +
+    '<p>Step through one packet\'s trip from Host A to Host B with the buttons above the figure. The colored strip under it shows the packet\'s headers at that moment; a red outline marks a field rewritten on the way.</p><p class="use">Pick the network, the transport, and NAT (Network Address Translation) above the figure. The trip plays once when you reach it, and again from Host A whenever you change a setting.</p>' +
     more('Show more: what changes, and what does not', '<ul class="list"><li>Going <b>down</b> a stack, each layer adds its header. Going <b>up</b>, each layer reads its header and removes it.</li><li>The switch reads the MAC (Media Access Control) addresses and forwards the frame <b>unchanged</b>.</li>' +
-      '<li>The router removes the old frame and builds a <b>new frame</b> for the next link: new MAC addresses and a new FCS (Frame Check Sequence). It lowers the TTL (Time to Live), called the hop limit in IPv6, and for IPv4 it fixes the header checksum.</li>' +
-      '<li>The IP addresses, the ports, and the data travel from end to end untouched, unless the router does NAT. NAT rewrites the source address and port, so the TCP or UDP checksum changes too.</li></ul>') + TERMS_BOX;
-  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">One packet\'s trip: each device drawn with the layers it uses</p>' +
+      '<li>The router removes the old frame and builds a <b>new frame</b> for the next link: new MAC addresses and a new FCS (Frame Check Sequence). It lowers the TTL (Time to Live), called the hop limit in IPv6 (Internet Protocol version 6), and for IPv4 (version 4) it fixes the header checksum.</li>' +
+      '<li>The IP (Internet Protocol) addresses, the ports, and the data travel from end to end untouched, unless the router does NAT. NAT rewrites the source address and port, so the TCP (Transmission Control Protocol) or UDP (User Datagram Protocol) checksum changes too.</li></ul>') + TERMS_BOX;
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">One packet\'s trip: each device drawn with the layers it uses</p>' + ctls('<div class="row"><label>Network <select id="l4ip">' + opts([['4', 'IPv4 (Internet Protocol version 4)'], ['6', 'IPv6 (Internet Protocol version 6)']], '4') + '</select></label><label>Transport <select id="l4l4">' + opts([['tcp', 'TCP (Transmission Control Protocol)'], ['udp', 'UDP (User Datagram Protocol)']], 'tcp') + '</select></label><label class="chk"><input type="checkbox" id="l4nat"><span>The router does NAT (Network Address Translation)</span></label></div>') +
     '<div class="playbar"><button class="btn alt small" id="l4prev">◀ Step back</button><button class="btn" id="l4next">Next step ▶</button><button class="btn amber small" id="l4play">▶ Play the trip</button><button class="btn alt small" id="l4reset">Start over</button><span class="count" id="l4count"></span>' + speedBar() + '</div>' +
     '<div class="fig" id="l4box"><svg id="l4svg" role="img" aria-label="Host A, Switch 1, the Router, Switch 2 and Host B, with the packet\'s position"></svg></div><p class="cmdnote" id="l4swipe" hidden>The figure follows the packet. Swipe it sideways to see the whole path.</p>' +
     '<div class="info" id="l4cap" aria-live="polite"></div>' +
-    '<p class="figtitle" id="l4striptitle"></p><div class="strip" id="l4strip"></div>' +
+    '<p class="figtitle" id="l4striptitle"></p><p class="axnote" data-axis="xy">The same packet as the amber dot in the figure above. → its headers in the order they are sent, Ethernet first; one row, the whole packet</p><div class="strip" id="l4strip"></div>' +
     '<ul class="legend"><li><i style="background:#fff;box-shadow:0 0 0 3px #F5A524 inset"></i>the header this layer is working on</li><li><i style="background:#fff;box-shadow:0 0 0 2px #E5484D inset"></i>rewritten since Host A sent it ("new")</li></ul>' +
-    more('Every field, compared with what Host A sent', '<div class="fields" id="l4fields"></div>' +
+    more('Every field, compared with what Host A sent', '<p class="cmdnote">The same packet as in the strip above, one box per header field.</p><div class="fields" id="l4fields"></div>' +
     '<ul class="legend"><li><i style="background:#E1F5EF;border-left:6px solid #13A88A"></i>same as Host A sent</li><li><i style="background:#FDE8E9;border-left:6px solid #E5484D"></i>rewritten on the way</li><li><i style="background:#fff;box-shadow:0 0 0 2px #F5A524 inset"></i>read in this step</li></ul>') + '</div>';
   $('#ltry').innerHTML = tryBox('l4', '<p>With the settings above, which fields that reach Host B on <b>Link 4</b> are different from what Host A sent on <b>Link 1</b>? Tick all of them.</p>', '<div class="checks" id="l4checks"></div><div class="row"><button class="btn small" id="l4c">Check</button></div>');
   function q(v) { return '<span class="addr">' + esc(v) + '</span>'; }
   function caption(i) {
     var m = model, a = m.first, b = m.after, L4 = L4NAME[st.l4], v6 = m.v6, ttl = v6 ? 'hop limit' : 'TTL (Time to Live)', ttl2 = v6 ? 'hop limit' : 'TTL', IPv = v6 ? 'IPv6' : 'IPv4';
     if (i < 0) return '<b>Ready.</b> Nothing has been sent yet. Host A\'s program is about to send "' + esc(a.text) + '" to the ' + (st.l4 === 'tcp' ? 'web server (port 80)' : 'DNS (Domain Name System) server (port 53)') + ' on Host B. So far the packet is only the data, shown in the strip below. On the way down each layer adds its header, and Ethernet adds an FCS (Frame Check Sequence), an error check, at the end. Press <b>Next step</b>.';
-    return ['<b>Step 1, Host A builds the frame.</b> The program hands "' + esc(a.text) + '" to ' + L4 + '. Going down, each layer adds its header: ' + L4 + ' (port ' + a.sport + ' → ' + a.dport + '), ' + IPv + ' (' + q(a.sip) + ' → ' + q(a.dip) + ', ' + ttl + ' 64), then Ethernet. Host B is on another network, so the Ethernet header is addressed to the <b>router\'s</b> MAC (Media Access Control) address ' + q(a.dmac) + ', not to Host B. The physical layer sends the frame as bits.',
-      '<b>Step 2, Link 1.</b> The bits travel to Switch 1.',
-      '<b>Step 3, Switch 1</b> opens only the data link layer. It reads the destination MAC address ' + q(a.dmac) + ' to pick the port toward the router, learns that ' + q(a.smac) + ' is on the port the frame came in on, and checks the FCS. It sends the frame out <b>unchanged</b>.',
-      '<b>Step 4, Link 2.</b> The same frame, bit for bit, travels to the router.',
-      '<b>Step 5, the Router</b> opens two layers. Data link: the frame is addressed to its own MAC ' + q(a.dmac) + ' and the FCS is good, so it removes the Ethernet header. Network: it reads the destination IP address ' + q(a.dip) + ', looks up the route, and lowers the ' + ttl2 + ' from 64 to 63' + (v6 ? '' : ', so it recomputes the header checksum') + (m.nat ? '. With NAT it also rewrites the source address to ' + q(b.sip) + ' and the source port to ' + b.sport + ', so it must fix the ' + L4 + ' checksum too' : '') + '. Going back down, it builds a <b>new</b> Ethernet header, from its other port ' + q(b.smac) + ' to Host B ' + q(b.dmac) + ', and a new FCS.',
-      '<b>Step 6, Link 3.</b> A new frame carries the same packet' + (m.nat ? ', with its new source address and port,' : '') + ' now with ' + ttl2 + ' 63.',
-      '<b>Step 7, Switch 2</b> does what Switch 1 did: it reads and learns MAC addresses, checks the FCS, and forwards the frame unchanged.',
-      '<b>Step 8, Link 4.</b> The frame reaches Host B.',
-      '<b>Step 9, Host B unwraps it</b>, bottom up. Data link: the frame is for its MAC, and EtherType ' + (v6 ? '0x86DD' : '0x0800') + ' says ' + IPv + '. Network: the packet is for its IP address, and ' + (v6 ? 'Next Header' : 'Protocol') + ' ' + (st.l4 === 'tcp' ? 6 : 17) + ' says ' + L4 + '. Transport: destination port ' + a.dport + ' picks the ' + (st.l4 === 'tcp' ? 'web' : 'DNS') + ' server, which receives "' + esc(a.text) + '".'][i];
+    return ['<b>Step 1: Host A builds the frame.</b> The program hands "' + esc(a.text) + '" to ' + L4 + '. Going down, each layer adds its header: ' + L4 + ' (port ' + a.sport + ' → ' + a.dport + '), ' + IPv + ' (' + q(a.sip) + ' → ' + q(a.dip) + ', ' + ttl + ' 64), then Ethernet. Host B is on another network, so the Ethernet header is addressed to the <b>router\'s</b> MAC (Media Access Control) address ' + q(a.dmac) + ', not to Host B. The physical layer sends the frame as bits.',
+      '<b>Step 2: Link 1.</b> The bits travel to Switch 1.',
+      '<b>Step 3: Switch 1</b> opens only the data link layer. It reads the destination MAC address ' + q(a.dmac) + ' to pick the port toward the router, learns that ' + q(a.smac) + ' is on the port the frame came in on, and checks the FCS. It sends the frame out <b>unchanged</b>.',
+      '<b>Step 4: Link 2.</b> The same frame, bit for bit, travels to the router.',
+      '<b>Step 5: the Router</b> opens two layers. Data link: the frame is addressed to its own MAC ' + q(a.dmac) + ' and the FCS is good, so it removes the Ethernet header. Network: it reads the destination IP address ' + q(a.dip) + ', looks up the route, and lowers the ' + ttl2 + ' from 64 to 63' + (v6 ? '' : ', so it recomputes the header checksum') + (m.nat ? '. With NAT it also rewrites the source address to ' + q(b.sip) + ' and the source port to ' + b.sport + ', so it must fix the ' + L4 + ' checksum too' : '') + '. Going back down, it builds a <b>new</b> Ethernet header, from its other port ' + q(b.smac) + ' to Host B ' + q(b.dmac) + ', and a new FCS.',
+      '<b>Step 6: Link 3.</b> A new frame carries the same packet' + (m.nat ? ', with its new source address and port,' : '') + ' now with ' + ttl2 + ' 63.',
+      '<b>Step 7: Switch 2</b> does what Switch 1 did: it reads and learns MAC addresses, checks the FCS, and forwards the frame unchanged.',
+      '<b>Step 8: Link 4.</b> The frame reaches Host B.',
+      '<b>Step 9: Host B unwraps it</b>, bottom up. Data link: the frame is for its MAC, and EtherType ' + (v6 ? '0x86DD' : '0x0800') + ' says ' + IPv + '. Network: the packet is for its IP address, and ' + (v6 ? 'Next Header' : 'Protocol') + ' ' + (st.l4 === 'tcp' ? 6 : 17) + ' says ' + L4 + '. Transport: destination port ' + a.dport + ' picks the ' + (st.l4 === 'tcp' ? 'web' : 'DNS') + ' server, which receives "' + esc(a.text) + '".'][i];
   }
   /* the headers the packet has at one point: lv = layer (-1 on the wire), v2 = after the router */
   function strip(lv, v2, devI) {
@@ -1308,19 +1417,22 @@ var LESSONS = [
     var box = $('#l4box'); if (!box) return; var over = box.scrollWidth > box.clientWidth + 2;
     $('#l4swipe').hidden = !over; if (over) box.scrollLeft = Math.max(0, (pos[0] - 0.1) / 11.7 * box.scrollWidth - box.clientWidth / 2);
   }
-  function rebuild() {
+  function playTrip() {   // from the start (nothing sent) to Host B
+    st.tok++; st.step = -1; rest();
+    (function next() { if (st.step < 8) play(st.step + 1, function () { var tok = st.tok; setTimeout(function () { if (st.tok === tok && lessonState.i === 3) next(); }, 450 / speed); }); })();
+  }
+  var ap = { cancel: function () {} };
+  function rebuild(first) {
     model = hopModel({ ip: st.ip, l4: st.l4, nat: st.nat });
     $('#l4checks').innerHTML = model.links[0].map(function (f) { return '<label><input type="checkbox" value="' + f.id + '"> ' + esc(f.name) + '</label>'; }).join('');
     $('#l4fb').className = 'feedback'; $('#l4fb').innerHTML = '';
     st.tok++; st.step = -1; rest();   // new settings: a new packet starts at Host A
+    if (!first) { ap.cancel(); if (!window.__NLV_NOAUTO) playTrip(); }   // and the trip plays once from there
   }
-  $('#l4next').onclick = function () { if (st.step < 8) play(st.step + 1); };
-  $('#l4prev').onclick = function () { st.tok++; if (st.step >= 0) { st.step--; rest(); } };
-  $('#l4reset').onclick = function () { st.tok++; st.step = -1; rest(); };
-  $('#l4play').onclick = function () {
-    st.tok++; st.step = -1; rest();
-    (function next() { if (st.step < 8) play(st.step + 1, function () { var tok = st.tok; setTimeout(function () { if (st.tok === tok && lessonState.i === 3) next(); }, 450 / speed); }); })();
-  };
+  $('#l4next').onclick = function () { ap.cancel(); if (st.step < 8) play(st.step + 1); };
+  $('#l4prev').onclick = function () { ap.cancel(); st.tok++; if (st.step >= 0) { st.step--; rest(); } };
+  $('#l4reset').onclick = function () { ap.cancel(); st.tok++; st.step = -1; rest(); };   // Start over: back to the start, without playing
+  $('#l4play').onclick = function () { ap.cancel(); playTrip(); };
   wireSpeed();
   $('#l4ip').onchange = function () { st.ip = +$('#l4ip').value; if (st.ip === 6) { st.nat = false; $('#l4nat').checked = false; } $('#l4nat').disabled = st.ip === 6; rebuild(); };
   $('#l4l4').onchange = function () { st.l4 = $('#l4l4').value; rebuild(); };
@@ -1331,7 +1443,7 @@ var LESSONS = [
     if (!miss && !extra) lessonDone($('#l4fb'), 'Right: ' + want.length + ' fields change, all of them written by the router. ' + (model.nat ? 'With NAT, the router also rewrote the source address and port, so the ' + L4NAME[st.l4] + ' checksum changed too.' : 'The IP addresses, the ports, the ' + L4NAME[st.l4] + ' checksum, and the data arrive exactly as Host A sent them.'));
     else wrong($('#l4fb'), (miss ? miss + ' changed field' + (miss > 1 ? 's are' : ' is') + ' not ticked. ' : '') + (extra ? extra + ' ticked field' + (extra > 1 ? 's do' : ' does') + ' not change. ' : '') + 'Play the trip and watch for the fields marked "new", or open "Every field" under the figure.');
   };
-  $('#l4nat').disabled = false; rebuild();
+  $('#l4nat').disabled = false; rebuild(true); ap = autoOnce($('#l4box'), playTrip);
 } },
 
 /* ---------- Lesson 5: the hourglass */
@@ -1340,12 +1452,11 @@ var LESSONS = [
   var st = { p: 'ospf' }, task;
   $('#ltext').innerHTML = head(4, 'Where does it really sit?') +
     '<p>Draw every protocol the Internet uses and you get an <b>hourglass</b>: many applications on top, many kinds of links at the bottom (Ethernet, Wi-Fi, PPP (Point-to-Point Protocol), fiber, radio), and IP (Internet Protocol) alone in the narrow waist.</p>' +
-    '<p>Some protocols are hard to place, because what <b>carries</b> them and the <b>job</b> they do point to different layers. Pick one: it and the protocols that carry it down to the wire turn amber, and everything it does not use turns gray.</p>' +
-    '<div class="row"><label>Protocol <select id="l5p">' + opts(['ip4', 'ip6', 'tcp', 'udp'].concat(PLACEABLE).map(function (id) { return [id, PROTO[id].full]; }), 'ospf') + '</select></label></div>' +
+    '<p>Some protocols are hard to place, because what <b>carries</b> them and the <b>job</b> they do point to different layers. Pick one above the figure: it and the protocols that carry it down to the wire turn amber, and everything it does not use turns gray.</p><p class="use">The protocol list is above the figure. In the hourglass, what rides on TCP (Transmission Control Protocol) sits on the left, what rides on UDP (User Datagram Protocol) on the right, and what rides directly on IP in the middle.</p>' +
     more('Show more: the tricky ones', '<ul class="list"><li>ARP (Address Resolution Protocol) is carried directly in an Ethernet frame, but it serves IP.</li><li>ICMP (Internet Control Message Protocol) and OSPF (Open Shortest Path First) ride directly in IP, with no TCP (Transmission Control Protocol) or UDP (User Datagram Protocol). The Internet does not force every protocol through every layer.</li><li>BGP (Border Gateway Protocol) and RIP (Routing Information Protocol) do routing work, but they run as applications over TCP and UDP.</li>' +
-      '<li>TLS (Transport Layer Security) sits between TCP and the application. QUIC does transport work inside UDP.</li></ul>') + TERMS_BOX;
-  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">The Internet\'s hourglass: the protocol you picked and everything that carries it in amber; what it does not use in gray</p><div class="fig"><svg id="l5svg" role="img" aria-label="The protocol hourglass with IP at the waist"></svg></div><div id="l5info"></div></div>';
-  $('#ltry').innerHTML = tryBox('l5', '<p>What carries each protocol directly? Pick each one in the list above to check it in the hourglass.</p>', '<div id="l5q"></div><div class="row"><button class="btn small" id="l5c">Check</button><button class="btn alt small" id="l5n">New protocols</button></div>');
+      '<li>TLS (Transport Layer Security) sits between TCP and the application. QUIC, a transport protocol (its name is not short for anything), does transport work inside UDP.</li></ul>') + TERMS_BOX;
+  $('#lfig').innerHTML = '<div class="card"><p class="figtitle">The Internet\'s hourglass: the protocol you picked and everything that carries it in amber; what it does not use in gray</p>' + ctls('<div class="row"><label>Protocol <select id="l5p">' + opts(['ip4', 'ip6', 'tcp', 'udp'].concat(PLACEABLE).map(function (id) { return [id, PROTO[id].full]; }), 'ospf') + '</select></label></div>') + '<div class="fig"><svg id="l5svg" role="img" aria-label="The protocol hourglass with IP at the waist"></svg></div><div id="l5info"></div></div>';
+  $('#ltry').innerHTML = tryBox('l5', '<p>What carries each protocol directly? Pick each one in the protocol list above the figure to check it in the hourglass.</p>', '<div id="l5q"></div><div class="row"><button class="btn small" id="l5c">Check</button><button class="btn alt small" id="l5n">New protocols</button></div>');
   function draw() {
     var p = PROTO[st.p];
     drawHourglass($('#l5svg'), st.p);
@@ -1364,7 +1475,7 @@ var LESSONS = [
     var bad = [], blank = 0;
     $$('#l5q select').forEach(function (s) { var id = task[+s.getAttribute('data-q')]; if (!s.value) blank++; else if (s.value !== PROTO[id].carrier) bad.push(PROTO[id].name); });
     if (blank) wrong($('#l5fb'), 'Choose an answer for every protocol.');
-    else if (bad.length) wrong($('#l5fb'), 'Look again at ' + bad.join(' and ') + '. Pick it in the list above to see what carries it in the hourglass.');
+    else if (bad.length) wrong($('#l5fb'), 'Look again at ' + bad.join(' and ') + '. Pick it in the protocol list above the figure to see what carries it in the hourglass.');
     else lessonDone($('#l5fb'), 'All four are right. ' + task.map(function (id) { return PROTO[id].name + ': ' + PROTO[id].key; }).join('; ') + '.');
   };
   newTask(); draw();
@@ -1387,7 +1498,9 @@ var LESSONS = [
       '<div class="row"><button class="btn small" id="l6c">Check</button><button class="btn alt small" id="l6n">New symptom</button></div>');
   box = $('#l6cmds'); renderCmds(box);
   function ladder(hl) {
-    var f = new Fig($('#l6svg'), 0, 9, 0, 4.1, 1.5);
+    var f = new Fig($('#l6svg'), 0, 9, -0.32, 4.42, 1.5);
+    f.ax('y', 0.5, 4.27, '↑ the checks in order: start at the bottom, and climb while each one passes');
+    f.ax('x', 4.5, -0.14, '→ across: what each step checks, and (in brackets) the layer job it tests', { ha: 'middle' });
     f.line(0.5, 0.1, 0.5, 4.0, { lw: 3, color: C.muted }); f.line(8.5, 0.1, 8.5, 4.0, { lw: 3, color: C.muted });
     RUNGS.forEach(function (r, i) {
       var y = 0.25 + i * 0.62, on = hl === r.id, off = hl && !on, b = BAND[r.band];   // once a step is outlined, the others turn gray
@@ -1413,10 +1526,12 @@ var LESSONS = [
 ];
 
 function renderStepper() {
-  var mapOn = lessonState.i < 0;
+  var mapOn = lessonState.i < 0 && !lessonState.gloss;
   $('#stepper').innerHTML = '<button data-l="-1" class="map" title="Lesson map" aria-label="Lesson map"' + (mapOn ? ' aria-current="step"' : '') + '><span class="num" aria-hidden="true">☰</span><span class="ttl">Lesson map</span></button>' +
-    LESSONS.map(function (L, i) { return '<button data-l="' + i + '" class="' + (progress.lessons[i] ? 'done' : '') + '" title="Lesson ' + (i + 1) + ': ' + esc(L.t) + '" aria-label="Lesson ' + (i + 1) + ': ' + esc(L.t) + (progress.lessons[i] ? ' (done)' : '') + '"' + (i === lessonState.i ? ' aria-current="step"' : '') + '><span class="num">' + (progress.lessons[i] ? '✓' : i + 1) + '</span><span class="ttl">' + esc(L.t) + '</span></button>'; }).join('');
+    LESSONS.map(function (L, i) { return '<button data-l="' + i + '" class="' + (progress.lessons[i] ? 'done' : '') + '" title="Lesson ' + (i + 1) + ': ' + esc(L.t) + '" aria-label="Lesson ' + (i + 1) + ': ' + esc(L.t) + (progress.lessons[i] ? ' (done)' : '') + '"' + (i === lessonState.i ? ' aria-current="step"' : '') + '><span class="num">' + (progress.lessons[i] ? '✓' : i + 1) + '</span><span class="ttl">' + esc(L.t) + '</span></button>'; }).join('') +
+    '<button data-g="1" class="glpill" title="Glossary: every term" aria-label="Glossary: every term"' + (lessonState.gloss ? ' aria-current="step"' : '') + '><span class="num" aria-hidden="true">📖</span><span class="ttl">Glossary</span></button>';
   $$('#stepper [data-l]').forEach(function (b) { b.onclick = function () { openLesson(+b.getAttribute('data-l')); window.scrollTo(0, 0); }; });
+  $('#stepper [data-g]').onclick = function () { openGlossary(); window.scrollTo(0, 0); };
   $('#lprog').style.width = (Object.keys(progress.lessons).length / LESSONS.length * 100) + '%';
 }
 function renderMap() {
@@ -1429,19 +1544,19 @@ function renderMap() {
         return '<button class="mapl' + (progress.lessons[i] ? ' done' : '') + '" data-ml="' + i + '"><span class="num">' + (progress.lessons[i] ? '✓' : i + 1) + '</span><b>Lesson ' + (i + 1) + ': ' + esc(L.t) + '</b><span class="d">' + esc(L.d) + '</span></button>';
       }).join('');
     }).join('') +
-    '<div class="row" style="margin-top:12px"><button class="btn" id="mapgo">' + (started ? 'Continue with Lesson ' + (next + 1) : 'Start Lesson 1') + ' →</button></div>';
+    '<div class="row" style="margin-top:12px"><button class="btn" id="mapgo">' + (started ? 'Continue with Lesson ' + (next + 1) : 'Start Lesson 1') + ' →</button></div>' + glossLink();
   $$('[data-ml]').forEach(function (b) { b.onclick = function () { openLesson(+b.getAttribute('data-ml')); window.scrollTo(0, 0); }; });
-  $('#mapgo').onclick = function () { openLesson(next); window.scrollTo(0, 0); };
+  $('#mapgo').onclick = function () { openLesson(next); window.scrollTo(0, 0); }; wireGlossLink();
 }
 function openLesson(i) {
-  lessonState.i = Math.max(-1, Math.min(LESSONS.length - 1, i)); lessonState.token++; renderStepper();
+  lessonState.i = Math.max(-1, Math.min(LESSONS.length - 1, i)); lessonState.gloss = false; lessonState.token++; renderStepper();
   var onMap = lessonState.i < 0;
   $('#lmap').hidden = !onMap; $('#lessonbox').hidden = onMap;
   $('#ltext').innerHTML = ''; $('#lfig').innerHTML = ''; $('#ltry').innerHTML = '';
   if (onMap) { renderMap(); if (typeof writeLink === 'function') writeLink(); return; }
   var L = LESSONS[lessonState.i]; termSeen = []; chipSeen = false; L.setup();
-  $('#ltry').insertAdjacentHTML('beforeend', '<div class="navrow"><button class="btn alt" id="lprev">← ' + (lessonState.i ? 'Lesson ' + lessonState.i : 'Lesson map') + '</button><button class="btn' + (lessonState.i === LESSONS.length - 1 ? ' amber' : '') + '" id="lnext">' + (lessonState.i === LESSONS.length - 1 ? 'Take the challenge →' : 'Lesson ' + (lessonState.i + 2) + ' →') + '</button></div>');
-  $('#lprev').onclick = function () { openLesson(lessonState.i - 1); window.scrollTo(0, 0); };
+  $('#ltry').insertAdjacentHTML('beforeend', glossLink() + '<div class="navrow"><button class="btn alt" id="lprev">← ' + (lessonState.i ? 'Lesson ' + lessonState.i : 'Lesson map') + '</button><button class="btn' + (lessonState.i === LESSONS.length - 1 ? ' amber' : '') + '" id="lnext">' + (lessonState.i === LESSONS.length - 1 ? 'Take the challenge →' : 'Lesson ' + (lessonState.i + 2) + ' →') + '</button></div>');
+  $('#lprev').onclick = function () { openLesson(lessonState.i - 1); window.scrollTo(0, 0); }; wireGlossLink();
   $('#lnext').onclick = function () { if (lessonState.i < LESSONS.length - 1) { openLesson(lessonState.i + 1); window.scrollTo(0, 0); } else go('challenge'); };
   fillTerms(L.terms); lessonState.terms = L.terms;
   if (typeof writeLink === 'function') writeLink();
@@ -1451,6 +1566,119 @@ function lessonDone(fb, msg) {
   if (!progress.lessons[lessonState.i]) { progress.lessons[lessonState.i] = true; addXP(20); renderStepper(); if (Object.keys(progress.lessons).length === LESSONS.length) earn('learned'); }
 }
 function wrong(fb, msg) { fb.className = 'feedback bad'; fb.innerHTML = msg; }
+
+/* ===================================================== GLOSSARY
+   One glossary for the whole app: TERMS (03-learn.js). Every term in the student-facing text of
+   the start screen, the lessons, and the Calculator shows its definition in a popup (hover, tap, or
+   keyboard focus); the "Terms in this lesson" lists and the Glossary page use the same wording.
+   The text is marked automatically: the first use of each term in every card (and in every
+   controls panel, info box, fold, Try it, and feedback) gets a dotted underline. Longer names come
+   first, so they win. The Challenge is left unmarked, so a definition never gives an answer away. */
+var GLOSS_PAT = {   // how each term is written in the text (the acronyms are matched as written)
+  'TCP/IP model': 'TCP/IP(?: models?)?', 'Layer': '[Ll]ayers?', 'Protocol': '[Pp]rotocols?', 'Header': '[Hh]eaders?', 'Encapsulation': '[Ee]ncapsulation',
+  'Segment': '[Ss]egments?', 'Datagram': '[Dd]atagrams?', 'Packet': '[Pp]ackets?', 'Frame': '[Ff]rames?', 'Padding': '[Pp]adding', 'Preamble': '[Pp]reamble',
+  'Demultiplexing': '[Dd]emultiplexing', 'Port number': '[Pp]ort numbers?|[Pp]orts?', 'Switch': '[Ss]witch(?:es)?', 'Router': '[Rr]outers?', 'Host': '[Hh]osts?',
+  'Hop limit': '[Hh]op limit', 'Checksum': '[Cc]hecksums?', 'Hourglass': '[Hh]ourglass', 'Ping': '[Pp]ing', 'Next hop': '[Nn]ext hop', 'Default gateway': '[Dd]efault gateway',
+  'MTU': 'MTUs?', 'MSS': 'MSS', 'Ethernet': 'Ethernet', 'Wi-Fi': 'Wi-Fi', 'Bytes on the wire': '[Bb]ytes on the wire|[Ww]ire time'
+};
+var GLOSS = TERMS.map(function (t) { return { k: t[0], d: t[1], re: GLOSS_PAT[t[0]] || t[0].replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&') }; })
+  .sort(function (a, b) { return b.k.length - a.k.length; });   // longer names first (ICMPv6 before ICMP, IPv4 before IP)
+var GLOSS_BY = {}; GLOSS.forEach(function (g) { GLOSS_BY[g.k] = g; g.rx = new RegExp('^(?:' + g.re + ')$'); });
+var GLOSS_RE = new RegExp(GLOSS.map(function (g) { return '(?:' + g.re + ')'; }).join('|'), 'g');
+var GLOSS_SKIP = 'h1, h2, h3, h4, .kicker, svg, script, style, input, select, option, textarea, button, code, pre, .gl, summary, .terms dt, #gpop, .topbar, .stepper, .pane, .cmd, .count, .lyr, .addr, .strip, .noglo, #view-challenge, .skills';
+var GLOSS_BLOCK = '.feedback, .tryit, .figctls, .legend, .info, details, .card, .hero, .modecard, dd, section, footer';   // a term is marked at its first use in each of these
+function glossKey(m) { for (var i = 0; i < GLOSS.length; i++) if (GLOSS[i].rx.test(m)) return GLOSS[i].k; return null; }
+function isWordCh(c) { return !!c && /[A-Za-z0-9_\-\/]/.test(c); }
+function inSpelledOut(txt, a) {   // inside the brackets that spell out an acronym, as in "TCP (Transmission Control Protocol)"
+  var o = txt.lastIndexOf('(', a); if (o < 0 || txt.lastIndexOf(')', a) > o) return false;
+  return /[A-Z0-9v]{2,}\s*$/.test(txt.slice(Math.max(0, o - 12), o).replace(/\s+$/, ' '));
+}
+function glossText(node) {
+  var txt = node.nodeValue; if (!txt || !/\S/.test(txt)) return;
+  var par = node.parentNode; if (!par || par.nodeType !== 1 || par.closest(GLOSS_SKIP)) return;
+  var blk = par.closest(GLOSS_BLOCK) || par, out = null, last = 0, m;
+  var ps = node.previousSibling, pre = ps ? String(ps.textContent || '').slice(-24) : '';   // the acronym before a bracket may already be underlined
+  GLOSS_RE.lastIndex = 0;
+  while ((m = GLOSS_RE.exec(txt))) {
+    var w = m[0], a = m.index, b = a + w.length;
+    if (!w) { GLOSS_RE.lastIndex++; continue; }
+    var k = glossKey(w);
+    if (!k || isWordCh(txt.charAt(a - 1)) || isWordCh(txt.charAt(b)) || inSpelledOut(pre + txt, pre.length + a)) continue;
+    if (k === 'Ping' && /^\s*-/.test(txt.slice(b))) continue;   // "ping -c" is a command, not the word
+    if (/^ (?:Visualizer|Layers Visualizer)/.test(txt.slice(b))) continue;   // the app's own name
+    if (blk.querySelector('.gl[data-g="' + k + '"]') || (out && out.keys[k])) continue;   // first use in each card
+    out = out || { frag: document.createDocumentFragment(), keys: {} };
+    out.frag.appendChild(document.createTextNode(txt.slice(last, a)));
+    var s = document.createElement('span'); s.className = 'gl'; s.setAttribute('data-g', k); s.tabIndex = 0; s.textContent = w;
+    out.frag.appendChild(s); out.keys[k] = true; last = b;
+  }
+  if (!out) return;
+  out.frag.appendChild(document.createTextNode(txt.slice(last)));
+  par.replaceChild(out.frag, node);
+}
+function gloss(root) {
+  if (!root || root.nodeType !== 1 || root.closest(GLOSS_SKIP)) return;
+  var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false), list = [], n;
+  while ((n = walker.nextNode())) list.push(n);
+  list.forEach(glossText);
+}
+/* the popup */
+var gpopFor = null;
+function gpopShow(t) {
+  var g = GLOSS_BY[t.getAttribute('data-g')], pop = $('#gpop'); if (!g || !pop) return;
+  pop.innerHTML = '<b>' + esc(g.k) + '</b>' + esc(g.d); pop.hidden = false; gpopFor = t;
+  t.setAttribute('aria-describedby', 'gpop');
+  var r = t.getBoundingClientRect(), pw = pop.offsetWidth, ph = pop.offsetHeight, vw = document.documentElement.clientWidth;
+  var x = Math.max(8, Math.min(vw - pw - 8, r.left + r.width / 2 - pw / 2)), y = r.bottom + 6;
+  if (y + ph > window.innerHeight - 4 && r.top - ph - 6 > 0) y = r.top - ph - 6;
+  pop.style.left = x + 'px'; pop.style.top = y + 'px';
+}
+function gpopHide() { var pop = $('#gpop'); if (pop) pop.hidden = true; if (gpopFor) gpopFor.removeAttribute('aria-describedby'); gpopFor = null; }
+function glossInit() {
+  if (/[?&]widget=/.test(location.search)) return;   // a slide widget: no underlines and no popups
+  if (!$('#gpop')) { var d = document.createElement('div'); d.id = 'gpop'; d.setAttribute('role', 'tooltip'); d.hidden = true; document.body.appendChild(d); }
+  document.addEventListener('mouseover', function (e) { var t = e.target.closest && e.target.closest('.gl'); if (t) gpopShow(t); });
+  document.addEventListener('mouseout', function (e) { var t = e.target.closest && e.target.closest('.gl'); if (t && t === gpopFor && document.activeElement !== t) gpopHide(); });
+  document.addEventListener('focusin', function (e) { if (e.target.classList && e.target.classList.contains('gl')) gpopShow(e.target); });
+  document.addEventListener('focusout', function (e) { if (e.target === gpopFor) gpopHide(); });
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest && e.target.closest('.gl');
+    if (t) { e.preventDefault(); gpopShow(t); return; }   // preventDefault: a term inside a label does not tick its box
+    if (gpopFor) gpopHide();
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && gpopFor) gpopHide(); });
+  window.addEventListener('scroll', function () { if (gpopFor) gpopShow(gpopFor); }, { passive: true });
+  ['#view-home', '#view-learn', '#view-calc', 'footer'].forEach(function (sel) {
+    var r = $(sel); if (!r) return; gloss(r);
+    if (window.MutationObserver) new MutationObserver(function (recs) {
+      recs.forEach(function (rec) { Array.prototype.forEach.call(rec.addedNodes, function (n) { if (n.nodeType === 1) gloss(n); else if (n.nodeType === 3) glossText(n); }); });
+    }).observe(r, { childList: true, subtree: true });
+  });
+}
+/* the Glossary page (Learn mode, ?mode=learn&lesson=glossary): every term, A to Z, with Find */
+function glossLink() { return '<p class="glink">📖 <a href="?mode=learn&amp;lesson=glossary" id="glink">Glossary: every term in this app</a></p>'; }
+function wireGlossLink() { var a = $('#glink'); if (a) a.onclick = function (e) { e.preventDefault(); openGlossary(); window.scrollTo(0, 0); }; }
+function openGlossary() {
+  var back = lessonState.gloss ? lessonState.back : lessonState.i;
+  lessonState.token++; lessonState.gloss = true; lessonState.back = back; renderStepper();
+  $('#lessonbox').hidden = true; $('#lmap').hidden = false;
+  var list = TERMS.slice().sort(function (a, b) { return a[0].toLowerCase().localeCompare(b[0].toLowerCase()); }), cur = '';
+  $('#lmap').innerHTML = '<div class="glossary"><p class="kicker">Appendix</p><h2>Glossary</h2><p class="noglo">Every term used in this app, A to Z. In the lessons and the Calculator, a dotted underline marks a term: point at it, tap it, or move to it with the Tab key to see the same definition.</p>' +
+    '<div class="row"><label>Find <input type="text" id="gfind" size="20" spellcheck="false" placeholder="for example MAC"></label><span class="count" id="gcount"></span></div><dl id="glist">' +
+    list.map(function (t) {
+      var L = t[0].charAt(0).toUpperCase(), head = L !== cur ? '<dt class="letter" aria-hidden="true">' + L + '</dt>' : ''; cur = L;
+      return head + '<dt class="gitem" id="g-' + esc(t[0].replace(/[^A-Za-z0-9]+/g, '-')) + '">' + esc(t[0]) + '</dt><dd class="gdef">' + esc(t[1]) + '</dd>';
+    }).join('') + '</dl><div class="row"><button class="btn alt" id="gback">← ' + (back >= 0 ? 'Back to Lesson ' + (back + 1) : 'Back to the lesson map') + '</button></div></div>';
+  function filter() {
+    var q = $('#gfind').value.trim().toLowerCase(), n = 0;
+    $$('#glist .gitem').forEach(function (dt) { var dd = dt.nextElementSibling, on = !q || (dt.textContent + ' ' + dd.textContent).toLowerCase().indexOf(q) >= 0; dt.hidden = dd.hidden = !on; if (on) n++; });
+    $$('#glist .letter').forEach(function (h) { var e = h.nextElementSibling, any = false; while (e && !e.classList.contains('letter')) { if (e.classList.contains('gitem') && !e.hidden) any = true; e = e.nextElementSibling; } h.hidden = !any; });
+    $('#gcount').textContent = n + ' of ' + list.length + ' terms';
+  }
+  $('#gfind').oninput = filter; filter();
+  $('#gback').onclick = function () { openLesson(back); window.scrollTo(0, 0); };
+  if (typeof writeLink === 'function') writeLink();
+}
 
 /* ===================================================== CALCULATOR */
 var calcState = { msg: 100, l4: 'tcp', ip: 4, tag: false, proto: 'dns', dev: 'router' };
@@ -1782,7 +2010,7 @@ function go(mode) {
   lessonState.token++;
   VIEWS.forEach(function (v) { $('#view-' + v).hidden = v !== current; });
   $$('.modes button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === current)); });
-  if (current === 'learn') openLesson(lessonState.i);
+  if (current === 'learn') { if (lessonState.gloss) openGlossary(); else openLesson(lessonState.i); }
   if (current === 'challenge') { if (game) { clearInterval(game.timer); game = null; } $('#ch-setup').hidden = false; $('#ch-play').hidden = true; $('#ch-end').hidden = true; renderShelf(); }
   if (current === 'calc') calc();
   window.scrollTo(0, 0); writeLink();
@@ -1790,7 +2018,7 @@ function go(mode) {
 function writeLink() {
   try {
     var q = new URLSearchParams(); q.set('mode', current);
-    if (current === 'learn') q.set('lesson', lessonState.i + 1);
+    if (current === 'learn') q.set('lesson', lessonState.gloss ? 'glossary' : lessonState.i + 1);
     if (current === 'calc') { q.set('msg', calcState.msg); q.set('l4', calcState.l4); q.set('ip', calcState.ip); if (calcState.tag) q.set('tag', '1'); }
     if (current === 'challenge') q.set('level', ($('.level[aria-pressed=true]') || $('.level')).getAttribute('data-level'));
     if (window.history && history.replaceState) history.replaceState(null, '', location.pathname + '?' + q.toString());
@@ -1798,7 +2026,8 @@ function writeLink() {
 }
 function readLink() {
   var q; try { q = new URLSearchParams(location.search); } catch (e) { return null; }
-  if (q.get('lesson') !== null && /^\d+$/.test(q.get('lesson'))) lessonState.i = Math.max(-1, Math.min(LESSONS.length - 1, +q.get('lesson') - 1));   // lesson=0 is the lesson map
+  if (q.get('lesson') === 'glossary') lessonState.gloss = true;
+  else if (q.get('lesson') !== null && /^\d+$/.test(q.get('lesson'))) lessonState.i = Math.max(-1, Math.min(LESSONS.length - 1, +q.get('lesson') - 1));   // lesson=0 is the lesson map
   if (/^[EMH]$/.test(q.get('level') || '')) setLevel(q.get('level'));
   var m = +q.get('msg'); if (q.get('msg') && Number.isInteger(m) && m >= 1 && m <= 65000) calcState.msg = m;
   if (L4H[q.get('l4')]) calcState.l4 = q.get('l4');
@@ -1810,7 +2039,7 @@ function readLink() {
 /* ===================================================== start */
 function init() {
   var mode = readLink();   // read the link before anything rewrites it
-  drawHero(); showXP(false); calcInit(); protoOut(); devOut(); renderShelf();
+  drawHero(); showXP(false); calcInit(); protoOut(); devOut(); renderShelf(); glossInit();
   $$('.modes button').forEach(function (b) { b.onclick = function () { go(b.getAttribute('data-mode')); }; });
   $$('[data-go]').forEach(function (b) { b.onclick = function () { go(b.getAttribute('data-go')); }; });
   $('#home').onclick = function () { go('home'); };
@@ -1823,8 +2052,299 @@ function init() {
   go(mode || 'home');
 }
 init();
-window.NetworkLayersVisualizer = { sizes: sizes, buildFrame: buildFrame, hopModel: hopModel, mapLayer: mapLayer, layersFor: layersFor, MODELS: MODELS, BANDS: BANDS, PROTOS: PROTOS, DEMUX: DEMUX, SYMPTOMS: SYMPTOMS, RUNGS: RUNGS, GEN: GEN, makeRound: makeRound, code: code, checkCode: checkCode, TERMS: TERMS, LESSONS: LESSONS };
+window.NetworkLayersVisualizer = { sizes: sizes, buildFrame: buildFrame, hopModel: hopModel, mapLayer: mapLayer, layersFor: layersFor, MODELS: MODELS, BANDS: BANDS, PROTOS: PROTOS, DEMUX: DEMUX, SYMPTOMS: SYMPTOMS, RUNGS: RUNGS, GEN: GEN, makeRound: makeRound, code: code, checkCode: checkCode, TERMS: TERMS, LESSONS: LESSONS, GLOSS: GLOSS, glossKey: glossKey };
 })();
 </script>
+
+<!-- vz-widgets:begin body -->
+<script id="vz-shell">
+/* Slide widgets, part 2 of 2 (runs last, after the app's own script).
+   Normal page: adds "For instructors: slide widget links" to the footer.
+   ?widget=<name>: shows only that figure and its controls, scaled to fill the frame.
+   ?widget=list: the instructors' page of widget links (&format=data also sends the list to a parent page).
+   One figure per widget; the list of widgets is window.VZ_WIDGETS (written by patch_widgets.py). */
+(function () {
+  'use strict';
+  var R = window.VZ_WIDGETS, V = window.VZ_MODE;
+  if (!R || !R.widgets) return;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function addStyle(css) { var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st); }
+  function linkFor(w, rel) { return (rel ? location.pathname : R.published) + '?widget=' + encodeURIComponent(w.name); }
+  function post(msg) { try { if (window.parent && window.parent !== window) window.parent.postMessage(msg, '*'); } catch (e) { /* no parent */ } }
+  function listData() {
+    return { type: 'vz-widget-list', app: R.app, published: R.published, widgets: R.widgets.map(function (w) {
+      return { name: w.name, title: w.title, group: w.group, link: linkFor(w), params: (w.params || []).map(function (p) {
+        return { key: p.key, label: p.label, type: p.options ? 'select' : p.pattern ? 'text' : 'number', pattern: p.pattern || null, 'default': p['default'], min: p.min, max: p.max,
+          integer: p.integer !== false, multi: !!p.multi, blank: p['default'] === '' || !!p.blank, options: p.options || null };
+      }) };
+    }) };
+  }
+  function copy(text, btn) {
+    function done(ok) { var o = btn.textContent; btn.textContent = ok ? 'Copied' : 'Select and copy'; setTimeout(function () { btn.textContent = o; }, 1300); }
+    function fallback() {
+      var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); var ok = false; try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      document.body.removeChild(ta); done(ok);
+    }
+    try { if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(function () { done(true); }, fallback); return; } } catch (e) { /* fall back */ }
+    fallback();
+  }
+
+  /* ===================================================== normal page: the footer link */
+  if (!V) {
+    var addFooterLink = function () {
+      if ($('#vzInstr')) return;
+      var foot = $('footer'), anchor = null;
+      if (!foot) return;
+      $$('details', foot).forEach(function (d) { var s = $('summary', d); if (s && /for instructors/i.test(s.textContent)) anchor = d; });
+      var p = document.createElement('p');
+      p.id = 'vzInstr'; p.className = 'vz-instr';
+      p.innerHTML = '<a href="?widget=list">For instructors: slide widget links<\/a> (put one figure at a time on a lecture slide)';
+      if (anchor) anchor.parentNode.insertBefore(p, anchor.nextSibling);
+      else ($('.card', foot) || foot).appendChild(p);
+    };
+    addStyle('.vz-instr{margin:8px 0 0;font-size:14px}.vz-instr a{font-weight:600}');
+    addFooterLink();
+    return;
+  }
+
+  /* ===================================================== shared look for widget and list pages */
+  addStyle(
+    'html.vz-w,html.vz-w body{overflow:hidden;background:#fff}' +
+    'html.vz-w body{margin:0}' +
+    '.vz-hide{display:none!important}' +
+    '.vz-path{display:block!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;' +
+      'max-width:none!important;width:auto!important;min-height:0!important;height:auto!important;position:static!important;transform:none!important;overflow:visible!important;top:auto!important}' +
+    '.vz-keep{margin:0 0 10px!important;max-width:none!important;position:static!important;top:auto!important}' +
+    '.vz-pinned>summary{pointer-events:none;cursor:default;list-style:none}.vz-pinned>summary::-webkit-details-marker{display:none}' +
+    '#vzHead{display:flex;align-items:center;gap:10px;padding:0 0 8px;margin:0 0 10px;border-bottom:2px solid #CFE6F0}' +
+    '#vzHead h1{margin:0;font-size:22px;color:#0B3D5C;flex:1;line-height:1.25}' +
+    '#vzHead .vz-name{font-size:12px;color:#5B6B78}' +
+    'body.vz-stage{position:absolute!important;left:0;top:0;transform-origin:0 0;padding:14px 18px!important;box-sizing:border-box}' +
+    '.vz-note{max-width:640px;margin:40px auto;padding:16px 20px}' +
+    /* list page */
+    'html.vz-list,html.vz-list body{overflow:auto}' +
+    '#vzList{max-width:980px;margin:0 auto;padding:18px 16px 40px}' +
+    '#vzList h1{font-size:26px;margin:0 0 6px}#vzList h2{font-size:19px;margin:22px 0 8px}' +
+    '#vzList .vz-item{margin:10px 0}#vzList .vz-item h3{margin:0 0 4px;font-size:17px}' +
+    '#vzList .vz-link{display:block;font-family:Consolas,Menlo,monospace;font-size:13px;background:#EAF5FA;border:1px solid #D3E3EC;border-radius:6px;padding:6px 8px;overflow-wrap:anywhere;margin:6px 0}' +
+    '#vzList .vz-params{font-size:14px;color:#5B6B78;margin:4px 0}' +
+    '#vzList .vz-prev{margin-top:8px;width:100%;max-width:560px;aspect-ratio:16/9;border:1px solid #D3E3EC;border-radius:8px;background:#fff}' +
+    '#vzList .vz-howto{font-size:15px}#vzList .vz-howto li{margin:3px 0}#vzList a.btn{text-decoration:none;display:inline-block}'
+  );
+
+  if (V.list) { showList(); return; }
+  if (!V.spec) { showUnknown(); return; }
+
+  /* ===================================================== one widget */
+  var spec = V.spec, W = spec.width || R.width || 960, applying = false, head = null, ready = false;
+
+  function controlRows() {   // the lesson's own controls: rows in the lesson text that hold an input, a menu, or a button
+    var box = $(R.lessonText || '#ltext');
+    if (!box) return [];
+    return $$('.row', box).filter(function (r) {
+      if (r.closest('.tryit, #ltry, .navrow, details')) return false;
+      if ($('#lprev, #lnext', r)) return false;
+      return !!$('input, select, button, textarea', r);
+    }).filter(function (r, i, all) { return !all.some(function (o) { return o !== r && o.contains(r); }); });
+  }
+  function resolve(sel) {   // "#a" or "#a << .card" (the closest .card around #a); "@controls" = the lesson's controls
+    if (sel === '@controls') return controlRows();
+    var parts = sel.split('<<'), out = $$(parts[0].trim());
+    if (parts[1]) out = out.map(function (e) { return e.closest(parts[1].trim()); }).filter(Boolean);
+    return out;
+  }
+  function keepList() {
+    var ks = spec.keep || (spec.mode === 'learn' ? ['@controls', R.lessonFig || '#lfig'] : []), out = [];
+    ks.forEach(function (s) { resolve(s).forEach(function (e) { if (out.indexOf(e) < 0) out.push(e); }); });
+    return out.filter(function (e) { return !out.some(function (o) { return o !== e && o.contains(e); }); });
+  }
+  function isolate() {
+    applying = true;
+    $$('.vz-hide, .vz-path, .vz-keep').forEach(function (e) { e.classList.remove('vz-hide', 'vz-path', 'vz-keep'); });
+    var keep = keepList(), path = [];
+    if (!keep.length) { applying = false; showUnknown('This widget\'s figure was not found on the page.'); return; }
+    keep.forEach(function (e) {
+      e.classList.add('vz-keep');
+      for (var p = e.parentElement; p && p !== document.body; p = p.parentElement) if (path.indexOf(p) < 0) path.push(p);
+    });
+    path.forEach(function (p) { p.classList.add('vz-path'); });
+    var nodes = keep.concat(path);
+    nodes.forEach(function (n) {
+      var par = n.parentElement; if (!par) return;
+      Array.prototype.forEach.call(par.children, function (c) {
+        if (c === head || nodes.indexOf(c) >= 0 || c.tagName === 'SCRIPT' || c.tagName === 'STYLE') return;
+        c.classList.add('vz-hide');
+      });
+    });
+    (spec.hide || []).forEach(function (s) { resolve(s).forEach(function (e) { e.classList.add('vz-hide'); }); });
+    var norm = function (t) { return String(t).replace(/\s+/g, ' ').trim().toLowerCase(); };
+    $$('.vz-keep .figtitle, .vz-keep h2, .vz-keep h3, .vz-keep summary').forEach(function (e) { if (norm(e.textContent) === norm(spec.title)) e.classList.add('vz-hide'); });   // the title bar already says it
+    applying = false;
+  }
+  var lock = null, MIN = spec.minScale || R.minScale || 0.6;
+  function fit(choose) {   // choose: pick the scale again (start, or the frame changed size); otherwise keep it, so nothing jumps
+    var b = document.body, vw = window.innerWidth, vh = window.innerHeight;
+    b.style.width = W + 'px';
+    var h = Math.max(b.scrollHeight, b.offsetHeight), sw = vw / W;
+    if (choose || !lock) {
+      var s = Math.min(sw, vh / h);
+      if (!isFinite(s) || s <= 0) s = 1;
+      s = Math.max(s, sw * MIN);   // never smaller than a readable size: a very tall figure scrolls instead
+      lock = { s: s, x: Math.max(0, (vw - W * s) / 2), y: Math.max(0, (vh - h * s) / 2), vw: vw, vh: vh };
+    }
+    b.style.transform = 'translate(' + lock.x + 'px,' + lock.y + 'px) scale(' + lock.s + ')';
+    var tall = lock.y + h * lock.s > vh + 1;
+    document.documentElement.style.overflowY = tall ? 'auto' : 'hidden';
+    window.VZ_FIT = { scale: lock.s, widthScale: sw, minScale: MIN, scrolls: tall };
+  }
+  function setParams() {
+    var q = new URLSearchParams(V.query.toString());
+    (spec.params || []).forEach(function (p) {   // "also": a value that only exists after another one is set (a second address needs its box ticked)
+      if (p.also && V.valid(p, q.get(p.key))) for (var k in p.also) if (q.get(k) === null) q.set(k, p.also[k]);
+    });
+    (spec.params || []).forEach(function (p) {
+      if (!p.input && !p.click) return;   // read by the app itself from the link
+      var raw = q.get(p.key);
+      if (raw === null || raw === '') return;
+      if (!V.valid(p, raw)) return;   // a bad value: the default stays, with no error message
+      if (p.click) {   // a choice made by clicking a chip or button: "click": "#cases [data-k=\"{v}\"]"
+        raw.split(p.multi ? /[-,]/ : /$^/).forEach(function (v) {
+          var b = null; try { b = resolve(p.click.split('{v}').join(String(v).replace(/["\\]/g, '')))[0]; } catch (er) { b = null; }
+          if (b) b.click();
+        });
+        return;
+      }
+      var e = $(p.input);
+      if (!e) return;
+      if (e.type === 'checkbox') e.checked = raw === '1'; else e.value = raw;
+      ['input', 'change'].forEach(function (t) { e.dispatchEvent(new Event(t, { bubbles: true })); });
+    });
+  }
+  function keyGuard(e) {   // a presenter remote's keys belong to PowerPoint, not to the widget
+    var k = e.key, t = e.target, tag = t && t.tagName, typ = (t && t.type || '').toLowerCase();
+    var texty = tag === 'TEXTAREA' || (tag === 'INPUT' && /^(text|number|search|url|email|tel|)$/.test(typ));
+    var slideKeys = { PageUp: 1, PageDown: 1, Home: 1, End: 1 };
+    var moveKeys = { ArrowLeft: 1, ArrowRight: 1, ArrowUp: 1, ArrowDown: 1, ' ': 1, Spacebar: 1, Enter: 1 };
+    var letter = k && k.length === 1 && /[bnpw.]/i.test(k);
+    if (slideKeys[k] || (!texty && (moveKeys[k] || letter))) { e.preventDefault(); e.stopImmediatePropagation(); }
+  }
+  function makeHead() {
+    head = document.createElement('div');
+    head.id = 'vzHead';
+    head.innerHTML = '<h1>' + esc(spec.title) + '<\/h1><button class="btn alt small" id="vzReset" type="button">↺ Reset<\/button>';
+    document.body.insertBefore(head, document.body.firstChild);
+    $('#vzReset').onclick = function () { location.reload(); };
+  }
+  function start() {
+    (spec.open || []).forEach(function (s) { resolve(s).forEach(function (d) { d.open = true; d.classList.add('vz-pinned'); }); });   // stays open: its heading cannot fold the figure away
+    (spec.click || []).forEach(function (s) { var e = $(s); if (e) e.click(); });
+    setParams();
+    makeHead();
+    document.body.classList.add('vz-stage');
+    isolate();
+    fit(true);
+    var settled = false;
+    setTimeout(function () { fit(true); settled = true; }, 1200);   // late drawing: choose the scale once more, then keep it
+    document.documentElement.classList.remove('vz-w-loading');
+    var pending = null;
+    new MutationObserver(function (muts) {
+      if (applying) return;
+      var outside = muts.some(function (m) {
+        var t = m.target.nodeType === 1 ? m.target : m.target.parentElement;
+        return t && !t.closest('.vz-keep') && t !== head && !(head && head.contains(t));
+      });
+      if (!outside) return;
+      clearTimeout(pending); pending = setTimeout(function () { isolate(); fit(!settled); }, 40);
+    }).observe(document.body, { childList: true, subtree: true });
+    if (window.ResizeObserver) new ResizeObserver(function () { fit(!settled); }).observe(document.body);
+    window.addEventListener('resize', function () { if (!lock || lock.vw !== window.innerWidth || lock.vh !== window.innerHeight) fit(true); });
+    window.addEventListener('keydown', keyGuard, true);
+    window.addEventListener('message', function (ev) {
+      if (ev.source !== window.parent) return;   // only the page this widget sits in may reset it
+      var d = ev.data || {};
+      if (d.type === 'vz-reset') location.reload();
+      if (d.type === 'vz-view') document.documentElement.classList.toggle('vz-presenting', !!d.presenting);
+    });
+    if (!ready) { ready = true; var ps = {}; (spec.params || []).forEach(function (p) {   // the values the widget really shows
+        var e = p.input ? $(p.input) : null, v = V.query.get(p.key);
+        ps[p.key] = e ? (e.type === 'checkbox' ? (e.checked ? '1' : '0') : e.value) : (V.valid(p, v) ? v : p['default']);
+      });
+      post({ type: 'vz-widget-ready', app: R.app, widget: spec.name, title: spec.title, params: ps }); }
+  }
+  function boot() { setTimeout(function () { requestAnimationFrame(function () { requestAnimationFrame(start); }); }, spec.wait || 30); }
+  if (document.readyState === 'complete') boot(); else window.addEventListener('load', boot);
+
+  /* ===================================================== page for a name that is not on the list */
+  function showUnknown(why) {
+    $$('body > *').forEach(function (e) { if (e.tagName !== 'SCRIPT' && e.tagName !== 'STYLE') e.classList.add('vz-hide'); });
+    var d = document.createElement('div');
+    d.className = 'card vz-note';
+    d.innerHTML = '<h2>No widget here<\/h2><p>' + esc(why || ('This app has no widget named "' + V.name + '".')) + '<\/p>' +
+      '<p><a href="' + esc(location.pathname) + '?widget=list">See all of this app\'s widgets<\/a><\/p>';
+    document.body.appendChild(d);
+    document.documentElement.classList.remove('vz-w-loading');
+    document.documentElement.style.overflow = 'auto';
+  }
+
+  /* ===================================================== the instructors' widget links page */
+  function showList() {
+    document.documentElement.classList.add('vz-list');
+    var data = listData();
+    if (V.data) post(data);
+    window.addEventListener('message', function (ev) { if (ev.source === window.parent && ev.data && ev.data.type === 'vz-get-list') post(data); });
+    function render() {
+      $$('body > *').forEach(function (e) { if (e.tagName !== 'SCRIPT' && e.tagName !== 'STYLE' && e.id !== 'vzList') e.classList.add('vz-hide'); });
+      var groups = [], by = {};
+      R.widgets.forEach(function (w) { if (!by[w.group]) { by[w.group] = []; groups.push(w.group); } by[w.group].push(w); });
+      var html = '<h1>' + esc(R.app) + ': slide widget links<\/h1>' +
+        '<div class="card vz-howto"><p>Each widget is one figure from this app with its own controls, sized to fill a slide. Copy a link and:<\/p><ul>' +
+        '<li><b>In PowerPoint:<\/b> insert the Visualizer Slides add-in on a slide, choose Change link, and paste it.<\/li>' +
+        '<li><b>Anywhere else:<\/b> open it in a browser, use it as a link on a slide, or put it in a QR (Quick Response) code.<\/li>' +
+        '<li><b>Starting values:<\/b> add them to the end of the link, for example <code>&amp;' + esc(exampleParam()) + '<\/code>. Values that are missing or out of range use the defaults.<\/li><\/ul>' +
+        '<div class="row"><button class="btn small" id="vzCopyAll" type="button">Copy all links<\/button><a class="btn alt small" href="' + esc(location.pathname) + '" id="vzBack">← Back to the app<\/a><\/div><\/div>';
+      groups.forEach(function (g) {
+        html += '<h2>' + esc(g) + '<\/h2>';
+        by[g].forEach(function (w) {
+          var ps = (w.params || []).map(function (p) {
+            var range = p.options ? 'one of ' + p.options.map(function (o) { return o.value; }).join(', ') : (p.min !== undefined ? p.min + ' to ' + p.max : '');
+            return '<code>' + esc(p.key) + '<\/code>: ' + esc(p.label) + ' (default ' + esc(p['default']) + (range ? '; ' + esc(range) : '') + ')';
+          });
+          html += '<div class="card vz-item" data-w="' + esc(w.name) + '"><h3>' + esc(w.title) + '<\/h3>' +
+            (ps.length ? '<p class="vz-params">Starting values: ' + ps.join('; ') + '<\/p>' : '<p class="vz-params">No starting values.<\/p>') +
+            '<span class="vz-link">' + esc(linkFor(w)) + '<\/span>' +
+            '<div class="row"><button class="btn small vz-copy" type="button">Copy link<\/button>' +
+            '<a class="btn alt small" target="_blank" rel="noopener" href="' + esc(linkFor(w, true)) + '">Open<\/a>' +
+            '<button class="btn alt small vz-pv" type="button" aria-expanded="false">Preview<\/button><\/div><\/div>';
+        });
+      });
+      var box = document.createElement('div'); box.id = 'vzList'; box.innerHTML = html;
+      document.body.appendChild(box);
+      $('#vzCopyAll').onclick = function () {
+        copy(R.widgets.map(function (w) { return w.group + ' / ' + w.title + '\n' + linkFor(w); }).join('\n\n'), $('#vzCopyAll'));
+      };
+      $$('.vz-item', box).forEach(function (it) {
+        var w = R.widgets.filter(function (x) { return x.name === it.getAttribute('data-w'); })[0];
+        $('.vz-copy', it).onclick = function () { copy(linkFor(w), $('.vz-copy', it)); };
+        $('.vz-pv', it).onclick = function () {
+          var b = $('.vz-pv', it), f = $('iframe', it);
+          if (f) { f.parentNode.removeChild(f); b.setAttribute('aria-expanded', 'false'); b.textContent = 'Preview'; return; }
+          f = document.createElement('iframe'); f.className = 'vz-prev'; f.title = 'Preview: ' + w.title; f.src = linkFor(w, true);
+          it.appendChild(f); b.setAttribute('aria-expanded', 'true'); b.textContent = 'Hide preview';
+        };
+      });
+      document.documentElement.classList.remove('vz-w-loading');
+    }
+    function exampleParam() {
+      for (var i = 0; i < R.widgets.length; i++) { var p = (R.widgets[i].params || [])[0]; if (p) return p.key + '=' + (p.options ? p.options[p.options.length - 1].value : p['default']); }
+      return 'name=value';
+    }
+    if (document.readyState === 'complete') setTimeout(render, 0); else window.addEventListener('load', function () { setTimeout(render, 0); });
+  }
+})();
+</script>
+<!-- vz-widgets:end body -->
 </body>
 </html>
